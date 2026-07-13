@@ -38,6 +38,11 @@ class Product_model extends CI_Model
         return $this->db->where('id', $id)->get($this->table)->row_array();
     }
 
+    public function get_by_sku($sku)
+    {
+        return $this->db->where('sku', $sku)->get($this->table)->row_array();
+    }
+
     public function create($data)
     {
         $this->db->insert($this->table, $data);

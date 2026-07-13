@@ -19,7 +19,7 @@ body{
 .btn-outline-brand:hover{ background-color: var(--brand); color:#fff; }
 
 /* ---------- Touch-friendly base (mobile customers) ---------- */
-.btn, .form-control, .form-select{ min-height: 44px; padding-top: 10px; }
+.btn, .form-control, .form-select{ padding: 10px 5px; }
 .btn-icon{ width:44px; height:44px; padding:0; display:inline-flex; align-items:center; justify-content:center; }
 
 /* ---------- Table layout grid ---------- */
@@ -120,6 +120,43 @@ body{
 }
 .kds-item-note{ font-size:.8em; color:#888; font-weight:400; }
 .kds-item-qty{ flex:0 0 auto; font-weight:700; font-size:.85rem; color: var(--brand); min-width:1.8em; text-align:center; }
+
+/* ---------- Booking calendar (lịch đặt sân) ---------- */
+.calendar-day{ display:flex; align-items:flex-start; }
+.calendar-gutter{ width:46px; flex:0 0 46px; position:relative; }
+.calendar-gutter-label{ position:absolute; right:6px; font-size:.7rem; color:#888; transform:translateY(-50%); white-space:nowrap; }
+.calendar-courts{ flex:1 1 auto; display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; }
+.calendar-court-col{ flex:1 0 150px; min-width:150px; }
+.calendar-court-header{
+  font-weight:600; text-align:center; padding:8px 4px; background:#fff; font-size:.85rem;
+  border:1px solid #eee; border-bottom:none; border-radius:.5rem .5rem 0 0;
+}
+.calendar-court-body{ position:relative; background:#fff; border:1px solid #eee; border-radius:0 0 .5rem .5rem; cursor:pointer; }
+.calendar-hour-line{ position:absolute; left:0; right:0; border-top:1px dashed #eee; pointer-events:none; }
+.calendar-booking{
+  position:absolute; left:2px; right:2px; border-radius:5px; padding:3px 5px;
+  font-size:.72rem; line-height:1.25; overflow:hidden; color:#fff; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,.15);
+}
+.calendar-booking.status-booked{ background:#0d6efd; }
+.calendar-booking.status-checked_in{ background:#198754; }
+.calendar-booking.status-completed{ background:#6c757d; }
+.calendar-booking-name{ font-weight:700; }
+
+.week-court-row td{ vertical-align:top; }
+.week-chip{
+  display:inline-block; font-size:.72rem; padding:2px 6px; border-radius:999px; color:#fff; margin:1px 2px; cursor:pointer;
+}
+.week-chip.status-booked{ background:#0d6efd; }
+.week-chip.status-checked_in{ background:#198754; }
+.week-chip.status-completed{ background:#6c757d; }
+
+.month-day-cell{
+  min-height:80px; border:1px solid #eee; padding:4px; background:#fff; cursor:pointer;
+}
+.month-day-cell:hover{ background:#f8f9fa; }
+.month-day-cell.is-today{ background: var(--brand-light); }
+.month-day-cell.is-other-month{ opacity:.4; }
+.month-day-number{ font-weight:600; font-size:.85rem; }
 
 /* ---------- Receipt / K80 print ---------- */
 @media print{

@@ -34,6 +34,12 @@ $route['orders/(:num)/checkout'] = 'orders/checkout/$1';
 
 $route['takeaway/create'] = 'takeaway/create';
 
+$route['bookings'] = 'bookings/index';
+$route['bookings/create'] = 'bookings/create';
+$route['bookings/(:num)/cancel'] = 'bookings/cancel/$1';
+$route['bookings/(:num)/checkin'] = 'bookings/checkin/$1';
+$route['bookings/group/(:any)/cancel'] = 'bookings/cancel_group/$1';
+
 $route['kitchen'] = 'kitchen/index';
 $route['kitchen/ticket/(:num)'] = 'kitchen/ticket/$1';
 $route['kitchen/ticket/(:num)/status'] = 'kitchen/update_status/$1';
@@ -68,6 +74,8 @@ $route['categories'] = 'categories/index';
 $route['categories/create'] = 'categories/create';
 $route['categories/(:num)/edit'] = 'categories/edit/$1';
 $route['categories/(:num)/delete'] = 'categories/delete/$1';
+
+$route['settings'] = 'settings/index';
 
 // Customer QR Ordering (public, no auth)
 $route['menu/(:any)'] = 'menu/index/$1';

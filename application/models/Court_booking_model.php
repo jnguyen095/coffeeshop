@@ -1,0 +1,183 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Court_booking_model extends CI_Model
+{
+    protected $table = 'court_bookings';
+
+    /** Khung giờ tính giá — sáng/chiều/tối. Chỉnh ở đây nếu quán đổi giờ hoạt động. */
+    const SLOTS = array(
+        'morning'   => array('label' => 'Sáng',  'start' => '06:00:00', 'end' => '12:00:00'),
+        'afternoon' => array('label' => 'Chiều', 'start' => '12:00:00', 'end' => '18:00:00'),
+        'evening'   => array('label' => 'Tối',   'start' => '18:00:00', 'end' => '23:00:00'),
+    );
+
+    /**
+     * Tính tiền sân cho một khoảng [start_time, end_time), cộng dồn phần thời
+     * lượng rơi vào từng khung giờ nhân với giá của khung đó (một buổi đặt có
+     * thể chạy qua nhiều khung, ví dụ 11:00-13:00 tính nửa giờ giá sáng + 1 giờ giá chiều).
+     */
+    public function calc_fee($table, $start_time, $end_time)
+    {
+        $start = $this->_to_minutes($start_time);
+        $end = $this->_to_minutes($end_time);
+        $rates = array(
+            'morning'   => (float) $table['rate_morning'],
+            'afternoon' => (float) $table['rate_afternoon'],
+            'evening'   => (float) $table['rate_evening'],
+        );
+
+        $fee = 0;
+        foreach (self::SLOTS as $key => $slot)
+        {
+            $slot_start = $this->_to_minutes($slot['start']);
+            $slot_end = $this->_to_minutes($slot['end']);
+            $overlap_minutes = max(0, min($end, $slot_end) - max($start, $slot_start));
+            $fee += ($overlap_minutes / 60) * $rates[$key];
+        }
+        return round($fee);
+    }
+
+    private function _to_minutes($time)
+    {
+        list($h, $m) = array_map('intval', explode(':', $time));
+        return $h * 60 + $m;
+    }
+
+    /** Overlap check: two ranges [start,end) collide iff start1 < end2 AND start2 < end1. */
+    public function has_conflict($table_id, $date, $start_time, $end_time, $exclude_id = NULL)
+    {
+        $this->db->where('table_id', $table_id)
+            ->where('booking_date', $date)
+            ->where_in('status', array('BOOKED', 'CHECKED_IN'))
+            ->where('start_time <', $end_time)
+            ->where('end_time >', $start_time);
+
+        if ($exclude_id)
+        {
+            $this->db->where('id !=', $exclude_id);
+        }
+
+        return $this->db->get($this->table)->num_rows() > 0;
+    }
+
+    public function create_booking($data)
+    {
+        $data['created_at'] = date('Y-m-d H:i:s');
+        $this->db->insert($this->table, $data);
+        return $this->db->insert_id();
+    }
+
+    /**
+     * Creates one booking per matching weekday between $date_from and $date_to
+     * (inclusive), skipping any date that already conflicts. Returns a summary:
+     * ['group_id'=>, 'created'=>[dates], 'skipped'=>[dates]].
+     */
+    public function create_recurring($table_id, $customer_name, $customer_phone, $notes, array $weekdays, $start_time, $end_time, $date_from, $date_to, $created_by)
+    {
+        $group_id = gen_token(32);
+        $created = array();
+        $skipped = array();
+
+        $cursor = strtotime($date_from);
+        $end = strtotime($date_to);
+
+        while ($cursor <= $end)
+        {
+            $day_of_week = (int) date('N', $cursor); // 1 (Mon) - 7 (Sun)
+            if (in_array($day_of_week, $weekdays, TRUE))
+            {
+                $date = date('Y-m-d', $cursor);
+
+                if ($this->has_conflict($table_id, $date, $start_time, $end_time))
+                {
+                    $skipped[] = $date;
+                }
+                else
+                {
+                    $this->create_booking(array(
+                        'table_id'         => $table_id,
+                        'customer_name'    => $customer_name,
+                        'customer_phone'   => $customer_phone,
+                        'booking_date'     => $date,
+                        'start_time'       => $start_time,
+                        'end_time'         => $end_time,
+                        'status'           => 'BOOKED',
+                        'booking_group_id' => $group_id,
+                        'notes'            => $notes,
+                        'created_by'       => $created_by,
+                    ));
+                    $created[] = $date;
+                }
+            }
+            $cursor = strtotime('+1 day', $cursor);
+        }
+
+        return array('group_id' => $group_id, 'created' => $created, 'skipped' => $skipped);
+    }
+
+    public function get_by_id($id)
+    {
+        return $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code, cafe_tables.rate_morning, cafe_tables.rate_afternoon, cafe_tables.rate_evening')
+            ->from($this->table)
+            ->join('cafe_tables', 'cafe_tables.id = court_bookings.table_id')
+            ->where('court_bookings.id', $id)
+            ->get()->row_array();
+    }
+
+    public function get_by_date($date, $table_id = NULL)
+    {
+        $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code')
+            ->from($this->table)
+            ->join('cafe_tables', 'cafe_tables.id = court_bookings.table_id')
+            ->where('court_bookings.booking_date', $date)
+            ->where_in('court_bookings.status', array('BOOKED', 'CHECKED_IN', 'COMPLETED'));
+
+        if ($table_id)
+        {
+            $this->db->where('court_bookings.table_id', $table_id);
+        }
+
+        return $this->db->order_by('cafe_tables.table_code', 'ASC')->order_by('court_bookings.start_time', 'ASC')->get()->result_array();
+    }
+
+    /** Dùng cho lịch xem theo Tuần/Tháng — mọi lịch đặt còn hiệu lực trong khoảng ngày. */
+    public function get_by_range($date_from, $date_to)
+    {
+        return $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code')
+            ->from($this->table)
+            ->join('cafe_tables', 'cafe_tables.id = court_bookings.table_id')
+            ->where('court_bookings.booking_date >=', $date_from)
+            ->where('court_bookings.booking_date <=', $date_to)
+            ->where_in('court_bookings.status', array('BOOKED', 'CHECKED_IN', 'COMPLETED'))
+            ->order_by('court_bookings.booking_date', 'ASC')
+            ->order_by('court_bookings.start_time', 'ASC')
+            ->get()->result_array();
+    }
+
+    public function get_by_group($group_id)
+    {
+        return $this->db->where('booking_group_id', $group_id)
+            ->where_in('status', array('BOOKED', 'CHECKED_IN'))
+            ->order_by('booking_date', 'ASC')
+            ->get($this->table)->result_array();
+    }
+
+    public function cancel($id)
+    {
+        return $this->db->where('id', $id)->where('status', 'BOOKED')->update($this->table, array('status' => 'CANCELLED'));
+    }
+
+    public function cancel_group($group_id)
+    {
+        return $this->db->where('booking_group_id', $group_id)->where('status', 'BOOKED')->update($this->table, array('status' => 'CANCELLED'));
+    }
+
+    public function mark_checked_in($id, $table_session_id)
+    {
+        return $this->db->where('id', $id)->update($this->table, array(
+            'status'           => 'CHECKED_IN',
+            'table_session_id' => $table_session_id,
+        ));
+    }
+}

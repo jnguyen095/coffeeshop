@@ -50,12 +50,10 @@ class Tables extends MY_Controller
             return;
         }
 
-        $this->Table_session_model->close_stray_open_sessions($id);
-        $session_id = $this->Table_session_model->open($id, $this->current_user['id']);
-        $order_id = $this->Order_model->create_for_table_session($session_id);
-        $this->Table_model->set_status($id, 'OPEN');
+        $result = $this->Order_model->open_table_with_order($id, $this->current_user['id']);
+        $order_id = $result['order_id'];
 
-        $this->audit('table', 'OPEN_TABLE', NULL, array('table_id' => $id, 'session_id' => $session_id, 'order_id' => $order_id));
+        $this->audit('table', 'OPEN_TABLE', NULL, array('table_id' => $id, 'session_id' => $result['session_id'], 'order_id' => $order_id));
 
         redirect('orders/'.$order_id);
     }
@@ -194,10 +192,14 @@ class Tables extends MY_Controller
             else
             {
                 $id = $this->Table_model->create(array(
-                    'table_code' => $code,
-                    'table_name' => $this->input->post('table_name', TRUE),
-                    'capacity'   => (int) $this->input->post('capacity'),
-                    'status'     => 'AVAILABLE',
+                    'table_code'     => $code,
+                    'table_name'     => $this->input->post('table_name', TRUE),
+                    'capacity'       => (int) $this->input->post('capacity'),
+                    'table_type'     => $this->input->post('table_type') === 'COURT' ? 'COURT' : 'CAFE',
+                    'rate_morning'   => (float) $this->input->post('rate_morning'),
+                    'rate_afternoon' => (float) $this->input->post('rate_afternoon'),
+                    'rate_evening'   => (float) $this->input->post('rate_evening'),
+                    'status'         => 'AVAILABLE',
                 ));
                 $this->audit('table', 'CREATE', NULL, array('id' => $id));
                 redirect('tables/manage');
@@ -229,9 +231,13 @@ class Tables extends MY_Controller
             else
             {
                 $this->Table_model->update($id, array(
-                    'table_code' => $code,
-                    'table_name' => $this->input->post('table_name', TRUE),
-                    'capacity'   => (int) $this->input->post('capacity'),
+                    'table_code'     => $code,
+                    'table_name'     => $this->input->post('table_name', TRUE),
+                    'capacity'       => (int) $this->input->post('capacity'),
+                    'table_type'     => $this->input->post('table_type') === 'COURT' ? 'COURT' : 'CAFE',
+                    'rate_morning'   => (float) $this->input->post('rate_morning'),
+                    'rate_afternoon' => (float) $this->input->post('rate_afternoon'),
+                    'rate_evening'   => (float) $this->input->post('rate_evening'),
                 ));
                 $this->audit('table', 'UPDATE', $table, array('id' => $id));
                 redirect('tables/manage');

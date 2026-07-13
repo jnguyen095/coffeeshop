@@ -27,6 +27,7 @@
         <?php endif; ?>
         <?php if (in_array($current_user['role'], array('STAFF','CASHIER','ADMIN'), TRUE)): ?>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('takeaway/create'); ?>"><i class="bi bi-bag-check"></i> Bán mang đi</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?php echo site_url('bookings'); ?>"><i class="bi bi-calendar-check"></i> Lịch sân</a></li>
         <?php endif; ?>
         <?php if (in_array($current_user['role'], array('BARISTA','ADMIN'), TRUE)): ?>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('kitchen'); ?>"><i class="bi bi-fire"></i> Bếp (KDS)</a></li>
@@ -44,6 +45,8 @@
             <li><a class="dropdown-item" href="<?php echo site_url('products'); ?>">Sản phẩm</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('users'); ?>">Người dùng</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('reports'); ?>">Báo cáo</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="<?php echo site_url('settings'); ?>"><i class="bi bi-gear"></i> Cài đặt</a></li>
           </ul>
         </li>
         <?php endif; ?>

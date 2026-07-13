@@ -13,8 +13,11 @@
     </div>
   </div>
 
-  <div class="row g-3" id="tablesGrid">
-    <?php foreach ($tables as $t): ?>
+  <?php
+    $cafe_tables = array_filter($tables, function ($t) { return $t['table_type'] !== 'COURT'; });
+    $court_tables = array_filter($tables, function ($t) { return $t['table_type'] === 'COURT'; });
+    $render_table_card = function ($t) {
+  ?>
     <div class="col-6 col-sm-4 col-md-3 col-lg-2" data-table-id="<?php echo $t['id']; ?>">
       <?php if ($t['status'] === 'AVAILABLE'): ?>
         <a href="<?php echo site_url('tables/'.$t['id'].'/open'); ?>" class="text-decoration-none table-link">
@@ -43,10 +46,27 @@
             </button>
         </div>
       </a>
-
     </div>
-    <?php endforeach; ?>
+  <?php
+    };
+  ?>
+
+  <?php if ($cafe_tables): ?>
+  <h6 class="fw-bold text-muted mb-2"><i class="bi bi-cup-hot"></i> Bàn cafe</h6>
+  <div class="row g-3 mb-4" id="tablesGrid">
+    <?php foreach ($cafe_tables as $t) $render_table_card($t); ?>
   </div>
+  <?php endif; ?>
+
+  <?php if ($court_tables): ?>
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h6 class="fw-bold text-muted mb-0"><i class="bi bi-dribbble"></i> Sân pickleball</h6>
+    <a href="<?php echo site_url('bookings'); ?>" class="btn btn-sm btn-outline-brand"><i class="bi bi-calendar-check"></i> Lịch đặt sân</a>
+  </div>
+  <div class="row g-3" id="courtsGrid">
+    <?php foreach ($court_tables as $t) $render_table_card($t); ?>
+  </div>
+  <?php endif; ?>
 </div>
 
 <!-- QR popup (thay vì mở trang mới) -->

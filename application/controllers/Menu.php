@@ -111,13 +111,10 @@ class Menu extends CI_Controller
      */
     private function _auto_open_table(&$table)
     {
-        $this->Table_session_model->close_stray_open_sessions($table['id']);
-        $session_id = $this->Table_session_model->open($table['id']);
-        $this->Order_model->create_for_table_session($session_id);
-        $this->Table_model->set_status($table['id'], 'OPEN');
+        $result = $this->Order_model->open_table_with_order($table['id']);
 
         $this->load->model('Audit_log_model');
-        $this->Audit_log_model->log('table', 'AUTO_OPEN_TABLE', NULL, array('table_id' => $table['id'], 'session_id' => $session_id));
+        $this->Audit_log_model->log('table', 'AUTO_OPEN_TABLE', NULL, array('table_id' => $table['id'], 'session_id' => $result['session_id']));
 
         $table['status'] = 'OPEN';
     }

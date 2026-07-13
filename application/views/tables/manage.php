@@ -10,13 +10,19 @@
 
   <div class="table-responsive">
     <table class="table bg-white shadow-sm rounded align-middle">
-      <thead class="table-light"><tr><th>Mã bàn</th><th>Tên bàn</th><th class="text-end">Sức chứa</th><th>Trạng thái</th><th></th></tr></thead>
+      <thead class="table-light"><tr><th>Mã bàn</th><th>Tên bàn</th><th>Loại</th><th class="text-end">Sức chứa</th><th>Giá/giờ (Sáng/Chiều/Tối)</th><th>Trạng thái</th><th></th></tr></thead>
       <tbody>
       <?php foreach ($tables as $t): ?>
         <tr>
           <td><?php echo htmlspecialchars($t['table_code']); ?></td>
           <td><?php echo htmlspecialchars($t['table_name']); ?></td>
+          <td><?php echo $t['table_type'] === 'COURT' ? '<span class="badge bg-info-subtle text-info-emphasis"><i class="bi bi-dribbble"></i> Sân</span>' : '<span class="badge bg-light text-dark"><i class="bi bi-cup-hot"></i> Bàn cafe</span>'; ?></td>
           <td class="text-end"><?php echo $t['capacity']; ?></td>
+          <td class="small">
+            <?php if ($t['table_type'] === 'COURT'): ?>
+              <?php echo money_format_vnd($t['rate_morning']); ?> / <?php echo money_format_vnd($t['rate_afternoon']); ?> / <?php echo money_format_vnd($t['rate_evening']); ?>
+            <?php else: ?>—<?php endif; ?>
+          </td>
           <td><span class="badge bg-<?php echo table_status_badge($t['status']); ?>"><?php echo $t['status']; ?></span></td>
           <td class="text-nowrap">
             <a href="<?php echo site_url('tables/manage/'.$t['id'].'/edit'); ?>" class="btn btn-sm btn-outline-primary">Sửa</a>
@@ -34,7 +40,7 @@
         </tr>
       <?php endforeach; ?>
       <?php if (empty($tables)): ?>
-        <tr><td colspan="5" class="text-center text-muted py-4">Chưa có bàn nào.</td></tr>
+        <tr><td colspan="7" class="text-center text-muted py-4">Chưa có bàn nào.</td></tr>
       <?php endif; ?>
       </tbody>
     </table>

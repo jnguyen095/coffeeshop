@@ -10,6 +10,11 @@ class Table_model extends CI_Model
         return $this->db->order_by('table_code', 'ASC')->get($this->table)->result_array();
     }
 
+    public function get_courts()
+    {
+        return $this->db->where('table_type', 'COURT')->order_by('table_code', 'ASC')->get($this->table)->result_array();
+    }
+
     public function get_by_id($id)
     {
         return $this->db->where('id', $id)->get($this->table)->row_array();

@@ -4,7 +4,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Order_model extends CI_Model
 {
     protected $table = 'order_sessions';
-    const VAT_RATE = 0.08;
 
     public function create_for_table_session($table_session_id)
     {
@@ -21,6 +20,24 @@ class Order_model extends CI_Model
         );
         $this->db->insert($this->table, $data);
         return $this->db->insert_id();
+    }
+
+    /**
+     * Shared "open a table" orchestration — used by staff opening a table
+     * manually, a customer auto-opening via QR, and court booking check-in.
+     * Closes any stray OPEN sessions first, opens a fresh one, creates its
+     * order, and flips the table to OPEN. Returns ['session_id'=>, 'order_id'=>].
+     */
+    public function open_table_with_order($table_id, $opened_by = NULL)
+    {
+        $this->load->model(array('Table_model', 'Table_session_model'));
+
+        $this->Table_session_model->close_stray_open_sessions($table_id);
+        $session_id = $this->Table_session_model->open($table_id, $opened_by);
+        $order_id = $this->create_for_table_session($session_id);
+        $this->Table_model->set_status($table_id, 'OPEN');
+
+        return array('session_id' => $session_id, 'order_id' => $order_id);
     }
 
     /** Takeaway order: no table, no table_session — just a standalone bill. */
@@ -72,7 +89,8 @@ class Order_model extends CI_Model
             ->where('status', 'ACTIVE')
             ->get('order_items')->row('amount');
 
-        $vat = round($subtotal * self::VAT_RATE);
+        $this->load->model('Setting_model');
+        $vat = round($subtotal * $this->Setting_model->get_vat_rate());
         $total = $subtotal - (float) $order['discount_amount'] + $vat;
 
         $this->db->where('id', $order_id)->update($this->table, array(
