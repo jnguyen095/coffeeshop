@@ -50,7 +50,7 @@ class Cashier extends MY_Controller
         if ($order && $order['status'] === 'OPEN')
         {
             $this->Order_model->mark_wait_payment($id);
-            $this->Table_model->set_status($order['table_id'], 'WAIT_PAYMENT');
+            if ($order['table_id']) $this->Table_model->set_status($order['table_id'], 'WAIT_PAYMENT');
             $this->audit('order', 'CLOSE_BILL', NULL, array('order_id' => $id));
         }
         redirect('cashier/'.$id);
@@ -78,8 +78,12 @@ class Cashier extends MY_Controller
         $this->Order_model->mark_paid($id);
 
         // Bàn tự động về trống ngay sau khi thanh toán — không cần nhân viên bấm "Đóng bàn".
-        $this->Table_session_model->close($order['table_session_id']);
-        $this->Table_model->set_status($order['table_id'], 'AVAILABLE');
+        // Đơn mang đi không có bàn/table_session nên bỏ qua bước này.
+        if ($order['table_session_id'])
+        {
+            $this->Table_session_model->close($order['table_session_id']);
+            $this->Table_model->set_status($order['table_id'], 'AVAILABLE');
+        }
 
         $this->audit('payment', 'PAY', NULL, array('order_id' => $id, 'payment_id' => $payment_id, 'method' => $method));
 

@@ -25,6 +25,9 @@
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('tables'); ?>"><i class="bi bi-grid-3x3-gap"></i> Bàn</a></li>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('orders'); ?>"><i class="bi bi-receipt"></i> Đơn hàng</a></li>
         <?php endif; ?>
+        <?php if (in_array($current_user['role'], array('STAFF','CASHIER','ADMIN'), TRUE)): ?>
+        <li class="nav-item"><a class="nav-link" href="<?php echo site_url('takeaway/create'); ?>"><i class="bi bi-bag-check"></i> Bán mang đi</a></li>
+        <?php endif; ?>
         <?php if (in_array($current_user['role'], array('BARISTA','ADMIN'), TRUE)): ?>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('kitchen'); ?>"><i class="bi bi-fire"></i> Bếp (KDS)</a></li>
         <?php endif; ?>

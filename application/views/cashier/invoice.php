@@ -25,7 +25,7 @@ td{ vertical-align:top; padding:2px 0; }
   <div class="center">HÓA ĐƠN BÁN HÀNG</div>
   <hr>
   <div>Số HĐ: <?php echo htmlspecialchars($order['order_no']); ?></div>
-  <div>Bàn: <?php echo htmlspecialchars($order['table_name']); ?></div>
+  <div><?php echo $order['table_name'] ? 'Bàn: '.htmlspecialchars($order['table_name']) : 'Mang đi'; ?></div>
   <div>Thời gian: <?php echo date('d/m/Y H:i', strtotime($order['paid_at'])); ?></div>
   <hr>
   <table>

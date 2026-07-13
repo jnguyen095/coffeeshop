@@ -9,7 +9,7 @@
           <?php foreach ($open_orders as $o): ?>
           <div class="list-group-item d-flex justify-content-between align-items-center">
             <div>
-              <div class="fw-semibold"><?php echo htmlspecialchars($o['table_name']); ?></div>
+              <div class="fw-semibold"><?php echo $o['table_name'] ? htmlspecialchars($o['table_name']) : '<i class="bi bi-bag-check"></i> Mang đi'; ?></div>
               <div class="small text-muted">#<?php echo htmlspecialchars($o['order_no']); ?> — <?php echo money_format_vnd($o['total_amount']); ?></div>
             </div>
             <?php echo form_open('cashier/'.$o['id'].'/close-bill'); ?>
@@ -31,7 +31,7 @@
           <?php foreach ($wait_orders as $o): ?>
           <a href="<?php echo site_url('cashier/'.$o['id']); ?>" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
             <div>
-              <div class="fw-semibold"><?php echo htmlspecialchars($o['table_name']); ?></div>
+              <div class="fw-semibold"><?php echo $o['table_name'] ? htmlspecialchars($o['table_name']) : '<i class="bi bi-bag-check"></i> Mang đi'; ?></div>
               <div class="small text-muted">#<?php echo htmlspecialchars($o['order_no']); ?></div>
             </div>
             <div class="fw-bold text-brand"><?php echo money_format_vnd($o['total_amount']); ?></div>

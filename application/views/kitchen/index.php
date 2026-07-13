@@ -58,9 +58,10 @@ function ticketCard(t){
     actionBtn = '<button class="btn btn-success btn-sm w-100" onclick="advanceTicket('+t.id+',\'COMPLETED\')">Hoàn thành</button>';
   }
 
+  var label = t.table_name ? escapeHtml(t.table_name) : '<i class="bi bi-bag-check"></i> Mang đi';
   return '<div class="card kds-ticket '+cls+' mb-3">'+
     '<div class="card-header d-flex justify-content-between">'+
-      '<span>'+escapeHtml(t.table_name)+'</span><span class="small text-muted">#'+escapeHtml(t.order_no)+'</span>'+
+      '<span>'+label+'</span><span class="small text-muted">#'+escapeHtml(t.order_no)+'</span>'+
     '</div>'+
     '<div class="card-body">'+
       '<div class="mb-2">'+itemsHtml+'</div>'+

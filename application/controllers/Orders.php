@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Orders extends MY_Controller
 {
-    protected $allowed_roles = array('STAFF', 'ADMIN');
+    protected $allowed_roles = array('STAFF', 'CASHIER', 'ADMIN');
 
     public function __construct()
     {
@@ -105,5 +105,20 @@ class Orders extends MY_Controller
         $this->Order_model->recalc_totals($order_id);
         $this->audit('order_item', 'CANCEL_ITEM', NULL, array('item_id' => $item_id));
         redirect('orders/'.$order_id);
+    }
+
+    /**
+     * "Thanh toán" trên đơn mang đi: không có bàn để đóng bill qua Sơ đồ bàn,
+     * nên chốt đơn (OPEN -> WAIT_PAYMENT) ngay tại đây rồi chuyển sang thu ngân.
+     */
+    public function checkout($order_id)
+    {
+        $order = $this->Order_model->get_by_id($order_id);
+        if ($order && $order['status'] === 'OPEN')
+        {
+            $this->Order_model->mark_wait_payment($order_id);
+            $this->audit('order', 'CHECKOUT', NULL, array('order_id' => $order_id));
+        }
+        redirect('cashier/'.$order_id);
     }
 }

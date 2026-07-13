@@ -1,11 +1,14 @@
 <div class="container-fluid py-3 py-md-4">
   <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h4 class="fw-bold mb-0">Danh sách đơn hàng</h4>
-    <div class="btn-group btn-group-sm">
-      <a href="<?php echo site_url('orders'); ?>" class="btn btn-outline-secondary <?php echo ! $status ? 'active' : ''; ?>">Tất cả</a>
-      <a href="<?php echo site_url('orders?status=OPEN'); ?>" class="btn btn-outline-primary <?php echo $status==='OPEN' ? 'active' : ''; ?>">Đang mở</a>
-      <a href="<?php echo site_url('orders?status=WAIT_PAYMENT'); ?>" class="btn btn-outline-warning <?php echo $status==='WAIT_PAYMENT' ? 'active' : ''; ?>">Chờ TT</a>
-      <a href="<?php echo site_url('orders?status=PAID'); ?>" class="btn btn-outline-success <?php echo $status==='PAID' ? 'active' : ''; ?>">Đã TT</a>
+    <div class="d-flex gap-2 flex-wrap">
+      <div class="btn-group btn-group-sm">
+        <a href="<?php echo site_url('orders'); ?>" class="btn btn-outline-secondary <?php echo ! $status ? 'active' : ''; ?>">Tất cả</a>
+        <a href="<?php echo site_url('orders?status=OPEN'); ?>" class="btn btn-outline-primary <?php echo $status==='OPEN' ? 'active' : ''; ?>">Đang mở</a>
+        <a href="<?php echo site_url('orders?status=WAIT_PAYMENT'); ?>" class="btn btn-outline-warning <?php echo $status==='WAIT_PAYMENT' ? 'active' : ''; ?>">Chờ TT</a>
+        <a href="<?php echo site_url('orders?status=PAID'); ?>" class="btn btn-outline-success <?php echo $status==='PAID' ? 'active' : ''; ?>">Đã TT</a>
+      </div>
+      <a href="<?php echo site_url('takeaway/create'); ?>" class="btn btn-sm btn-brand"><i class="bi bi-bag-check"></i> Bán mang đi</a>
     </div>
   </div>
 
@@ -18,7 +21,7 @@
       <?php foreach ($orders as $o): ?>
         <tr>
           <td><?php echo htmlspecialchars($o['order_no']); ?></td>
-          <td><?php echo htmlspecialchars($o['table_name']); ?></td>
+          <td><?php echo $o['table_name'] ? htmlspecialchars($o['table_name']) : '<span class="badge bg-secondary"><i class="bi bi-bag-check"></i> Mang đi</span>'; ?></td>
           <td class="text-end"><?php echo money_format_vnd($o['total_amount']); ?></td>
           <td><span class="badge bg-<?php echo order_status_badge($o['status']); ?>"><?php echo $o['status']; ?></span></td>
           <td class="small text-muted"><?php echo date('d/m H:i', strtotime($o['created_at'])); ?></td>

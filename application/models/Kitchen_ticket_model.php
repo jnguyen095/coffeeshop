@@ -70,9 +70,9 @@ class Kitchen_ticket_model extends CI_Model
 
     private function _tickets_by_status($statuses, $order_col, $order_dir)
     {
-        return $this->db->select('kitchen_tickets.*, cafe_tables.table_name, cafe_tables.table_code, order_sessions.order_no')
+        return $this->db->select('kitchen_tickets.*, cafe_tables.table_name, cafe_tables.table_code, order_sessions.order_no, order_sessions.order_type')
             ->from($this->table)
-            ->join('cafe_tables', 'cafe_tables.id = kitchen_tickets.table_id')
+            ->join('cafe_tables', 'cafe_tables.id = kitchen_tickets.table_id', 'left')
             ->join('order_sessions', 'order_sessions.id = kitchen_tickets.order_session_id')
             ->where_in('kitchen_tickets.status', $statuses)
             ->order_by($order_col, $order_dir)
@@ -81,9 +81,9 @@ class Kitchen_ticket_model extends CI_Model
 
     public function get_ticket($id)
     {
-        $ticket = $this->db->select('kitchen_tickets.*, cafe_tables.table_name, cafe_tables.table_code, order_sessions.order_no')
+        $ticket = $this->db->select('kitchen_tickets.*, cafe_tables.table_name, cafe_tables.table_code, order_sessions.order_no, order_sessions.order_type')
             ->from($this->table)
-            ->join('cafe_tables', 'cafe_tables.id = kitchen_tickets.table_id')
+            ->join('cafe_tables', 'cafe_tables.id = kitchen_tickets.table_id', 'left')
             ->join('order_sessions', 'order_sessions.id = kitchen_tickets.order_session_id')
             ->where('kitchen_tickets.id', $id)
             ->get()->row_array();

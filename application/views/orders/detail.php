@@ -1,14 +1,32 @@
 <div class="container-fluid py-3 py-md-4">
   <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
     <div>
-      <h4 class="fw-bold mb-0"><?php echo htmlspecialchars($order['table_name']); ?> <span class="text-muted fs-6">#<?php echo htmlspecialchars($order['order_no']); ?></span></h4>
+      <h4 class="fw-bold mb-0">
+        <?php if ($order['order_type'] === 'TAKEAWAY'): ?>
+          <i class="bi bi-bag-check text-brand"></i> Mang đi
+        <?php else: ?>
+          <?php echo htmlspecialchars($order['table_name']); ?>
+        <?php endif; ?>
+        <span class="text-muted fs-6">#<?php echo htmlspecialchars($order['order_no']); ?></span>
+      </h4>
       <span class="badge bg-<?php echo order_status_badge($order['status']); ?>"><?php echo $order['status']; ?></span>
     </div>
     <div class="btn-group btn-group-sm flex-wrap">
-      <a href="<?php echo site_url('tables/'.$order['table_id'].'/transfer'); ?>" class="btn btn-outline-secondary"><i class="bi bi-arrow-left-right"></i> Chuyển bàn</a>
-      <a href="<?php echo site_url('tables/'.$order['table_id'].'/merge'); ?>" class="btn btn-outline-secondary"><i class="bi bi-union"></i> Gộp bàn</a>
-      <a href="<?php echo site_url('tables/'.$order['table_id'].'/print-provisional'); ?>" target="_blank" class="btn btn-outline-dark"><i class="bi bi-printer"></i> In tạm tính</a>
-      <a href="<?php echo site_url('tables'); ?>" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Sơ đồ bàn</a>
+      <?php if ($order['order_type'] === 'TAKEAWAY'): ?>
+        <?php if ($order['status'] === 'OPEN'): ?>
+        <?php echo form_open('orders/'.$order['id'].'/checkout', array('class' => 'd-inline')); ?>
+          <button class="btn btn-brand"><i class="bi bi-cash-coin"></i> Thanh toán</button>
+        <?php echo form_close(); ?>
+        <?php else: ?>
+        <a href="<?php echo site_url('cashier/'.$order['id']); ?>" class="btn btn-brand"><i class="bi bi-cash-coin"></i> Thu ngân</a>
+        <?php endif; ?>
+        <a href="<?php echo site_url('takeaway/create'); ?>" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Bán mang đi</a>
+      <?php else: ?>
+        <a href="<?php echo site_url('tables/'.$order['table_id'].'/transfer'); ?>" class="btn btn-outline-secondary"><i class="bi bi-arrow-left-right"></i> Chuyển bàn</a>
+        <a href="<?php echo site_url('tables/'.$order['table_id'].'/merge'); ?>" class="btn btn-outline-secondary"><i class="bi bi-union"></i> Gộp bàn</a>
+        <a href="<?php echo site_url('tables/'.$order['table_id'].'/print-provisional'); ?>" target="_blank" class="btn btn-outline-dark"><i class="bi bi-printer"></i> In tạm tính</a>
+        <a href="<?php echo site_url('tables'); ?>" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Sơ đồ bàn</a>
+      <?php endif; ?>
     </div>
   </div>
 

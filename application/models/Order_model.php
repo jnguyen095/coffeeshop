@@ -10,7 +10,26 @@ class Order_model extends CI_Model
     {
         $data = array(
             'order_no'          => gen_no('ORD'),
+            'order_type'        => 'DINE_IN',
             'table_session_id'  => $table_session_id,
+            'status'            => 'OPEN',
+            'subtotal'          => 0,
+            'discount_amount'   => 0,
+            'vat_amount'        => 0,
+            'total_amount'      => 0,
+            'created_at'        => date('Y-m-d H:i:s'),
+        );
+        $this->db->insert($this->table, $data);
+        return $this->db->insert_id();
+    }
+
+    /** Takeaway order: no table, no table_session — just a standalone bill. */
+    public function create_takeaway()
+    {
+        $data = array(
+            'order_no'          => gen_no('TA'),
+            'order_type'        => 'TAKEAWAY',
+            'table_session_id'  => NULL,
             'status'            => 'OPEN',
             'subtotal'          => 0,
             'discount_amount'   => 0,
@@ -88,8 +107,8 @@ class Order_model extends CI_Model
     {
         return $this->db->select('order_sessions.*, table_sessions.table_id, cafe_tables.table_name, cafe_tables.table_code')
             ->from($this->table)
-            ->join('table_sessions', 'table_sessions.id = order_sessions.table_session_id')
-            ->join('cafe_tables', 'cafe_tables.id = table_sessions.table_id')
+            ->join('table_sessions', 'table_sessions.id = order_sessions.table_session_id', 'left')
+            ->join('cafe_tables', 'cafe_tables.id = table_sessions.table_id', 'left')
             ->where('order_sessions.id', $id)
             ->get()->row_array();
     }
@@ -98,8 +117,8 @@ class Order_model extends CI_Model
     {
         $this->db->select('order_sessions.*, cafe_tables.table_name, cafe_tables.table_code')
             ->from($this->table)
-            ->join('table_sessions', 'table_sessions.id = order_sessions.table_session_id')
-            ->join('cafe_tables', 'cafe_tables.id = table_sessions.table_id');
+            ->join('table_sessions', 'table_sessions.id = order_sessions.table_session_id', 'left')
+            ->join('cafe_tables', 'cafe_tables.id = table_sessions.table_id', 'left');
 
         if ( ! empty($filters['status']))
         {

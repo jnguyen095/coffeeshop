@@ -3,7 +3,7 @@
 
   <div class="card border-0 shadow-sm rounded-4 mb-3">
     <div class="card-header bg-white d-flex justify-content-between">
-      <span class="fw-semibold"><?php echo htmlspecialchars($order['table_name']); ?> — #<?php echo htmlspecialchars($order['order_no']); ?></span>
+      <span class="fw-semibold"><?php echo $order['table_name'] ? htmlspecialchars($order['table_name']) : '<i class="bi bi-bag-check"></i> Mang đi'; ?> — #<?php echo htmlspecialchars($order['order_no']); ?></span>
       <span class="badge bg-<?php echo order_status_badge($order['status']); ?>"><?php echo $order['status']; ?></span>
     </div>
     <div class="list-group list-group-flush">
@@ -40,7 +40,7 @@
           </div>
           <div class="mb-3" id="receivedGroup">
             <label class="form-label">Khách đưa</label>
-            <input type="number" name="received_amount" id="receivedAmount" class="form-control form-control-lg" value="<?php echo (int) $order['total_amount']; ?>" min="0" step="1000">
+            <input type="number" name="received_amount" id="receivedAmount" class="form-control form-control-lg" value="<?php echo (int) $order['total_amount']; ?>">
           </div>
           <div class="mb-3 fs-5">
             Tiền thối lại: <span class="fw-bold text-success" id="changeAmount">0đ</span>
@@ -50,7 +50,7 @@
       </div>
     </div>
   <?php elseif ($order['status'] === 'PAID'): ?>
-    <div class="alert alert-success"><i class="bi bi-check-circle"></i> Đã thanh toán — bàn đã tự động về trống.</div>
+    <div class="alert alert-success"><i class="bi bi-check-circle"></i> Đã thanh toán<?php echo $order['table_name'] ? ' — bàn đã tự động về trống.' : '.'; ?></div>
     <div class="d-grid gap-2">
       <a href="<?php echo site_url('cashier/'.$order['id'].'/invoice'); ?>" target="_blank" class="btn btn-brand btn-lg"><i class="bi bi-printer"></i> In hóa đơn</a>
     </div>
@@ -66,7 +66,7 @@ function calcChange(){
   changeSpan.textContent = change.toLocaleString('vi-VN') + 'đ';
 }
 if (receivedInput){
-  receivedInput.addEventListener('input', calcChange);
-  calcChange();
+  //receivedInput.addEventListener('input', calcChange);
+  //calcChange();
 }
 </script>

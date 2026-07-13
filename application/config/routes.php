@@ -30,6 +30,9 @@ $route['orders/(:num)'] = 'orders/detail/$1';
 $route['orders/(:num)/add-item'] = 'orders/add_item/$1';
 $route['orders/(:num)/update-item/(:num)'] = 'orders/update_item/$1/$2';
 $route['orders/(:num)/cancel-item/(:num)'] = 'orders/cancel_item/$1/$2';
+$route['orders/(:num)/checkout'] = 'orders/checkout/$1';
+
+$route['takeaway/create'] = 'takeaway/create';
 
 $route['kitchen'] = 'kitchen/index';
 $route['kitchen/ticket/(:num)'] = 'kitchen/ticket/$1';

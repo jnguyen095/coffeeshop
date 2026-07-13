@@ -3,7 +3,7 @@
 
   <div class="card kds-ticket status-<?php echo strtolower($ticket['status']); ?>">
     <div class="card-header d-flex justify-content-between">
-      <span class="fw-bold"><?php echo htmlspecialchars($ticket['table_name']); ?></span>
+      <span class="fw-bold"><?php echo $ticket['table_name'] ? htmlspecialchars($ticket['table_name']) : '<i class="bi bi-bag-check"></i> Mang đi'; ?></span>
       <span class="text-muted">#<?php echo htmlspecialchars($ticket['order_no']); ?></span>
     </div>
     <div class="card-body">
