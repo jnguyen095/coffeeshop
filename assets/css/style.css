@@ -19,7 +19,7 @@ body{
 .btn-outline-brand:hover{ background-color: var(--brand); color:#fff; }
 
 /* ---------- Touch-friendly base (mobile customers) ---------- */
-.btn, .form-control, .form-select{ min-height: 44px; }
+.btn, .form-control, .form-select{ min-height: 44px; padding-top: 10px; }
 .btn-icon{ width:44px; height:44px; padding:0; display:inline-flex; align-items:center; justify-content:center; }
 
 /* ---------- Table layout grid ---------- */
