@@ -3,6 +3,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 /*
 |--------------------------------------------------------------------------
+| Application Timezone
+|--------------------------------------------------------------------------
+|
+| Set explicitly (rather than relying on php.ini's date.timezone, which is
+| shared across every site on this server) so all timestamps written by
+| date()/time() — order/kitchen ticket times, sessions, audit logs — match
+| the cafe's real local time regardless of the server's global PHP config.
+|
+*/
+date_default_timezone_set('Asia/Ho_Chi_Minh');
+
+/*
+|--------------------------------------------------------------------------
 | Display Debug backtrace
 |--------------------------------------------------------------------------
 |
