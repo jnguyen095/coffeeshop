@@ -143,9 +143,12 @@ body{
 .calendar-booking-name{ font-weight:700; }
 
 .week-court-row td{ vertical-align:top; }
+/* Mỗi lịch đặt 1 dòng riêng, xếp theo thứ tự giờ tăng dần — dễ nhận ra khung giờ trống giữa các dòng. */
 .week-chip{
-  display:inline-block; font-size:.72rem; padding:2px 6px; border-radius:999px; color:#fff; margin:1px 2px; cursor:pointer;
+  display:block; font-size:.72rem; padding:2px 6px; border-radius:4px; color:#fff; margin-bottom:3px; cursor:pointer;
+  overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
 }
+.week-chip:last-child{ margin-bottom:0; }
 .week-chip.status-booked{ background:#0d6efd; }
 .week-chip.status-checked_in{ background:#198754; }
 .week-chip.status-completed{ background:#6c757d; }
@@ -157,6 +160,23 @@ body{
 .month-day-cell.is-today{ background: var(--brand-light); }
 .month-day-cell.is-other-month{ opacity:.4; }
 .month-day-number{ font-weight:600; font-size:.85rem; }
+
+/* Mỗi sân 1 cột trong ô ngày — 2 sân cùng giờ đứng cạnh nhau, không chồng lên nhau. */
+.month-court-col{
+  flex:1 1 0; min-width:0; border-top:3px solid #ccc; padding-top:2px;
+}
+.month-court-label{
+  font-size:.58rem; font-weight:700; text-align:center; color:#666;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.month-chip{
+  font-size:.62rem; text-align:center; border-radius:3px; padding:1px 2px; margin:1px 0;
+  color:#fff; cursor:pointer; overflow:hidden; white-space:nowrap;
+}
+.month-chip.status-booked{ background:#0d6efd; }
+.month-chip.status-checked_in{ background:#198754; }
+.month-chip.status-completed{ background:#6c757d; }
+.month-court-more{ font-size:.55rem; color:#888; text-align:center; }
 
 /* ---------- Receipt / K80 print ---------- */
 @media print{

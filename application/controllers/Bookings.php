@@ -111,6 +111,7 @@ class Bookings extends MY_Controller
             'month_start'  => $month_start,
             'month_end'    => $month_end,
             'by_day'       => $by_day,
+            'courts'       => $this->Table_model->get_courts(),
         );
         $this->load->view('layout/header', $data);
         $this->load->view('bookings/month', $data);
