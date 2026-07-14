@@ -8,7 +8,7 @@ class Orders extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('Order_model', 'Order_item_model', 'Product_model', 'Category_model', 'Kitchen_ticket_model', 'Table_model'));
+        $this->load->model(array('Order_model', 'Order_item_model', 'Product_model', 'Category_model', 'Kitchen_ticket_model', 'Table_model', 'Court_booking_model'));
     }
 
     public function index()
@@ -85,6 +85,47 @@ class Orders extends MY_Controller
             $this->Kitchen_ticket_model->create_ticket($id, $order['table_id'], $ticket_items);
             $this->Order_model->recalc_totals($id);
             $this->audit('order', 'ADD_ITEM', NULL, array('order_id' => $id, 'items' => $ticket_items));
+        }
+
+        redirect('orders/'.$id);
+    }
+
+    /**
+     * Thêm "Tiền sân" trực tiếp vào order bằng cách nhập giờ chơi thực tế —
+     * dùng cho khách vãng lai/linh hoạt giờ, không qua lịch đặt trước và
+     * không cần tên/SĐT khách. Có thể gọi nhiều lần nếu khách chơi thêm giờ.
+     */
+    public function add_timeslot($id)
+    {
+        $order = $this->Order_model->get_detail($id);
+        if ( ! $order || $order['status'] !== 'OPEN' || $order['table_type'] !== 'COURT')
+        {
+            redirect('orders/'.$id);
+            return;
+        }
+
+        $start_time = $this->input->post('start_time');
+        $end_time = $this->input->post('end_time');
+
+        if ( ! $start_time || ! $end_time || $end_time <= $start_time)
+        {
+            $this->session->set_flashdata('error', 'Giờ kết thúc phải sau giờ bắt đầu.');
+            redirect('orders/'.$id);
+            return;
+        }
+
+        $amount = $this->Court_booking_model->calc_fee($order, $start_time.':00', $end_time.':00');
+
+        if ($amount > 0)
+        {
+            $court_fee_product = $this->Product_model->get_by_sku('COURT_FEE');
+            if ($court_fee_product)
+            {
+                $note = 'Sân '.$start_time.'-'.$end_time;
+                $this->Order_item_model->add($id, $court_fee_product['id'], 1, $amount, $note);
+                $this->Order_model->recalc_totals($id);
+                $this->audit('order', 'ADD_TIMESLOT', NULL, array('order_id' => $id, 'start_time' => $start_time, 'end_time' => $end_time, 'amount' => $amount));
+            }
         }
 
         redirect('orders/'.$id);

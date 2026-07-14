@@ -86,6 +86,34 @@
     </div>
 
     <div class="col-lg-5">
+      <?php if ($this->session->flashdata('error')): ?>
+        <div class="alert alert-danger py-2 small"><?php echo $this->session->flashdata('error'); ?></div>
+      <?php endif; ?>
+
+      <?php if ($order['status'] === 'OPEN' && $order['table_type'] === 'COURT'): ?>
+      <div class="card border-0 shadow-sm rounded-4 mb-3">
+        <div class="card-header bg-white fw-semibold"><i class="bi bi-dribbble"></i> Thêm giờ chơi sân</div>
+        <div class="card-body">
+          <?php echo form_open('orders/'.$order['id'].'/add-timeslot'); ?>
+            <div class="row g-2 align-items-end">
+              <div class="col-5">
+                <label class="form-label small mb-1">Giờ bắt đầu</label>
+                <input type="time" name="start_time" class="form-control" required>
+              </div>
+              <div class="col-5">
+                <label class="form-label small mb-1">Giờ kết thúc</label>
+                <input type="time" name="end_time" class="form-control" required>
+              </div>
+              <div class="col-2">
+                <button class="btn btn-brand w-100"><i class="bi bi-plus-lg"></i></button>
+              </div>
+            </div>
+            <div class="form-text">Tự tính tiền theo khung giờ (Sáng <?php echo money_format_vnd($order['rate_morning']); ?> / Chiều <?php echo money_format_vnd($order['rate_afternoon']); ?> / Tối <?php echo money_format_vnd($order['rate_evening']); ?>). Không cần đặt lịch trước, có thể thêm nhiều lần nếu chơi thêm giờ.</div>
+          <?php echo form_close(); ?>
+        </div>
+      </div>
+      <?php endif; ?>
+
       <?php if ($order['status'] === 'OPEN'): ?>
       <div class="card border-0 shadow-sm rounded-4">
         <div class="card-header bg-white fw-semibold">Thêm món</div>

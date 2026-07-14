@@ -123,7 +123,7 @@ class Order_model extends CI_Model
 
     public function get_detail($id)
     {
-        return $this->db->select('order_sessions.*, table_sessions.table_id, cafe_tables.table_name, cafe_tables.table_code')
+        return $this->db->select('order_sessions.*, table_sessions.table_id, cafe_tables.table_name, cafe_tables.table_code, cafe_tables.table_type, cafe_tables.rate_morning, cafe_tables.rate_afternoon, cafe_tables.rate_evening')
             ->from($this->table)
             ->join('table_sessions', 'table_sessions.id = order_sessions.table_session_id', 'left')
             ->join('cafe_tables', 'cafe_tables.id = table_sessions.table_id', 'left')

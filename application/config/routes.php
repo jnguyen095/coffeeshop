@@ -28,6 +28,7 @@ $route['tables/(:num)/qr'] = 'tables/qr/$1';
 $route['orders'] = 'orders/index';
 $route['orders/(:num)'] = 'orders/detail/$1';
 $route['orders/(:num)/add-item'] = 'orders/add_item/$1';
+$route['orders/(:num)/add-timeslot'] = 'orders/add_timeslot/$1';
 $route['orders/(:num)/update-item/(:num)'] = 'orders/update_item/$1/$2';
 $route['orders/(:num)/cancel-item/(:num)'] = 'orders/cancel_item/$1/$2';
 $route['orders/(:num)/checkout'] = 'orders/checkout/$1';
