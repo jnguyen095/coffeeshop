@@ -11,6 +11,7 @@
         <div class="mb-1"><i class="bi bi-person"></i> <span id="modalCustomer"></span></div>
         <div class="mb-1"><i class="bi bi-telephone"></i> <span id="modalPhone"></span></div>
         <div class="mb-2 text-muted small" id="modalNotes"></div>
+        <div class="mb-2"><i class="bi bi-cash-coin"></i> Tiền sân ước tính: <strong class="text-brand" id="modalFee"></strong></div>
         <span class="badge" id="modalStatus"></span>
       </div>
       <div class="modal-footer" id="modalActions"></div>
@@ -29,6 +30,8 @@
 var STATUS_LABEL = {BOOKED:'Đã đặt', CHECKED_IN:'Đang chơi', COMPLETED:'Hoàn tất', CANCELLED:'Đã hủy', NO_SHOW:'Không đến'};
 var STATUS_COLOR = {BOOKED:'primary', CHECKED_IN:'success', COMPLETED:'secondary', CANCELLED:'secondary', NO_SHOW:'danger'};
 
+function fmtMoney(n){ return Math.round(n).toLocaleString('vi-VN') + 'đ'; }
+
 function showBookingDetail(el){
   var d = el.dataset;
   document.getElementById('modalCourtName').textContent = d.court;
@@ -36,6 +39,7 @@ function showBookingDetail(el){
   document.getElementById('modalCustomer').textContent = d.customer || '—';
   document.getElementById('modalPhone').textContent = d.phone || '—';
   document.getElementById('modalNotes').textContent = d.notes || '';
+  document.getElementById('modalFee').textContent = fmtMoney(d.fee || 0);
   var statusEl = document.getElementById('modalStatus');
   statusEl.textContent = STATUS_LABEL[d.status] || d.status;
   statusEl.className = 'badge bg-' + (STATUS_COLOR[d.status] || 'secondary');

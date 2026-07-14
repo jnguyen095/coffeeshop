@@ -127,7 +127,7 @@ class Court_booking_model extends CI_Model
 
     public function get_by_date($date, $table_id = NULL)
     {
-        $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code')
+        $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code, cafe_tables.rate_morning, cafe_tables.rate_afternoon, cafe_tables.rate_evening')
             ->from($this->table)
             ->join('cafe_tables', 'cafe_tables.id = court_bookings.table_id')
             ->where('court_bookings.booking_date', $date)
@@ -138,13 +138,14 @@ class Court_booking_model extends CI_Model
             $this->db->where('court_bookings.table_id', $table_id);
         }
 
-        return $this->db->order_by('cafe_tables.table_code', 'ASC')->order_by('court_bookings.start_time', 'ASC')->get()->result_array();
+        $bookings = $this->db->order_by('cafe_tables.table_code', 'ASC')->order_by('court_bookings.start_time', 'ASC')->get()->result_array();
+        return $this->_with_estimated_fee($bookings);
     }
 
     /** Dùng cho lịch xem theo Tuần/Tháng — mọi lịch đặt còn hiệu lực trong khoảng ngày. */
     public function get_by_range($date_from, $date_to)
     {
-        return $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code')
+        $bookings = $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code, cafe_tables.rate_morning, cafe_tables.rate_afternoon, cafe_tables.rate_evening')
             ->from($this->table)
             ->join('cafe_tables', 'cafe_tables.id = court_bookings.table_id')
             ->where('court_bookings.booking_date >=', $date_from)
@@ -153,6 +154,16 @@ class Court_booking_model extends CI_Model
             ->order_by('court_bookings.booking_date', 'ASC')
             ->order_by('court_bookings.start_time', 'ASC')
             ->get()->result_array();
+        return $this->_with_estimated_fee($bookings);
+    }
+
+    private function _with_estimated_fee($bookings)
+    {
+        foreach ($bookings as &$b)
+        {
+            $b['estimated_fee'] = $this->calc_fee($b, $b['start_time'], $b['end_time']);
+        }
+        return $bookings;
     }
 
     public function get_by_group($group_id)

@@ -62,7 +62,8 @@
                  data-phone="<?php echo htmlspecialchars($b['customer_phone'], ENT_QUOTES); ?>"
                  data-notes="<?php echo htmlspecialchars($b['notes'], ENT_QUOTES); ?>"
                  data-status="<?php echo $b['status']; ?>"
-                 data-order-id="<?php echo $b['order_id']; ?>">
+                 data-order-id="<?php echo $b['order_id']; ?>"
+                 data-fee="<?php echo (int) $b['estimated_fee']; ?>">
               <div class="calendar-booking-name"><?php echo substr($b['start_time'],0,5); ?>-<?php echo substr($b['end_time'],0,5); ?></div>
               <div><?php echo htmlspecialchars($b['customer_name']); ?></div>
             </div>
