@@ -54,7 +54,7 @@ class Order_item_model extends CI_Model
 
     public function get_active_by_order($order_session_id)
     {
-        return $this->db->select('order_items.*, products.product_name, products.image')
+        return $this->db->select('order_items.*, products.product_name, products.image, products.sku')
             ->from($this->table)
             ->join('products', 'products.id = order_items.product_id')
             ->where('order_session_id', $order_session_id)

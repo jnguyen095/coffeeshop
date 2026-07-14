@@ -265,26 +265,46 @@ function loadOrderStatus(){
       }
       var order = res.order;
       var totalQty = order.items.reduce(function(sum, it){ return sum + parseInt(it.qty, 10); }, 0);
-      var html = '<h6 class="fw-semibold mb-2">Các đợt gọi món</h6>';
+      var courtItems = order.items.filter(function(it){ return it.sku === 'COURT_FEE'; });
+      var html = '';
 
-      order.tickets.slice().reverse().forEach(function(t){
+      if (courtItems.length){
+        html += '<h6 class="fw-semibold mb-2"><i class="bi bi-cash-coin"></i> Tiền sân</h6>';
         html += '<div class="card mb-2"><div class="card-body p-2">';
-        html += '<div class="d-flex justify-content-between align-items-center mb-1">'+
-          '<span class="badge bg-'+STATUS_COLOR[t.status]+'">'+STATUS_LABEL[t.status]+'</span>'+
-          '<span class="small text-muted"><i class="bi bi-clock"></i> '+formatDateTime(t.created_at)+'</span>'+
-        '</div>';
-        t.items.forEach(function(it){
-          var thumb = it.image
-            ? '<img class="menu-item-thumb" src="'+BASE_URL+'assets/'+it.image+'" alt="">'
-            : '<div class="menu-item-thumb-fallback"><i class="bi bi-cup-straw"></i></div>';
-          html += '<div class="menu-item px-0">'+thumb+
-            '<div class="menu-item-name">'+escapeHtml(it.product_name)+'</div>'+
-            '<div class="menu-item-price">'+fmt(it.price)+'</div>'+
-            '<div class="menu-item-qty">x'+it.qty+'</div>'+
+        courtItems.forEach(function(it){
+          html += '<div class="d-flex justify-content-between align-items-center py-1">'+
+            '<span>'+escapeHtml(it.note || 'Tiền sân')+'</span>'+
+            '<span class="fw-semibold">'+fmt(it.price * it.qty)+'</span>'+
           '</div>';
         });
         html += '</div></div>';
-      });
+      }
+
+      if (order.tickets.length){
+        html += '<h6 class="fw-semibold mb-2">Các đợt gọi món</h6>';
+        order.tickets.slice().reverse().forEach(function(t){
+          html += '<div class="card mb-2"><div class="card-body p-2">';
+          html += '<div class="d-flex justify-content-between align-items-center mb-1">'+
+            '<span class="badge bg-'+STATUS_COLOR[t.status]+'">'+STATUS_LABEL[t.status]+'</span>'+
+            '<span class="small text-muted"><i class="bi bi-clock"></i> '+formatDateTime(t.created_at)+'</span>'+
+          '</div>';
+          t.items.forEach(function(it){
+            var thumb = it.image
+              ? '<img class="menu-item-thumb" src="'+BASE_URL+'assets/'+it.image+'" alt="">'
+              : '<div class="menu-item-thumb-fallback"><i class="bi bi-cup-straw"></i></div>';
+            html += '<div class="menu-item px-0">'+thumb+
+              '<div class="menu-item-name">'+escapeHtml(it.product_name)+'</div>'+
+              '<div class="menu-item-price">'+fmt(it.price)+'</div>'+
+              '<div class="menu-item-qty">x'+it.qty+'</div>'+
+            '</div>';
+          });
+          html += '</div></div>';
+        });
+      }
+
+      if (!html){
+        html = '<div class="text-muted text-center py-4">Chưa có món nào được gọi.</div>';
+      }
       el.innerHTML = html;
 
       document.getElementById('orderStatusQtyValue').textContent = totalQty + ' món';
