@@ -44,9 +44,10 @@ class Order_item_model extends CI_Model
 
     public function get_by_order($order_session_id)
     {
-        return $this->db->select('order_items.*, products.product_name, products.image')
+        return $this->db->select('order_items.*, products.product_name, products.image, categories.court_only')
             ->from($this->table)
             ->join('products', 'products.id = order_items.product_id')
+            ->join('categories', 'categories.id = products.category_id', 'left')
             ->where('order_session_id', $order_session_id)
             ->order_by('order_items.id', 'ASC')
             ->get()->result_array();
@@ -54,9 +55,10 @@ class Order_item_model extends CI_Model
 
     public function get_active_by_order($order_session_id)
     {
-        return $this->db->select('order_items.*, products.product_name, products.image, products.sku')
+        return $this->db->select('order_items.*, products.product_name, products.image, products.sku, categories.court_only')
             ->from($this->table)
             ->join('products', 'products.id = order_items.product_id')
+            ->join('categories', 'categories.id = products.category_id', 'left')
             ->where('order_session_id', $order_session_id)
             ->where('order_items.status', 'ACTIVE')
             ->order_by('order_items.id', 'ASC')

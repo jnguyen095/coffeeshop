@@ -36,7 +36,7 @@ class Orders extends MY_Controller
         }
 
         $items = $this->Order_item_model->get_by_order($id);
-        $products_by_category = $this->Product_model->get_active_grouped_by_category();
+        $products_by_category = $this->Product_model->get_active_grouped_by_category($order['table_type']);
         $tickets = $this->Kitchen_ticket_model->tickets_with_items_for_order($id);
 
         $data = array(
@@ -78,6 +78,7 @@ class Orders extends MY_Controller
             return;
         }
 
+        $added_items = array();
         $ticket_items = array();
         foreach ($product_ids as $i => $pid)
         {
@@ -86,14 +87,24 @@ class Orders extends MY_Controller
             if ( ! $product || $product['status'] !== 'ACTIVE') continue;
 
             $this->Order_item_model->add($id, $pid, $qty, $product['price'], $notes[$i] ?: NULL);
-            $ticket_items[] = array('product_id' => $pid, 'qty' => $qty, 'note' => $notes[$i] ?: NULL);
+            $item = array('product_id' => $pid, 'qty' => $qty, 'note' => $notes[$i] ?: NULL);
+            $added_items[] = $item;
+
+            // Dịch vụ sân (thuê vợt, thuê trang phục, nhặt bóng...) không cần pha chế nên không tạo phiếu bếp.
+            if ( ! $product['court_only'])
+            {
+                $ticket_items[] = $item;
+            }
         }
 
-        if ($ticket_items)
+        if ($added_items)
         {
-            $this->Kitchen_ticket_model->create_ticket($id, $order['table_id'], $ticket_items);
+            if ($ticket_items)
+            {
+                $this->Kitchen_ticket_model->create_ticket($id, $order['table_id'], $ticket_items);
+            }
             $this->Order_model->recalc_totals($id);
-            $this->audit('order', 'ADD_ITEM', NULL, array('order_id' => $id, 'items' => $ticket_items));
+            $this->audit('order', 'ADD_ITEM', NULL, array('order_id' => $id, 'items' => $added_items));
         }
 
         redirect('orders/'.$id);

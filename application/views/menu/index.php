@@ -265,15 +265,16 @@ function loadOrderStatus(){
       }
       var order = res.order;
       var totalQty = order.items.reduce(function(sum, it){ return sum + parseInt(it.qty, 10); }, 0);
-      var courtItems = order.items.filter(function(it){ return it.sku === 'COURT_FEE'; });
+      var courtItems = order.items.filter(function(it){ return it.sku === 'COURT_FEE' || it.court_only == 1; });
       var html = '';
 
       if (courtItems.length){
-        html += '<h6 class="fw-semibold mb-2"><i class="bi bi-cash-coin"></i> Tiền sân</h6>';
+        html += '<h6 class="fw-semibold mb-2"><i class="bi bi-cash-coin"></i> Dịch vụ sân</h6>';
         html += '<div class="card mb-2"><div class="card-body p-2">';
         courtItems.forEach(function(it){
+          var label = (it.sku === 'COURT_FEE') ? (it.note || 'Tiền sân') : (it.product_name + (it.qty > 1 ? ' x'+it.qty : ''));
           html += '<div class="d-flex justify-content-between align-items-center py-1">'+
-            '<span>'+escapeHtml(it.note || 'Tiền sân')+'</span>'+
+            '<span>'+escapeHtml(label)+'</span>'+
             '<span class="fw-semibold">'+fmt(it.price * it.qty)+'</span>'+
           '</div>';
         });

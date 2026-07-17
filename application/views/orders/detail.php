@@ -30,47 +30,35 @@
     </div>
   </div>
 
+  <?php
+    // Tách riêng dịch vụ sân (thuê vợt, thuê trang phục...) khỏi món ăn/uống thường
+    // để hiển thị thành một khối riêng — chúng không qua bếp nên không lẫn vào đây.
+    $court_items = array();
+    $regular_items = array();
+    foreach ($items as $it)
+    {
+        if ($it['court_only']) { $court_items[] = $it; } else { $regular_items[] = $it; }
+    }
+  ?>
+
   <div class="row g-3">
     <div class="col-lg-7">
+    <?php if ($court_items): ?>
+        <div class="card border-0 shadow-sm rounded-4 mb-3">
+            <div class="card-header bg-white fw-semibold"><i class="bi bi-cash-coin text-brand"></i> Dịch vụ sân</div>
+            <div class="list-group list-group-flush">
+                <?php foreach ($court_items as $it): ?>
+                    <?php $this->load->view('orders/_item_row', array('it' => $it, 'order' => $order)); ?>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
       <div class="card border-0 shadow-sm rounded-4 mb-3">
         <div class="card-header bg-white fw-semibold">Món đã gọi</div>
         <div class="list-group list-group-flush">
-          <?php foreach ($items as $it): ?>
-          <div class="list-group-item d-flex justify-content-between align-items-center <?php echo $it['status']==='CANCELLED' ? 'opacity-50 text-decoration-line-through' : ''; ?>">
-            <div class="d-flex align-items-center gap-2">
-              <?php if ($it['image']): ?>
-                <img src="<?php echo base_url('assets/'.$it['image']); ?>" style="width:44px;height:44px;object-fit:cover;" class="rounded border flex-shrink-0">
-              <?php else: ?>
-                <div class="d-flex align-items-center justify-content-center bg-light rounded border text-muted flex-shrink-0" style="width:44px;height:44px;"><i class="bi bi-cup-straw"></i></div>
-              <?php endif; ?>
-              <div>
-                <div class="fw-semibold"><?php echo htmlspecialchars($it['product_name']); ?></div>
-                <div class="small text-muted"><?php echo money_format_vnd($it['price']); ?> x <?php echo $it['qty']; ?><?php if ($it['note']): ?> — <?php echo htmlspecialchars($it['note']); ?><?php endif; ?></div>
-              </div>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-              <div class="fw-semibold"><?php echo money_format_vnd($it['amount']); ?></div>
-              <?php if ($it['status'] === 'ACTIVE' && $order['status'] === 'OPEN'): ?>
-              <div class="dropdown">
-                <button class="btn btn-sm btn-light" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                  <li>
-                    <?php echo form_open('orders/'.$order['id'].'/update-item/'.$it['id'], array('class' => 'px-3 py-1 d-flex gap-1')); ?>
-                      <input type="number" name="qty" min="1" value="<?php echo $it['qty']; ?>" class="form-control form-control-sm" style="width:70px;">
-                      <button class="btn btn-sm btn-outline-primary">Sửa</button>
-                    <?php echo form_close(); ?>
-                  </li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li>
-                    <?php echo form_open('orders/'.$order['id'].'/cancel-item/'.$it['id'], array('onsubmit' => "return confirm('Hủy món này?');")); ?>
-                      <button class="dropdown-item text-danger">Hủy món</button>
-                    <?php echo form_close(); ?>
-                  </li>
-                </ul>
-              </div>
-              <?php endif; ?>
-            </div>
-          </div>
+          <?php foreach ($regular_items as $it): ?>
+            <?php $this->load->view('orders/_item_row', array('it' => $it, 'order' => $order)); ?>
           <?php endforeach; ?>
           <?php if (empty($items)): ?>
             <div class="list-group-item text-muted text-center py-4">Chưa có món nào.</div>
@@ -83,6 +71,8 @@
           <div class="d-flex justify-content-between fw-bold fs-5 mt-1"><span>Tổng cộng</span><span class="text-brand"><?php echo money_format_vnd($order['total_amount']); ?></span></div>
         </div>
       </div>
+
+
 
       <?php if ($tickets && ! in_array($order['status'], array('PAID', 'CANCELLED'), TRUE)): ?>
       <div class="card border-0 shadow-sm rounded-4 mb-3">

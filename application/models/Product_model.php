@@ -14,14 +14,25 @@ class Product_model extends CI_Model
             ->get()->result_array();
     }
 
-    public function get_active_grouped_by_category()
+    /**
+     * $table_type: khi khác 'COURT' (bàn cafe thường, mang đi, ...) sẽ ẩn các
+     * danh mục đánh dấu court_only (thuê vợt, thuê trang phục, nhặt bóng...) —
+     * những món đó chỉ hiện khi đang gọi món cho sân pickleball.
+     */
+    public function get_active_grouped_by_category($table_type = NULL)
     {
-        $products = $this->db->where('products.status', 'ACTIVE')
+        $this->db->where('products.status', 'ACTIVE')
             ->select('products.*, categories.name as category_name, categories.sort_order as cat_sort')
             ->from($this->table)
             ->join('categories', 'categories.id = products.category_id', 'left')
-            ->where('categories.status', 'ACTIVE')
-            ->order_by('categories.sort_order', 'ASC')
+            ->where('categories.status', 'ACTIVE');
+
+        if ($table_type !== 'COURT')
+        {
+            $this->db->where('categories.court_only', 0);
+        }
+
+        $products = $this->db->order_by('categories.sort_order', 'ASC')
             ->order_by('products.product_name', 'ASC')
             ->get()->result_array();
 
@@ -35,7 +46,11 @@ class Product_model extends CI_Model
 
     public function get_by_id($id)
     {
-        return $this->db->where('id', $id)->get($this->table)->row_array();
+        return $this->db->select('products.*, categories.court_only')
+            ->from($this->table)
+            ->join('categories', 'categories.id = products.category_id', 'left')
+            ->where('products.id', $id)
+            ->get()->row_array();
     }
 
     public function get_by_sku($sku)

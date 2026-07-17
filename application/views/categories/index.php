@@ -9,7 +9,7 @@
       <tbody>
       <?php foreach ($categories as $c): ?>
         <tr>
-          <td><?php echo htmlspecialchars($c['name']); ?></td>
+          <td><?php echo htmlspecialchars($c['name']); ?> <?php if ($c['court_only']): ?><span class="badge bg-info text-dark">Sân pickleball</span><?php endif; ?></td>
           <td><?php echo $c['sort_order']; ?></td>
           <td><span class="badge bg-<?php echo $c['status']==='ACTIVE'?'success':'secondary'; ?>"><?php echo $c['status']; ?></span></td>
           <td>

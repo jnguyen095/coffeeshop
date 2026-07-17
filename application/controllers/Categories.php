@@ -30,6 +30,7 @@ class Categories extends MY_Controller
             $id = $this->Category_model->create(array(
                 'name'       => $this->input->post('name', TRUE),
                 'sort_order' => (int) $this->input->post('sort_order'),
+                'court_only' => $this->input->post('court_only') ? 1 : 0,
                 'status'     => 'ACTIVE',
             ));
             $this->audit('category', 'CREATE', NULL, array('id' => $id));
@@ -53,6 +54,7 @@ class Categories extends MY_Controller
             $this->Category_model->update($id, array(
                 'name'       => $this->input->post('name', TRUE),
                 'sort_order' => (int) $this->input->post('sort_order'),
+                'court_only' => $this->input->post('court_only') ? 1 : 0,
                 'status'     => $this->input->post('status'),
             ));
             $this->audit('category', 'UPDATE', $category, array('id' => $id));

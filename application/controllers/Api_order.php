@@ -66,6 +66,7 @@ class Api_order extends CI_Controller
             return;
         }
 
+        $added_items = array();
         $ticket_items = array();
         foreach ($items as $it)
         {
@@ -76,20 +77,30 @@ class Api_order extends CI_Controller
             $note = isset($it['note']) ? substr($it['note'], 0, 255) : NULL;
 
             $this->Order_item_model->add($order['id'], $product['id'], $qty, $product['price'], $note);
-            $ticket_items[] = array('product_id' => $product['id'], 'qty' => $qty, 'note' => $note);
+            $item = array('product_id' => $product['id'], 'qty' => $qty, 'note' => $note);
+            $added_items[] = $item;
+
+            // Dịch vụ sân (thuê vợt, thuê trang phục, nhặt bóng...) không cần pha chế nên không tạo phiếu bếp.
+            if ( ! $product['court_only'])
+            {
+                $ticket_items[] = $item;
+            }
         }
 
-        if (empty($ticket_items))
+        if (empty($added_items))
         {
             json_response(array('success' => FALSE, 'message' => 'Món không hợp lệ'), 400);
             return;
         }
 
-        $this->Kitchen_ticket_model->create_ticket($order['id'], $table['id'], $ticket_items);
+        if ($ticket_items)
+        {
+            $this->Kitchen_ticket_model->create_ticket($order['id'], $table['id'], $ticket_items);
+        }
         $this->Order_model->recalc_totals($order['id']);
 
         $this->load->model('Audit_log_model');
-        $this->Audit_log_model->log('order', 'CUSTOMER_ADD_ITEM', NULL, array('order_id' => $order['id'], 'items' => $ticket_items));
+        $this->Audit_log_model->log('order', 'CUSTOMER_ADD_ITEM', NULL, array('order_id' => $order['id'], 'items' => $added_items));
 
         json_response(array('success' => TRUE, 'order_id' => $order['id']));
     }

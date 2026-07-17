@@ -90,7 +90,7 @@ class Menu extends CI_Controller
             'table'                => $table,
             'token'                => $token,
             'secret'               => $secret,
-            'products_by_category' => $this->Product_model->get_active_grouped_by_category(),
+            'products_by_category' => $this->Product_model->get_active_grouped_by_category($table['table_type']),
         );
         $this->load->view('menu/index', $data);
     }

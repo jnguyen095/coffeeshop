@@ -9,6 +9,11 @@
       <label class="form-label">Thứ tự hiển thị</label>
       <input type="number" name="sort_order" class="form-control" value="<?php echo $category ? $category['sort_order'] : 0; ?>">
     </div>
+    <div class="mb-3 form-check">
+      <input type="checkbox" name="court_only" value="1" class="form-check-input" id="courtOnly" <?php echo ($category && $category['court_only']) ? 'checked' : ''; ?>>
+      <label class="form-check-label" for="courtOnly">Chỉ dành cho sân pickleball</label>
+      <div class="form-text">Sản phẩm trong danh mục này chỉ hiện khi gọi món cho sân pickleball, không hiện ở bàn cafe thường.</div>
+    </div>
     <?php if ($category): ?>
     <div class="mb-3">
       <label class="form-label">Trạng thái</label>
