@@ -9,6 +9,21 @@
     // Gom lịch đặt theo sân để dễ render từng cột.
     $by_table = array();
     foreach ($bookings as $b) { $by_table[$b['table_id']][] = $b; }
+
+    // Vạch "giờ hiện tại" — chỉ hiện khi đang xem đúng ngày hôm nay và trong khung giờ hoạt động.
+    $show_now_line = false;
+    $now_pct = 0;
+    if ($date === date('Y-m-d'))
+    {
+        $now_minutes = ((int) date('G')) * 60 + (int) date('i');
+        $day_start_minutes = $day_start_hour * 60;
+        $day_end_minutes = $day_end_hour * 60;
+        if ($now_minutes >= $day_start_minutes && $now_minutes <= $day_end_minutes)
+        {
+            $show_now_line = true;
+            $now_pct = ($now_minutes - $day_start_minutes) / $total_minutes * 100;
+        }
+    }
   ?>
 
   <div class="d-flex align-items-center gap-2 mb-3">
@@ -24,7 +39,7 @@
     <div class="alert alert-warning">Chưa có sân nào được cấu hình. Vào <a href="<?php echo site_url('tables/manage'); ?>">Quản lý bàn</a> để thêm sân (loại "Sân pickleball").</div>
   <?php else: ?>
 
-  <div class="calendar-day" style="--calendar-h: 900px;">
+  <div class="calendar-day" style="position:relative; height:900px;">
     <div class="calendar-gutter" style="height:900px;">
       <?php for ($h = $day_start_hour; $h <= $day_end_hour; $h++):
         $pct = (($h - $day_start_hour) * 60 / $total_minutes) * 100;
@@ -72,6 +87,12 @@
       </div>
       <?php endforeach; ?>
     </div>
+
+    <?php if ($show_now_line): ?>
+      <div class="calendar-now-line" style="top:<?php echo $now_pct; ?>%;">
+        <span class="calendar-now-label"><?php echo date('H:i'); ?></span>
+      </div>
+    <?php endif; ?>
   </div>
 
   <div class="small text-muted mt-2">
