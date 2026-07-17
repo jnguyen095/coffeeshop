@@ -193,6 +193,7 @@ body{
 
 /* ---------- Small screens ---------- */
 @media (max-width: 575.98px){
+  body{ font-size:16px; }
   .table-card .card-body{ padding: .75rem; }
   h1, .h1{ font-size:1.5rem; }
   h4, .h4{ font-size:1.1rem; }

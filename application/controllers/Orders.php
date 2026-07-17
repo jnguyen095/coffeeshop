@@ -37,6 +37,7 @@ class Orders extends MY_Controller
 
         $items = $this->Order_item_model->get_by_order($id);
         $products_by_category = $this->Product_model->get_active_grouped_by_category();
+        $tickets = $this->Kitchen_ticket_model->tickets_with_items_for_order($id);
 
         $data = array(
             'page_title'            => 'Đơn hàng '.$order['order_no'],
@@ -44,10 +45,18 @@ class Orders extends MY_Controller
             'order'                 => $order,
             'items'                 => $items,
             'products_by_category'  => $products_by_category,
+            'tickets'               => $tickets,
         );
         $this->load->view('layout/header', $data);
         $this->load->view('orders/detail', $data);
         $this->load->view('layout/footer');
+    }
+
+    /** JSON poll dùng để cập nhật trạng thái pha chế theo thời gian thực trên trang chi tiết đơn. */
+    public function ticket_status($id)
+    {
+        $tickets = $this->Kitchen_ticket_model->tickets_with_items_for_order($id);
+        json_response(array('success' => TRUE, 'tickets' => $tickets));
     }
 
     public function add_item($id)

@@ -62,6 +62,19 @@ if ( ! function_exists('kitchen_status_badge'))
     }
 }
 
+if ( ! function_exists('kitchen_status_label'))
+{
+    function kitchen_status_label($status)
+    {
+        $map = array(
+            'NEW'       => 'Mới',
+            'PREPARING' => 'Đang pha chế',
+            'COMPLETED' => 'Hoàn thành',
+        );
+        return isset($map[$status]) ? $map[$status] : $status;
+    }
+}
+
 if ( ! function_exists('role_label'))
 {
     function role_label($role)
