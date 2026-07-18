@@ -74,9 +74,22 @@ function ticketCard(t){
 function escapeHtml(s){ var d=document.createElement('div'); d.textContent = s||''; return d.innerHTML; }
 
 function timeAgo(dt){
-  var diff = Math.floor((Date.now() - new Date(dt.replace(' ','T')).getTime())/60000);
-  if (diff < 1) return 'Vừa xong';
-  return diff+' phút trước';
+  var then = new Date(dt.replace(' ','T'));
+  var now = new Date();
+  var diffMin = Math.floor((now.getTime() - then.getTime())/60000);
+
+  var sameDay = then.getFullYear() === now.getFullYear() && then.getMonth() === now.getMonth() && then.getDate() === now.getDate();
+
+  if (sameDay){
+    if (diffMin < 1) return 'Vừa xong';
+    if (diffMin < 60) return diffMin+' phút trước';
+    var hours = Math.floor(diffMin/60);
+    var mins = diffMin % 60;
+    return hours+' giờ'+(mins > 0 ? ' '+mins+' phút' : '')+' trước';
+  }
+
+  var pad = function(n){ return n < 10 ? '0'+n : n; };
+  return pad(then.getDate())+'/'+pad(then.getMonth()+1)+' '+pad(then.getHours())+':'+pad(then.getMinutes());
 }
 
 function loadTickets(){

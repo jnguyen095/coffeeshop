@@ -96,7 +96,7 @@
     <div class="d-flex justify-content-between fw-bold fs-5 mb-2">
       <span>Tổng cộng</span><span id="cartOffcanvasTotal">0đ</span>
     </div>
-    <button class="btn btn-brand btn-lg" id="submitOrderBtn" onclick="submitOrder();"><i class="bi bi-send"></i> Gọi nước</button>
+    <button class="btn btn-brand btn-lg" id="submitOrderBtn" onclick="submitOrder();"><i class="bi bi-send"></i> Gọi Món</button>
   </div>
 </div>
 
@@ -124,7 +124,7 @@
   <div class="bg-white rounded-4 p-4" style="max-width:340px;">
     <i class="bi bi-qr-code-scan text-warning" style="font-size:2.5rem;"></i>
     <p class="mt-3 mb-3" id="expiredMessage"></p>
-    <button class="btn btn-brand w-100" onclick="location.reload();">Tải lại trang</button>
+<!--    <button class="btn btn-brand w-100" onclick="location.reload();">Tải lại trang</button>-->
   </div>
 </div>
 
