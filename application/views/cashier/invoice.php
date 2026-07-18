@@ -20,8 +20,8 @@ td{ vertical-align:top; padding:2px 0; }
 </head>
 <body>
 <div class="receipt">
-  <div class="center bold big">CAFE POS</div>
-  <div class="center">123 Đường ABC, Quận 1, TP.HCM</div>
+  <div class="center bold big">PICK ANGEL PARK</div>
+  <div class="center">28 Võ Văn Kiệt, BMT</div>
   <div class="center">HÓA ĐƠN BÁN HÀNG</div>
   <hr>
   <div>Số HĐ: <?php echo htmlspecialchars($order['order_no']); ?></div>

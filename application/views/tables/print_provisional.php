@@ -19,7 +19,7 @@ td{ vertical-align:top; padding:2px 0; }
 </head>
 <body>
 <div class="receipt">
-  <div class="center bold">CAFE POS</div>
+  <div class="center bold">PICK ANGEL PARK</div>
   <div class="center">PHIẾU TẠM TÍNH</div>
   <hr>
   <div>Bàn: <?php echo htmlspecialchars($table['table_name']); ?></div>
