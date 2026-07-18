@@ -18,7 +18,7 @@ img{ width:220px; height:220px; }
     <h3><?php echo htmlspecialchars($table['table_name']); ?></h3>
     <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=<?php echo urlencode($menu_url); ?>" alt="QR">
     <p>Quét mã để xem thực đơn &amp; đặt món</p>
-    <small><?php echo htmlspecialchars($menu_url); ?></small>
+<!--    <small>--><?php //echo htmlspecialchars($menu_url); ?><!--</small>-->
   </div>
   <div class="no-print"><button class="print-btn" onclick="window.print();">🖨 In mã QR</button></div>
 </body>
