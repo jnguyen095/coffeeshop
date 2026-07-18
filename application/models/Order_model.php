@@ -202,4 +202,56 @@ class Order_model extends CI_Model
             ->order_by('day', 'ASC')
             ->get($this->table)->result_array();
     }
+
+    /**
+     * Doanh thu tách theo nhóm mặt hàng — dịch vụ sân (court_only) vs đồ uống/món ăn
+     * thường (mọi thứ còn lại) — gộp thành 1 dòng cho cả khoảng ngày. Tính trên giá
+     * trị mặt hàng (order_items.amount) nên không cộng đúng bằng "Tổng doanh thu"
+     * (total_amount) nếu có giảm giá/VAT — dùng để xem tỷ trọng, không thay thế Tổng.
+     */
+    public function revenue_split($from, $to)
+    {
+        $row = $this->db->select("
+                SUM(CASE WHEN categories.court_only = 1 THEN order_items.amount ELSE 0 END) as court_revenue,
+                SUM(CASE WHEN categories.court_only = 1 THEN 0 ELSE order_items.amount END) as drink_revenue", FALSE)
+            ->from('order_items')
+            ->join('order_sessions', 'order_sessions.id = order_items.order_session_id')
+            ->join('products', 'products.id = order_items.product_id')
+            ->join('categories', 'categories.id = products.category_id', 'left')
+            ->where('order_items.status', 'ACTIVE')
+            ->where('order_sessions.status', 'PAID')
+            ->where('order_sessions.paid_at >=', $from.' 00:00:00')
+            ->where('order_sessions.paid_at <=', $to.' 23:59:59')
+            ->get()->row_array();
+
+        return array(
+            'drink_revenue' => (float) $row['drink_revenue'],
+            'court_revenue' => (float) $row['court_revenue'],
+        );
+    }
+
+    /** Giống revenue_split() nhưng gộp riêng theo từng ngày, key theo 'Y-m-d' — dùng cho báo cáo theo tháng. */
+    public function revenue_split_by_day($from, $to)
+    {
+        $rows = $this->db->select("DATE(order_sessions.paid_at) as day,
+                SUM(CASE WHEN categories.court_only = 1 THEN order_items.amount ELSE 0 END) as court_revenue,
+                SUM(CASE WHEN categories.court_only = 1 THEN 0 ELSE order_items.amount END) as drink_revenue", FALSE)
+            ->from('order_items')
+            ->join('order_sessions', 'order_sessions.id = order_items.order_session_id')
+            ->join('products', 'products.id = order_items.product_id')
+            ->join('categories', 'categories.id = products.category_id', 'left')
+            ->where('order_items.status', 'ACTIVE')
+            ->where('order_sessions.status', 'PAID')
+            ->where('order_sessions.paid_at >=', $from.' 00:00:00')
+            ->where('order_sessions.paid_at <=', $to.' 23:59:59')
+            ->group_by('DATE(order_sessions.paid_at)')
+            ->get()->result_array();
+
+        $by_day = array();
+        foreach ($rows as $r)
+        {
+            $by_day[$r['day']] = array('drink_revenue' => (float) $r['drink_revenue'], 'court_revenue' => (float) $r['court_revenue']);
+        }
+        return $by_day;
+    }
 }

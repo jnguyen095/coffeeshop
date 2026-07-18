@@ -22,11 +22,15 @@ class Reports extends MY_Controller
     public function daily_revenue()
     {
         $date = $this->input->get('date') ?: date('Y-m-d');
+        $split = $this->Order_model->revenue_split($date, $date);
+
         $data = array(
-            'page_title'   => 'Doanh thu theo ngày',
-            'current_user' => $this->current_user,
-            'date'         => $date,
-            'revenue'      => (float) $this->Order_model->daily_revenue($date),
+            'page_title'    => 'Doanh thu theo ngày',
+            'current_user'  => $this->current_user,
+            'date'          => $date,
+            'revenue'       => (float) $this->Order_model->daily_revenue($date),
+            'drink_revenue' => $split['drink_revenue'],
+            'court_revenue' => $split['court_revenue'],
         );
         $this->load->view('layout/header', $data);
         $this->load->view('reports/daily_revenue', $data);
@@ -39,11 +43,20 @@ class Reports extends MY_Controller
         $from = $month.'-01';
         $to = date('Y-m-t', strtotime($from));
 
+        $rows = $this->Order_model->revenue_by_day($from, $to);
+        $split_by_day = $this->Order_model->revenue_split_by_day($from, $to);
+        foreach ($rows as &$r)
+        {
+            $r['drink_revenue'] = isset($split_by_day[$r['day']]) ? $split_by_day[$r['day']]['drink_revenue'] : 0;
+            $r['court_revenue'] = isset($split_by_day[$r['day']]) ? $split_by_day[$r['day']]['court_revenue'] : 0;
+        }
+        unset($r);
+
         $data = array(
             'page_title'   => 'Doanh thu theo tháng',
             'current_user' => $this->current_user,
             'month'        => $month,
-            'rows'         => $this->Order_model->revenue_by_day($from, $to),
+            'rows'         => $rows,
         );
         $this->load->view('layout/header', $data);
         $this->load->view('reports/monthly_revenue', $data);

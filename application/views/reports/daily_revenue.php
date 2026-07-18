@@ -11,4 +11,26 @@
       <div class="display-6 fw-bold text-brand mt-2"><?php echo money_format_vnd($revenue); ?></div>
     </div>
   </div>
+
+  <div class="row g-3 mt-1">
+    <div class="col-6">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-body text-center">
+          <i class="bi bi-cup-hot text-brand fs-3"></i>
+          <div class="fs-5 fw-bold mt-1"><?php echo money_format_vnd($drink_revenue); ?></div>
+          <div class="text-muted small">Đồ uống / món ăn</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-body text-center">
+          <i class="bi bi-dribbble text-brand fs-3"></i>
+          <div class="fs-5 fw-bold mt-1"><?php echo money_format_vnd($court_revenue); ?></div>
+          <div class="text-muted small">Sân pickleball</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="small text-muted mt-2">(*) Đồ uống/Sân tính theo giá trị mặt hàng, chưa gồm giảm giá/VAT nên có thể không cộng khớp Tổng doanh thu tuyệt đối.</div>
 </div>

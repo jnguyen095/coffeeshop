@@ -17,6 +17,11 @@
           <i class="bi bi-cash-stack text-success fs-2"></i>
           <div class="fs-4 fw-bold mt-1"><?php echo money_format_vnd($today_revenue); ?></div>
           <div class="text-muted small">Doanh thu hôm nay</div>
+          <div class="small text-muted mt-1 border-top pt-1">
+            <i class="bi bi-cup-hot"></i> <?php echo money_format_vnd($drink_revenue_today); ?>
+            <span class="mx-1">·</span>
+            <i class="bi bi-dribbble"></i> <?php echo money_format_vnd($court_revenue_today); ?>
+          </div>
         </div>
       </div>
     </div>

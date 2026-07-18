@@ -94,3 +94,25 @@ $db['default'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
+/*
+$db['default'] = array(
+    'dsn'	=> '',
+    'hostname' => 'sql211.infinityfree.com',
+    'username' => 'if0_42437700',
+    'password' => 'ZJ3O41nuh0Mc3Fm',
+    'database' => 'if0_42437700_kds_cafe',
+    'dbdriver' => 'mysqli',
+    'dbprefix' => '',
+    'pconnect' => FALSE,
+    'db_debug' => (ENVIRONMENT !== 'production'),
+    'cache_on' => FALSE,
+    'cachedir' => '',
+    'char_set' => 'utf8mb4',
+    'dbcollat' => 'utf8mb4_unicode_ci',
+    'swap_pre' => '',
+    'encrypt' => FALSE,
+    'compress' => FALSE,
+    'stricton' => FALSE,
+    'failover' => array(),
+    'save_queries' => TRUE
+);*/
