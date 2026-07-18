@@ -11,16 +11,48 @@ class Orders extends MY_Controller
         $this->load->model(array('Order_model', 'Order_item_model', 'Product_model', 'Category_model', 'Kitchen_ticket_model', 'Table_model', 'Court_booking_model'));
     }
 
+    const PER_PAGE = 20;
+
     public function index()
     {
         $status = $this->input->get('status');
-        $orders = $this->Order_model->get_list($status ? array('status' => $status) : array());
+        $table_id = $this->input->get('table_id');
+
+        // Mặc định chỉ xem đơn hôm nay; nếu người dùng đã bấm lọc (kể cả bỏ trống
+        // để xem tất cả ngày) thì tôn trọng giá trị họ chọn, không ép về hôm nay nữa.
+        $date_from = $this->input->get('date_from');
+        $date_to = $this->input->get('date_to');
+        if ($date_from === NULL && $date_to === NULL)
+        {
+            $date_from = $date_to = date('Y-m-d');
+        }
+
+        $filters = array();
+        if ($status) $filters['status'] = $status;
+        if ($date_from) $filters['date_from'] = $date_from;
+        if ($date_to) $filters['date_to'] = $date_to;
+        if ($table_id) $filters['table_id'] = $table_id;
+
+        $total = $this->Order_model->count_list($filters);
+        $total_pages = max(1, (int) ceil($total / self::PER_PAGE));
+        $page = max(1, min($total_pages, (int) $this->input->get('page')));
+        $offset = ($page - 1) * self::PER_PAGE;
+
+        $orders = $this->Order_model->get_list($filters, self::PER_PAGE, $offset);
 
         $data = array(
             'page_title'   => 'Đơn hàng',
             'current_user' => $this->current_user,
             'orders'       => $orders,
             'status'       => $status,
+            'date_from'    => $date_from,
+            'date_to'      => $date_to,
+            'table_id'     => $table_id,
+            'tables'       => $this->Table_model->get_all(),
+            'page'         => $page,
+            'total_pages'  => $total_pages,
+            'total'        => $total,
+            'per_page'     => self::PER_PAGE,
         );
         $this->load->view('layout/header', $data);
         $this->load->view('orders/index', $data);

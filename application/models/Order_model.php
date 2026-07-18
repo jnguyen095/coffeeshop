@@ -131,13 +131,37 @@ class Order_model extends CI_Model
             ->get()->row_array();
     }
 
-    public function get_list($filters = array())
+    public function get_list($filters = array(), $limit = NULL, $offset = 0)
     {
         $this->db->select('order_sessions.*, cafe_tables.table_name, cafe_tables.table_code')
             ->from($this->table)
             ->join('table_sessions', 'table_sessions.id = order_sessions.table_session_id', 'left')
             ->join('cafe_tables', 'cafe_tables.id = table_sessions.table_id', 'left');
 
+        $this->_apply_list_filters($filters);
+        $this->db->order_by('order_sessions.id', 'DESC');
+
+        if ($limit !== NULL)
+        {
+            $this->db->limit($limit, $offset);
+        }
+
+        return $this->db->get()->result_array();
+    }
+
+    public function count_list($filters = array())
+    {
+        $this->db->from($this->table)
+            ->join('table_sessions', 'table_sessions.id = order_sessions.table_session_id', 'left')
+            ->join('cafe_tables', 'cafe_tables.id = table_sessions.table_id', 'left');
+
+        $this->_apply_list_filters($filters);
+
+        return $this->db->count_all_results();
+    }
+
+    private function _apply_list_filters($filters)
+    {
         if ( ! empty($filters['status']))
         {
             $this->db->where('order_sessions.status', $filters['status']);
@@ -146,8 +170,18 @@ class Order_model extends CI_Model
         {
             $this->db->where('DATE(order_sessions.created_at)', $filters['date']);
         }
-
-        return $this->db->order_by('order_sessions.id', 'DESC')->get()->result_array();
+        if ( ! empty($filters['date_from']))
+        {
+            $this->db->where('order_sessions.created_at >=', $filters['date_from'].' 00:00:00');
+        }
+        if ( ! empty($filters['date_to']))
+        {
+            $this->db->where('order_sessions.created_at <=', $filters['date_to'].' 23:59:59');
+        }
+        if ( ! empty($filters['table_id']))
+        {
+            $this->db->where('cafe_tables.id', $filters['table_id']);
+        }
     }
 
     public function daily_revenue($date)
