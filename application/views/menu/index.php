@@ -96,7 +96,7 @@
     <div class="d-flex justify-content-between fw-bold fs-5 mb-2">
       <span>Tổng cộng</span><span id="cartOffcanvasTotal">0đ</span>
     </div>
-    <button class="btn btn-brand btn-lg" id="submitOrderBtn" onclick="submitOrder();"><i class="bi bi-send"></i> Gửi bếp</button>
+    <button class="btn btn-brand btn-lg" id="submitOrderBtn" onclick="submitOrder();"><i class="bi bi-send"></i> Gọi nước</button>
   </div>
 </div>
 
@@ -221,7 +221,7 @@ function submitOrder(){
     body: JSON.stringify({token: TOKEN, secret: SECRET, items: items})
   }).then(function(r){ return r.json(); }).then(function(res){
     btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-send"></i> Gửi bếp';
+    btn.innerHTML = '<i class="bi bi-send"></i> Gọi nước';
     if (res.expired){ handleExpired(res.message); return; }
     if (res.success){
       cart = {};
