@@ -40,10 +40,10 @@ if ( ! function_exists('table_status_badge'))
     function table_status_badge($status)
     {
         $map = array(
-            'AVAILABLE'    => 'success',
-            'OPEN'         => 'primary',
+            'AVAILABLE'    => 'default',
+            'OPEN'         => 'success',
             'WAIT_PAYMENT' => 'warning',
-            'PAID'         => 'info',
+            'PAID'         => 'success',
         );
         return isset($map[$status]) ? $map[$status] : 'light';
     }
