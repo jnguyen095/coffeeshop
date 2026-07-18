@@ -8,7 +8,7 @@ class Reports extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('Order_model', 'Product_model', 'Table_session_model', 'Kitchen_ticket_model', 'Payment_model'));
+        $this->load->model(array('Order_model', 'Product_model', 'Table_session_model', 'Kitchen_ticket_model', 'Payment_model', 'Court_booking_model', 'Table_model'));
     }
 
     public function index()
@@ -98,6 +98,28 @@ class Reports extends MY_Controller
         );
         $this->load->view('layout/header', $data);
         $this->load->view('reports/kitchen_performance', $data);
+        $this->load->view('layout/footer');
+    }
+
+    public function court_performance()
+    {
+        $from = $this->input->get('from') ?: date('Y-m-01');
+        $to = $this->input->get('to') ?: date('Y-m-d');
+
+        $data = array(
+            'page_title'          => 'Hiệu suất sân pickleball',
+            'current_user'        => $this->current_user,
+            'from'                => $from,
+            'to'                  => $to,
+            'has_courts'          => (bool) $this->Table_model->get_courts(),
+            'revenue_by_court'    => $this->Court_booking_model->revenue_by_court($from, $to),
+            'revenue_trend'       => $this->Court_booking_model->revenue_trend($from, $to),
+            'bookings_by_status'  => $this->Court_booking_model->bookings_by_status($from, $to),
+            'usage_by_slot'       => $this->Court_booking_model->usage_by_slot($from, $to),
+            'utilization'         => $this->Court_booking_model->utilization_by_court($from, $to),
+        );
+        $this->load->view('layout/header', $data);
+        $this->load->view('reports/court_performance', $data);
         $this->load->view('layout/footer');
     }
 

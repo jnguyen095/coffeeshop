@@ -8,7 +8,7 @@ class Dashboard extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('Table_model', 'Order_model', 'Kitchen_ticket_model', 'Payment_model'));
+        $this->load->model(array('Table_model', 'Order_model', 'Kitchen_ticket_model', 'Payment_model', 'Court_booking_model'));
     }
 
     public function index()
@@ -20,16 +20,39 @@ class Dashboard extends MY_Controller
             $status_counts[$t['status']] = (isset($status_counts[$t['status']]) ? $status_counts[$t['status']] : 0) + 1;
         }
 
+        $courts = $this->Table_model->get_courts();
+        $courts_occupied = 0;
+        foreach ($courts as $c)
+        {
+            if ($c['status'] !== 'AVAILABLE') $courts_occupied++;
+        }
+
         $today = date('Y-m-d');
+        $week_ago = date('Y-m-d', strtotime('-6 days'));
+
         $data = array(
-            'page_title'      => 'Tổng quan',
-            'current_user'    => $this->current_user,
-            'tables_total'    => count($tables),
-            'status_counts'   => $status_counts,
-            'today_revenue'   => (float) $this->Order_model->daily_revenue($today),
-            'active_tickets'  => count($this->Kitchen_ticket_model->get_dashboard_tickets(array('NEW', 'PREPARING'))),
-            'wait_payment'    => count($this->Order_model->get_list(array('status' => 'WAIT_PAYMENT'))),
+            'page_title'          => 'Tổng quan',
+            'current_user'        => $this->current_user,
+            'tables_total'        => count($tables),
+            'status_counts'       => $status_counts,
+            'today_revenue'       => (float) $this->Order_model->daily_revenue($today),
+            'active_tickets'      => count($this->Kitchen_ticket_model->get_dashboard_tickets(array('NEW', 'PREPARING'))),
+            'wait_payment'        => count($this->Order_model->get_list(array('status' => 'WAIT_PAYMENT'))),
+            'courts_total'        => count($courts),
+            'courts_occupied'     => $courts_occupied,
+            'court_revenue_today' => 0,
+            'court_revenue_trend' => array(),
         );
+
+        if ($courts)
+        {
+            $trend = $this->Court_booking_model->revenue_trend($week_ago, $today);
+            $data['court_revenue_trend'] = $trend;
+            foreach ($trend as $t)
+            {
+                if ($t['day'] === $today) $data['court_revenue_today'] = (float) $t['total_revenue'];
+            }
+        }
 
         $this->load->view('layout/header', $data);
         $this->load->view('dashboard/index', $data);

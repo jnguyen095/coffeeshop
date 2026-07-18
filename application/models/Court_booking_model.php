@@ -191,4 +191,119 @@ class Court_booking_model extends CI_Model
             'table_session_id' => $table_session_id,
         ));
     }
+
+    /** Doanh thu dịch vụ sân (tiền sân + thuê vợt/trang phục/nhặt bóng...) theo từng sân, đơn đã thanh toán. */
+    public function revenue_by_court($from, $to)
+    {
+        return $this->db->select('cafe_tables.table_name, SUM(order_items.amount) as total_revenue')
+            ->from('order_items')
+            ->join('order_sessions', 'order_sessions.id = order_items.order_session_id')
+            ->join('table_sessions', 'table_sessions.id = order_sessions.table_session_id')
+            ->join('cafe_tables', 'cafe_tables.id = table_sessions.table_id')
+            ->join('products', 'products.id = order_items.product_id')
+            ->join('categories', 'categories.id = products.category_id')
+            ->where('categories.court_only', 1)
+            ->where('order_items.status', 'ACTIVE')
+            ->where('order_sessions.status', 'PAID')
+            ->where('order_sessions.paid_at >=', $from.' 00:00:00')
+            ->where('order_sessions.paid_at <=', $to.' 23:59:59')
+            ->group_by('cafe_tables.id')
+            ->order_by('total_revenue', 'DESC')
+            ->get()->result_array();
+    }
+
+    /** Xu hướng doanh thu dịch vụ sân theo ngày, dùng cho biểu đồ đường. */
+    public function revenue_trend($from, $to)
+    {
+        return $this->db->select("DATE(order_sessions.paid_at) as day, SUM(order_items.amount) as total_revenue")
+            ->from('order_items')
+            ->join('order_sessions', 'order_sessions.id = order_items.order_session_id')
+            ->join('products', 'products.id = order_items.product_id')
+            ->join('categories', 'categories.id = products.category_id')
+            ->where('categories.court_only', 1)
+            ->where('order_items.status', 'ACTIVE')
+            ->where('order_sessions.status', 'PAID')
+            ->where('order_sessions.paid_at >=', $from.' 00:00:00')
+            ->where('order_sessions.paid_at <=', $to.' 23:59:59')
+            ->group_by('DATE(order_sessions.paid_at)')
+            ->order_by('day', 'ASC')
+            ->get()->result_array();
+    }
+
+    /** Số lượng booking theo trạng thái trong khoảng ngày, dùng cho biểu đồ tròn. */
+    public function bookings_by_status($from, $to)
+    {
+        return $this->db->select('status, COUNT(*) as total')
+            ->where('booking_date >=', $from)
+            ->where('booking_date <=', $to)
+            ->group_by('status')
+            ->get($this->table)->result_array();
+    }
+
+    /** Tổng số phút chơi thực tế rơi vào từng khung giờ (sáng/chiều/tối), booking đã check-in/hoàn tất. */
+    public function usage_by_slot($from, $to)
+    {
+        $bookings = $this->db->select('start_time, end_time')
+            ->where('booking_date >=', $from)
+            ->where('booking_date <=', $to)
+            ->where_in('status', array('CHECKED_IN', 'COMPLETED'))
+            ->get($this->table)->result_array();
+
+        $totals = array('morning' => 0, 'afternoon' => 0, 'evening' => 0);
+        foreach ($bookings as $b)
+        {
+            $start = $this->_to_minutes($b['start_time']);
+            $end = $this->_to_minutes($b['end_time']);
+            foreach (self::SLOTS as $key => $slot)
+            {
+                $slot_start = $this->_to_minutes($slot['start']);
+                $slot_end = $this->_to_minutes($slot['end']);
+                $totals[$key] += max(0, min($end, $slot_end) - max($start, $slot_start));
+            }
+        }
+        return $totals;
+    }
+
+    /**
+     * Tỷ lệ lấp đầy từng sân = tổng phút đã chơi (check-in/hoàn tất) / tổng phút
+     * hoạt động có thể có trong khoảng ngày (dựa trên khung giờ SLOTS: 06:00-23:00).
+     */
+    public function utilization_by_court($from, $to)
+    {
+        $days = (int) round((strtotime($to) - strtotime($from)) / 86400) + 1;
+
+        $available_minutes_per_day = 0;
+        foreach (self::SLOTS as $slot)
+        {
+            $available_minutes_per_day += $this->_to_minutes($slot['end']) - $this->_to_minutes($slot['start']);
+        }
+        $available_minutes = $available_minutes_per_day * max(1, $days);
+
+        $courts = $this->db->where('table_type', 'COURT')->order_by('table_code', 'ASC')->get('cafe_tables')->result_array();
+
+        $bookings = $this->db->select('table_id, start_time, end_time')
+            ->where('booking_date >=', $from)
+            ->where('booking_date <=', $to)
+            ->where_in('status', array('CHECKED_IN', 'COMPLETED'))
+            ->get($this->table)->result_array();
+
+        $used_minutes = array();
+        foreach ($bookings as $b)
+        {
+            $minutes = $this->_to_minutes($b['end_time']) - $this->_to_minutes($b['start_time']);
+            $used_minutes[$b['table_id']] = (isset($used_minutes[$b['table_id']]) ? $used_minutes[$b['table_id']] : 0) + $minutes;
+        }
+
+        $result = array();
+        foreach ($courts as $c)
+        {
+            $used = isset($used_minutes[$c['id']]) ? $used_minutes[$c['id']] : 0;
+            $result[] = array(
+                'table_name'      => $c['table_name'],
+                'used_minutes'    => $used,
+                'utilization_pct' => $available_minutes > 0 ? round($used / $available_minutes * 100, 1) : 0,
+            );
+        }
+        return $result;
+    }
 }

@@ -61,6 +61,7 @@ $route['reports/top-products'] = 'reports/top_products';
 $route['reports/table-usage'] = 'reports/table_usage';
 $route['reports/kitchen-performance'] = 'reports/kitchen_performance';
 $route['reports/payment-summary'] = 'reports/payment_summary';
+$route['reports/court-performance'] = 'reports/court_performance';
 
 $route['users'] = 'users/index';
 $route['users/create'] = 'users/create';

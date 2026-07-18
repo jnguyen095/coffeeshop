@@ -9,6 +9,7 @@
       array('table-usage', 'bi-grid-3x3-gap', 'Sử dụng bàn'),
       array('kitchen-performance', 'bi-fire', 'Hiệu suất bếp'),
       array('payment-summary', 'bi-cash-coin', 'Tổng hợp thanh toán'),
+      array('court-performance', 'bi-dribbble', 'Hiệu suất sân pickleball'),
     );
     foreach ($reports as $r): ?>
     <div class="col-6 col-md-4 col-lg-3">
