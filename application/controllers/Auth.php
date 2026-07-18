@@ -22,6 +22,14 @@ class Auth extends CI_Controller
             redirect('dashboard');
         }
 
+        // Chưa có session (hết hạn 2 giờ) nhưng còn cookie "ghi nhớ đăng nhập" (1 năm) hợp lệ.
+        $remembered_user = attempt_remember_login();
+        if ($remembered_user)
+        {
+            redirect($this->_home_for_role($remembered_user['role']));
+            return;
+        }
+
         $error = NULL;
 
         if ($this->input->method() === 'post')
@@ -37,6 +45,13 @@ class Auth extends CI_Controller
                 {
                     unset($user['password']);
                     $this->session->set_userdata('user', $user);
+
+                    if ($this->input->post('remember'))
+                    {
+                        $this->load->model('User_remember_model');
+                        $cookie_value = $this->User_remember_model->create($user['id']);
+                        set_remember_cookie($cookie_value, User_remember_model::TTL_DAYS * 86400);
+                    }
 
                     $this->load->model('Audit_log_model');
                     $this->Audit_log_model->log('auth', 'LOGIN', NULL, array('username' => $user['username']), $user['id']);
@@ -61,9 +76,13 @@ class Auth extends CI_Controller
         {
             $this->load->model('Audit_log_model');
             $this->Audit_log_model->log('auth', 'LOGOUT', NULL, NULL, $user['id']);
+
+            $this->load->model('User_remember_model');
+            $this->User_remember_model->delete_for_user($user['id']);
         }
         $this->session->unset_userdata('user');
         $this->session->sess_destroy();
+        clear_remember_cookie();
         redirect('login');
     }
 

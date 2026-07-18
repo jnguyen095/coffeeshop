@@ -71,9 +71,9 @@
       <div class="menu-item-name"><?php echo htmlspecialchars($p['product_name']); ?></div>
       <div class="menu-item-price"><?php echo money_format_vnd($p['price']); ?></div>
       <div class="qty-stepper">
-        <button type="button" onclick="stepQty(<?php echo $p['id']; ?>,-1)">−</button>
+        <button type="button" onclick="stepQty(<?php echo $p['id']; ?>,-1)"><i class="bi bi-dash-lg"></i></button>
         <span id="qty-<?php echo $p['id']; ?>">0</span>
-        <button type="button" onclick="stepQty(<?php echo $p['id']; ?>,1)">+</button>
+        <button type="button" onclick="stepQty(<?php echo $p['id']; ?>,1)"><i class="bi bi-plus-lg"></i></button>
       </div>
     </div>
     <?php endforeach; ?>

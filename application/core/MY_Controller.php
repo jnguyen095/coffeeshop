@@ -22,6 +22,13 @@ class MY_Controller extends CI_Controller
 
         if ( ! $this->current_user)
         {
+            // Phiên CI session (2 giờ) đã hết hạn — thử tự đăng nhập lại bằng
+            // cookie "ghi nhớ đăng nhập" (1 năm) trước khi bắt về trang login.
+            $this->current_user = attempt_remember_login();
+        }
+
+        if ( ! $this->current_user)
+        {
             redirect('login');
             return;
         }

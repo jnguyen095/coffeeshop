@@ -156,8 +156,11 @@
                   <div class="small text-muted"><?php echo money_format_vnd($p['price']); ?></div>
                 </div>
               </div>
-              <input type="number" min="0" value="0" class="form-control form-control-sm qty-input" style="width:70px;"
-                     data-product-id="<?php echo $p['id']; ?>">
+              <div class="qty-stepper">
+                <button type="button" onclick="stepAddItemQty(<?php echo $p['id']; ?>,-1)"><i class="bi bi-dash-lg"></i></button>
+                <span id="add-item-qty-<?php echo $p['id']; ?>">0</span>
+                <button type="button" onclick="stepAddItemQty(<?php echo $p['id']; ?>,1)"><i class="bi bi-plus-lg"></i></button>
+              </div>
             </div>
             <?php endforeach; ?>
           <?php endforeach; ?>
@@ -222,19 +225,24 @@ if (document.getElementById('ticketStatusList')){
   setInterval(pollTicketStatus, 5000);
 }
 
+var addItemCart = {};
+
+function stepAddItemQty(pid, delta){
+  var cur = addItemCart[pid] || 0;
+  cur = Math.max(0, cur + delta);
+  if (cur === 0) delete addItemCart[pid]; else addItemCart[pid] = cur;
+  document.getElementById('add-item-qty-'+pid).textContent = cur;
+}
+
 function buildCartInputs(){
   var container = document.getElementById('hiddenInputs');
   container.innerHTML = '';
-  var inputs = document.querySelectorAll('.qty-input');
   var count = 0;
-  inputs.forEach(function(inp){
-    var qty = parseInt(inp.value, 10) || 0;
-    if (qty > 0){
-      count++;
-      container.innerHTML += '<input type="hidden" name="product_id[]" value="'+inp.dataset.productId+'">';
-      container.innerHTML += '<input type="hidden" name="qty[]" value="'+qty+'">';
-      container.innerHTML += '<input type="hidden" name="note[]" value="">';
-    }
+  Object.keys(addItemCart).forEach(function(pid){
+    count++;
+    container.innerHTML += '<input type="hidden" name="product_id[]" value="'+pid+'">';
+    container.innerHTML += '<input type="hidden" name="qty[]" value="'+addItemCart[pid]+'">';
+    container.innerHTML += '<input type="hidden" name="note[]" value="">';
   });
   if (count === 0){ alert('Vui lòng chọn ít nhất 1 món.'); return false; }
   return true;

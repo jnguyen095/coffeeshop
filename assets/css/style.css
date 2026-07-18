@@ -82,7 +82,7 @@ body{
   flex:0 0 auto; color: var(--brand); font-weight:700; font-size:.78rem; white-space:nowrap;
 }
 .qty-stepper{ display:flex; align-items:center; gap:.25rem; flex:0 0 auto; }
-.qty-stepper button{ width:24px; height:24px; border-radius:50%; border:1px solid #ddd; background:#fff; line-height:1; padding:0; font-size:.85rem; }
+.qty-stepper button{ width:24px; height:24px; border-radius:50%; border:1px solid #ddd; background:#fff; line-height:1; padding:0; font-size:16px; }
 .qty-stepper span{ min-width:1em; text-align:center; font-weight:600; font-size:.82rem; }
 .menu-item-qty{ flex:0 0 auto; font-size:.8rem; font-weight:600; color:#666; white-space:nowrap; }
 
