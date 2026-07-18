@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Tables extends MY_Controller
 {
-    protected $allowed_roles = array('STAFF', 'ADMIN');
+    protected $allowed_roles = array('STAFF', 'ADMIN', 'CASHIER');
 
     public function __construct()
     {
