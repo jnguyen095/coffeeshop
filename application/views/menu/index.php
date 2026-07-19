@@ -198,7 +198,7 @@ function renderCart(){
       '<div class="menu-item-name">'+escapeHtml(p.name)+'</div>'+
       '<div class="menu-item-price">'+fmt(p.price)+'</div>'+
       '<div class="qty-stepper">'+
-        '<button type="button" onclick="stepQty('+pid+',-1)">−</button><span>'+qty+'</span><button type="button" onclick="stepQty('+pid+',1)">+</button>'+
+        '<button type="button" onclick="stepQty('+pid+',-1)"><i class="bi bi-dash-lg"></i></button><span>'+qty+'</span><button type="button" onclick="stepQty('+pid+',1)"><i class="bi bi-plus-lg"></i></button>'+
       '</div></div>';
   });
   document.getElementById('cartItemsList').innerHTML = html || '<div class="text-muted text-center py-4">Giỏ hàng trống</div>';
