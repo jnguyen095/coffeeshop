@@ -24,7 +24,7 @@
       <?php else: ?>
         <a href="<?php echo site_url('tables/'.$t['id']); ?>" class="text-decoration-none table-link">
       <?php endif; ?>
-        <div class="card table-card border-0 h-100 position-relative bg-<?php echo table_status_badge($t['status']); ?>">
+        <div class="card table-card border-0 h-100 position-relative">
           <?php if ( ! empty($t['pending_calls'])): ?>
             <span class="call-alert-badge call-alert-icon" title="<?php echo in_array('PAYMENT', $t['pending_calls'], TRUE) ? 'Yêu cầu thanh toán' : 'Cần hỗ trợ'; ?>">
               <i class="bi <?php echo in_array('PAYMENT', $t['pending_calls'], TRUE) ? 'bi-credit-card' : 'bi-bell-fill'; ?>"></i>

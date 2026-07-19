@@ -66,7 +66,6 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
             <i class="bi bi-person-circle"></i> <?php echo htmlspecialchars($current_user['fullname']); ?>
-            <span class="badge bg-light text-dark ms-1"><?php echo role_label($current_user['role']); ?></span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a class="dropdown-item" href="<?php echo site_url('logout'); ?>"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
