@@ -35,7 +35,7 @@
             </div>
             <div class="mb-3 form-check">
               <input type="checkbox" name="remember" value="1" class="form-check-input" id="rememberMe">
-              <label class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập (1 năm)</label>
+              <label class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
             </div>
             <button type="submit" class="btn btn-brand btn-lg w-100">Đăng nhập</button>
           <?php echo form_close(); ?>
