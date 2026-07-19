@@ -75,15 +75,15 @@ body{
   background: var(--brand-light); color: var(--brand); font-size:1rem;
 }
 .menu-item-name{
-  flex:1 1 auto; min-width:0; font-weight:600; font-size:.82rem;
+  flex:1 1 auto; min-width:0; font-weight:600; font-size:16px;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .menu-item-price{
-  flex:0 0 auto; color: var(--brand); font-weight:700; font-size:.78rem; white-space:nowrap;
+  flex:0 0 auto; color: var(--brand); font-weight:700; font-size:16px; white-space:nowrap;
 }
 .qty-stepper{ display:flex; align-items:center; gap:.25rem; flex:0 0 auto; }
 .qty-stepper button{ width:24px; height:24px; border-radius:50%; border:1px solid #ddd; background:#fff; line-height:1; padding:0; font-size:16px; }
-.qty-stepper span{ min-width:1em; text-align:center; font-weight:600; font-size:.82rem; }
+.qty-stepper span{ min-width:1em; text-align:center; font-weight:600; font-size:16px; }
 .menu-item-qty{ flex:0 0 auto; font-size:.8rem; font-weight:600; color:#666; white-space:nowrap; }
 
 .cart-fab{
@@ -203,4 +203,12 @@ body{
   h1, .h1{ font-size:1.5rem; }
   h4, .h4{ font-size:1.1rem; }
 }
-
+button.btn.btn-light.btn-sm.rounded-pill {
+  position: relative;
+}
+span#orderItemCountBadge {
+  position: absolute;
+  left: -18px;
+  top: -7px;
+  font-size: 16px;
+}

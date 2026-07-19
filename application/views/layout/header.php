@@ -6,7 +6,7 @@
 <title><?php echo isset($page_title) ? $page_title.' - Cafe POS' : 'Cafe POS & KDS'; ?></title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-<link href="<?php echo base_url('assets/css/style.css'); ?>" rel="stylesheet">
+<link href="<?php echo base_url('assets/css/style_v1.2.css'); ?>" rel="stylesheet">
 </head>
 <body>
 <?php if ( ! empty($current_user)): ?>
