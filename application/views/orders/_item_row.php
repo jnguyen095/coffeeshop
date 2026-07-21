@@ -2,7 +2,7 @@
   // Viền ảnh món tô theo trạng thái pha chế (ưu tiên NEW > PREPARING > COMPLETED) —
   // chớp khi còn NEW/PREPARING, viền đặc khi COMPLETED. Món hủy hoặc chưa lên bếp thì không tô.
   $kitchen_status = isset($kitchen_status) ? $kitchen_status : NULL;
-  $img_classes = 'rounded border flex-shrink-0';
+  $img_classes = 'rounded border flex-shrink-0 item-kitchen-img';
   if ($kitchen_status && $it['status'] !== 'CANCELLED')
   {
       $img_classes .= ' border-'.kitchen_status_badge($kitchen_status);
@@ -12,7 +12,7 @@
       }
   }
 ?>
-<div class="list-group-item d-flex justify-content-between align-items-center <?php echo $it['status']==='CANCELLED' ? 'opacity-50 text-decoration-line-through' : ''; ?>">
+<div class="list-group-item d-flex justify-content-between align-items-center <?php echo $it['status']==='CANCELLED' ? 'opacity-50 text-decoration-line-through' : ''; ?>" data-product-id="<?php echo $it['product_id']; ?>">
   <div class="d-flex align-items-center gap-2">
     <?php if ($it['image']): ?>
       <img src="<?php echo base_url('assets/'.$it['image']); ?>" style="width:44px;height:44px;object-fit:cover;" class="<?php echo $img_classes; ?>">

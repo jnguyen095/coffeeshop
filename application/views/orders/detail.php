@@ -4,7 +4,8 @@
     // mọi ticket của đơn này) — dùng để tô viền ảnh món trong danh sách "Món đã gọi".
     // Chỉ tính khi đơn còn hoạt động, khớp điều kiện hiển thị của khối ticket status cũ.
     $kitchen_status_by_product = array();
-    if ($tickets && ! in_array($order['status'], array('PAID', 'CANCELLED'), TRUE))
+    $kitchen_poll_active = ($tickets && ! in_array($order['status'], array('PAID', 'CANCELLED'), TRUE));
+    if ($kitchen_poll_active)
     {
         $rank = array('NEW' => 3, 'PREPARING' => 2, 'COMPLETED' => 1);
         foreach ($tickets as $t)
@@ -77,7 +78,7 @@
 
       <div class="card border-0 shadow-sm rounded-4 mb-3">
         <div class="card-header bg-white fw-semibold">Món đã gọi</div>
-        <div class="list-group list-group-flush">
+        <div class="list-group list-group-flush" id="orderedItemsList">
           <?php foreach ($regular_items as $it): ?>
             <?php $this->load->view('orders/_item_row', array('it' => $it, 'order' => $order, 'kitchen_status' => isset($kitchen_status_by_product[$it['product_id']]) ? $kitchen_status_by_product[$it['product_id']] : NULL)); ?>
           <?php endforeach; ?>
@@ -166,6 +167,41 @@
 </div>
 
 <script>
+// Tô lại viền ảnh món theo trạng thái pha chế mới nhất, không render lại toàn bộ list.
+var KITCHEN_RANK = {NEW: 3, PREPARING: 2, COMPLETED: 1};
+var KITCHEN_BORDER_COLOR = {NEW: 'danger', PREPARING: 'warning', COMPLETED: 'success'};
+
+function applyKitchenBorder(el, status){
+  el.classList.remove('border-danger', 'border-warning', 'border-success', 'order-kitchen-flash');
+  if ( ! status) return;
+  el.classList.add('border-'+KITCHEN_BORDER_COLOR[status]);
+  if (status !== 'COMPLETED') el.classList.add('order-kitchen-flash');
+}
+
+function refreshKitchenBorders(){
+  fetch('<?php echo site_url("orders/".$order['id']."/ticket-status"); ?>')
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if ( ! res.success) return;
+      var statusByProduct = {};
+      res.tickets.forEach(function(t){
+        t.items.forEach(function(it){
+          var cur = statusByProduct[it.product_id];
+          if ( ! cur || KITCHEN_RANK[it.status] > KITCHEN_RANK[cur]) statusByProduct[it.product_id] = it.status;
+        });
+      });
+      document.querySelectorAll('#orderedItemsList [data-product-id]').forEach(function(row){
+        if (row.classList.contains('opacity-50')) return; // món đã hủy — không tô viền
+        var img = row.querySelector('.item-kitchen-img');
+        if (img) applyKitchenBorder(img, statusByProduct[row.dataset.productId]);
+      });
+    });
+}
+
+<?php if ($kitchen_poll_active): ?>
+setInterval(refreshKitchenBorders, 5000);
+<?php endif; ?>
+
 var addItemCart = {};
 
 function stepAddItemQty(pid, delta){
