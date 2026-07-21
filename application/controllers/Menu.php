@@ -58,11 +58,11 @@ class Menu extends CI_Controller
             show_404();
         }
 
-        if ($table['status'] === 'AVAILABLE')
+       /* if ($table['status'] === 'AVAILABLE')
         {
             redirect('menu/'.$token);
             return;
-        }
+        } */
 
         if (in_array($table['status'], array('WAIT_PAYMENT', 'PAID'), TRUE))
         {
@@ -78,6 +78,7 @@ class Menu extends CI_Controller
                 'NOT_OPEN'   => 'Bàn hiện chưa mở, vui lòng gọi nhân viên hoặc quét lại mã QR trên bàn.',
                 'SUPERSEDED' => 'Phiên đặt món này đã kết thúc (bàn đã phục vụ khách mới). Vui lòng quét lại mã QR trên bàn.',
                 'EXPIRED'    => 'Phiên đặt món đã hết hạn do quá lâu chưa thanh toán. Vui lòng gọi nhân viên hoặc quét lại mã QR trên bàn.',
+                'CLOSED'     => 'Bàn đã thanh toán, cảm ơn quý khách và sớm gặp lại'
             );
             $this->load->view('menu/session_ended', array(
                 'table'   => $table,

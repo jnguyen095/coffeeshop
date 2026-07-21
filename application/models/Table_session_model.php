@@ -41,8 +41,14 @@ class Table_session_model extends CI_Model
      */
     public function validate_session($table_id, $secret)
     {
-        $session = $this->get_open_by_table($table_id);
 
+        $tbSession = $this->db->where('table_id', $table_id)->where('session_secret', $secret)
+            ->order_by('id', 'DESC')->limit(1)->get($this->table)->row_array();
+        if($tbSession['status'] == 'CLOSED'){
+            return array('valid' => FALSE, 'reason' => 'CLOSED');
+        }
+
+        $session = $this->get_open_by_table($table_id);
         if ( ! $session)
         {
             return array('valid' => FALSE, 'reason' => 'NOT_OPEN');

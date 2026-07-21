@@ -189,6 +189,7 @@ class Api_order extends CI_Controller
             'NOT_OPEN'   => 'Bàn hiện chưa mở, vui lòng quét lại mã QR trên bàn.',
             'SUPERSEDED' => 'Phiên đặt món này đã kết thúc. Vui lòng quét lại mã QR trên bàn.',
             'EXPIRED'    => 'Phiên đặt món đã hết hạn. Vui lòng gọi nhân viên hoặc quét lại mã QR trên bàn.',
+            'CLOSED'     => 'Bàn đã thanh toán, cảm ơn quý khách và sớm gặp lại'
         );
 
         return array('valid' => FALSE, 'message' => $messages[$check['reason']]);
