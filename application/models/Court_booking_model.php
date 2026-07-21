@@ -190,7 +190,7 @@ class Court_booking_model extends CI_Model
             ->get()->row_array();
     }
 
-    public function get_by_date($date, $table_id = NULL)
+    public function get_by_date($date, $table_id = NULL, $search = '')
     {
         $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code, cafe_tables.rate_morning, cafe_tables.rate_afternoon, cafe_tables.rate_evening')
             ->from($this->table)
@@ -202,24 +202,40 @@ class Court_booking_model extends CI_Model
         {
             $this->db->where('court_bookings.table_id', $table_id);
         }
+        $this->_apply_search_filter($search);
 
         $bookings = $this->db->order_by('cafe_tables.table_code', 'ASC')->order_by('court_bookings.start_time', 'ASC')->get()->result_array();
         return $this->_with_estimated_fee($bookings);
     }
 
     /** Dùng cho lịch xem theo Tuần/Tháng — mọi lịch đặt còn hiệu lực trong khoảng ngày. */
-    public function get_by_range($date_from, $date_to)
+    public function get_by_range($date_from, $date_to, $search = '')
     {
-        $bookings = $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code, cafe_tables.rate_morning, cafe_tables.rate_afternoon, cafe_tables.rate_evening')
+        $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code, cafe_tables.rate_morning, cafe_tables.rate_afternoon, cafe_tables.rate_evening')
             ->from($this->table)
             ->join('cafe_tables', 'cafe_tables.id = court_bookings.table_id')
             ->where('court_bookings.booking_date >=', $date_from)
             ->where('court_bookings.booking_date <=', $date_to)
-            ->where_in('court_bookings.status', array('BOOKED', 'CHECKED_IN', 'COMPLETED'))
-            ->order_by('court_bookings.booking_date', 'ASC')
+            ->where_in('court_bookings.status', array('BOOKED', 'CHECKED_IN', 'COMPLETED'));
+        $this->_apply_search_filter($search);
+
+        $bookings = $this->db->order_by('court_bookings.booking_date', 'ASC')
             ->order_by('court_bookings.start_time', 'ASC')
             ->get()->result_array();
         return $this->_with_estimated_fee($bookings);
+    }
+
+    /** Lọc theo tên khách hoặc số điện thoại (chứa chuỗi tìm kiếm), dùng chung cho get_by_date()/get_by_range(). */
+    private function _apply_search_filter($search)
+    {
+        if ($search === '' || $search === NULL)
+        {
+            return;
+        }
+        $this->db->group_start()
+            ->like('court_bookings.customer_name', $search)
+            ->or_like('court_bookings.customer_phone', $search)
+            ->group_end();
     }
 
     private function _with_estimated_fee($bookings)

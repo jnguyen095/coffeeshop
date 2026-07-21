@@ -13,13 +13,14 @@
     foreach ($bookings as $b) { $grid[$b['table_id']][$b['booking_date']][] = $b; }
 
     $weekday_labels = array('Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7','Chủ nhật');
+    $search_qs = ($search !== '') ? '&search='.urlencode($search) : '';
   ?>
 
   <div class="d-flex align-items-center gap-2 mb-3">
-    <a href="<?php echo site_url('bookings?view=week&date='.$prev_week); ?>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-left"></i></a>
+    <a href="<?php echo site_url('bookings?view=week&date='.$prev_week.$search_qs); ?>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-left"></i></a>
     <span class="fw-semibold small"><?php echo date('d/m', strtotime($week_start)); ?> - <?php echo date('d/m/Y', strtotime($week_end)); ?></span>
-    <a href="<?php echo site_url('bookings?view=week&date='.$next_week); ?>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-right"></i></a>
-    <a href="<?php echo site_url('bookings?view=week&date='.date('Y-m-d')); ?>" class="btn btn-sm btn-outline-dark">Tuần này</a>
+    <a href="<?php echo site_url('bookings?view=week&date='.$next_week.$search_qs); ?>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-right"></i></a>
+    <a href="<?php echo site_url('bookings?view=week&date='.date('Y-m-d').$search_qs); ?>" class="btn btn-sm btn-outline-dark">Tuần này</a>
   </div>
 
   <?php if (empty($courts)): ?>
@@ -57,7 +58,10 @@
                       data-status="<?php echo $b['status']; ?>"
                       data-order-id="<?php echo $b['order_id']; ?>"
                       data-fee="<?php echo (int) $b['estimated_fee']; ?>">
-                  <?php echo substr($b['start_time'],0,5); ?>-<?php echo substr($b['end_time'],0,5); ?> <?php echo htmlspecialchars(mb_strimwidth($b['customer_name'], 0, 10, '…')); ?>
+                  <div class="week-chip-line"><?php echo substr($b['start_time'],0,5); ?>-<?php echo substr($b['end_time'],0,5); ?> <?php echo htmlspecialchars(mb_strimwidth($b['customer_name'], 0, 10, '…')); ?></div>
+                  <?php if ( ! empty($b['customer_phone'])): ?>
+                    <div class="week-chip-line week-chip-phone"><?php echo htmlspecialchars($b['customer_phone']); ?></div>
+                  <?php endif; ?>
                 </span>
               <?php endforeach; ?>
             </td>

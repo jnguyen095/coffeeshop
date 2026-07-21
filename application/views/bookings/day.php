@@ -4,6 +4,7 @@
   <?php
     $prev_date = date('Y-m-d', strtotime($date.' -1 day'));
     $next_date = date('Y-m-d', strtotime($date.' +1 day'));
+    $search_qs = ($search !== '') ? '&search='.urlencode($search) : '';
     $total_minutes = ($day_end_hour - $day_start_hour) * 60;
 
     // Gom lịch đặt theo sân để dễ render từng cột.
@@ -27,11 +28,11 @@
   ?>
 
   <div class="d-flex align-items-center gap-2 mb-3">
-    <a href="<?php echo site_url('bookings?view=day&date='.$prev_date); ?>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-left"></i></a>
+    <a href="<?php echo site_url('bookings?view=day&date='.$prev_date.$search_qs); ?>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-left"></i></a>
     <input type="date" value="<?php echo $date; ?>" class="form-control form-control-sm" style="max-width:180px;"
-           onchange="location.href='<?php echo site_url('bookings'); ?>?view=day&date='+this.value">
-    <a href="<?php echo site_url('bookings?view=day&date='.$next_date); ?>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-right"></i></a>
-    <a href="<?php echo site_url('bookings?view=day&date='.date('Y-m-d')); ?>" class="btn btn-sm btn-outline-dark">Hôm nay</a>
+           onchange="location.href='<?php echo site_url('bookings'); ?>?view=day&date='+this.value+'<?php echo $search_qs; ?>'">
+    <a href="<?php echo site_url('bookings?view=day&date='.$next_date.$search_qs); ?>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-right"></i></a>
+    <a href="<?php echo site_url('bookings?view=day&date='.date('Y-m-d').$search_qs); ?>" class="btn btn-sm btn-outline-dark">Hôm nay</a>
     <span class="small text-muted ms-auto d-none d-md-inline">Bấm vào ô trống để đặt lịch nhanh, bấm vào lịch đã đặt để xem chi tiết</span>
   </div>
 
@@ -81,6 +82,9 @@
                  data-fee="<?php echo (int) $b['estimated_fee']; ?>">
               <div class="calendar-booking-name"><?php echo substr($b['start_time'],0,5); ?>-<?php echo substr($b['end_time'],0,5); ?></div>
               <div><?php echo htmlspecialchars($b['customer_name']); ?></div>
+              <?php if ( ! empty($b['customer_phone'])): ?>
+                <div class="calendar-booking-phone"><?php echo htmlspecialchars($b['customer_phone']); ?></div>
+              <?php endif; ?>
             </div>
           <?php endforeach; ?>
         </div>

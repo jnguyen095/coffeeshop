@@ -146,14 +146,17 @@ body{
 .calendar-booking.status-checked_in{ background:#198754; }
 .calendar-booking.status-completed{ background:#6c757d; }
 .calendar-booking-name{ font-weight:700; }
+.calendar-booking-phone{ font-size:.66rem; opacity:.9; }
 
 .week-court-row td{ vertical-align:top; }
 /* Mỗi lịch đặt 1 dòng riêng, xếp theo thứ tự giờ tăng dần — dễ nhận ra khung giờ trống giữa các dòng. */
 .week-chip{
   display:block; font-size:.72rem; padding:2px 6px; border-radius:4px; color:#fff; margin-bottom:3px; cursor:pointer;
-  overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+  overflow:hidden;
 }
 .week-chip:last-child{ margin-bottom:0; }
+.week-chip-line{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.week-chip-phone{ font-size:.62rem; opacity:.85; }
 .week-chip.status-booked{ background:#0d6efd; }
 .week-chip.status-checked_in{ background:#198754; }
 .week-chip.status-completed{ background:#6c757d; }

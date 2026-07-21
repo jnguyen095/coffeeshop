@@ -20,13 +20,14 @@
     $court_palette = array('#0d6efd','#20c997','#fd7e14','#6f42c1','#d63384','#0dcaf0','#198754','#dc3545');
     $court_colors = array();
     foreach ($courts as $i => $c) { $court_colors[$c['id']] = $court_palette[$i % count($court_palette)]; }
+    $search_qs = ($search !== '') ? '&search='.urlencode($search) : '';
   ?>
 
   <div class="d-flex align-items-center gap-2 mb-3">
-    <a href="<?php echo site_url('bookings?view=month&date='.$prev_month); ?>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-left"></i></a>
+    <a href="<?php echo site_url('bookings?view=month&date='.$prev_month.$search_qs); ?>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-left"></i></a>
     <span class="fw-semibold">Tháng <?php echo date('m/Y', strtotime($month_start)); ?></span>
-    <a href="<?php echo site_url('bookings?view=month&date='.$next_month); ?>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-right"></i></a>
-    <a href="<?php echo site_url('bookings?view=month&date='.date('Y-m-d')); ?>" class="btn btn-sm btn-outline-dark">Tháng này</a>
+    <a href="<?php echo site_url('bookings?view=month&date='.$next_month.$search_qs); ?>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-chevron-right"></i></a>
+    <a href="<?php echo site_url('bookings?view=month&date='.date('Y-m-d').$search_qs); ?>" class="btn btn-sm btn-outline-dark">Tháng này</a>
   </div>
 
   <div class="row g-1 mb-1">
@@ -48,7 +49,7 @@
       ?>
       <div class="col">
         <div class="month-day-cell rounded <?php echo $is_today ? 'is-today' : ''; ?> <?php echo $is_other_month ? 'is-other-month' : ''; ?>"
-             onclick="location.href='<?php echo site_url('bookings'); ?>?view=day&date=<?php echo $cursor; ?>'">
+             onclick="location.href='<?php echo site_url('bookings'); ?>?view=day&date=<?php echo $cursor; ?><?php echo $search_qs; ?>'">
           <div class="month-day-number"><?php echo date('j', strtotime($cursor)); ?></div>
           <?php
             // Mỗi sân 1 cột riêng trong ngày — không dồn chung 1 danh sách nữa,

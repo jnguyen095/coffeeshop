@@ -21,10 +21,11 @@ class Bookings extends MY_Controller
     {
         $view = $this->input->get('view') ?: 'day';
         $date = $this->input->get('date') ?: date('Y-m-d');
+        $search = trim((string) $this->input->get('search'));
 
-        if ($view === 'week') { $this->_week_view($date); return; }
-        if ($view === 'month') { $this->_month_view($date); return; }
-        $this->_day_view($date);
+        if ($view === 'week') { $this->_week_view($date, $search); return; }
+        if ($view === 'month') { $this->_month_view($date, $search); return; }
+        $this->_day_view($date, $search);
     }
 
     private function _enrich_with_order_id(&$bookings)
@@ -48,9 +49,9 @@ class Bookings extends MY_Controller
         return array((int) $sh, ((int) $eh) + ($em > 0 ? 1 : 0));
     }
 
-    private function _day_view($date)
+    private function _day_view($date, $search = '')
     {
-        $bookings = $this->Court_booking_model->get_by_date($date);
+        $bookings = $this->Court_booking_model->get_by_date($date, NULL, $search);
         $this->_enrich_with_order_id($bookings);
 
         list($day_start_hour, $day_end_hour) = $this->_booking_hour_bounds();
@@ -60,6 +61,7 @@ class Bookings extends MY_Controller
             'current_user'    => $this->current_user,
             'view'            => 'day',
             'date'            => $date,
+            'search'          => $search,
             'courts'          => $this->Table_model->get_courts(),
             'bookings'        => $bookings,
             'day_start_hour'  => $day_start_hour,
@@ -71,13 +73,13 @@ class Bookings extends MY_Controller
         $this->load->view('layout/footer');
     }
 
-    private function _week_view($date)
+    private function _week_view($date, $search = '')
     {
         $day_of_week = (int) date('N', strtotime($date)); // 1=Mon
         $week_start = date('Y-m-d', strtotime($date.' -'.($day_of_week - 1).' days'));
         $week_end = date('Y-m-d', strtotime($week_start.' +6 days'));
 
-        $bookings = $this->Court_booking_model->get_by_range($week_start, $week_end);
+        $bookings = $this->Court_booking_model->get_by_range($week_start, $week_end, $search);
         $this->_enrich_with_order_id($bookings);
 
         $data = array(
@@ -85,6 +87,7 @@ class Bookings extends MY_Controller
             'current_user' => $this->current_user,
             'view'         => 'week',
             'date'         => $date,
+            'search'       => $search,
             'week_start'   => $week_start,
             'week_end'     => $week_end,
             'courts'       => $this->Table_model->get_courts(),
@@ -95,12 +98,12 @@ class Bookings extends MY_Controller
         $this->load->view('layout/footer');
     }
 
-    private function _month_view($date)
+    private function _month_view($date, $search = '')
     {
         $month_start = date('Y-m-01', strtotime($date));
         $month_end = date('Y-m-t', strtotime($date));
 
-        $bookings = $this->Court_booking_model->get_by_range($month_start, $month_end);
+        $bookings = $this->Court_booking_model->get_by_range($month_start, $month_end, $search);
         $this->_enrich_with_order_id($bookings);
 
         $by_day = array();
@@ -114,6 +117,7 @@ class Bookings extends MY_Controller
             'current_user' => $this->current_user,
             'view'         => 'month',
             'date'         => $date,
+            'search'       => $search,
             'month_start'  => $month_start,
             'month_end'    => $month_end,
             'by_day'       => $by_day,
