@@ -35,4 +35,16 @@ class Setting_model extends CI_Model
     {
         return (float) $this->get('vat_percent', 8);
     }
+
+    /** Giờ mở cửa nhận đặt sân, định dạng 'HH:MM'. */
+    public function get_booking_start_time()
+    {
+        return $this->get('booking_start_time', '06:00');
+    }
+
+    /** Giờ đóng cửa nhận đặt sân, định dạng 'HH:MM'. */
+    public function get_booking_end_time()
+    {
+        return $this->get('booking_end_time', '22:00');
+    }
 }

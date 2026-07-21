@@ -22,4 +22,27 @@
       <?php echo form_close(); ?>
     </div>
   </div>
+
+  <div class="card border-0 shadow-sm rounded-4 mt-3">
+    <div class="card-header bg-white fw-semibold">Giờ nhận đặt sân</div>
+    <div class="card-body">
+      <?php echo form_open(current_url()); ?>
+        <input type="hidden" name="form" value="booking_hours">
+        <div class="row g-2">
+          <div class="col-6">
+            <label class="form-label">Giờ bắt đầu</label>
+            <input type="time" name="booking_start_time" class="form-control form-control-lg"
+                   value="<?php echo $booking_start_time; ?>" required>
+          </div>
+          <div class="col-6">
+            <label class="form-label">Giờ kết thúc</label>
+            <input type="time" name="booking_end_time" class="form-control form-control-lg"
+                   value="<?php echo $booking_end_time; ?>" required>
+          </div>
+        </div>
+        <div class="form-text">Khung giờ trong ngày cho phép đặt/hiển thị lịch sân. Mặc định 06:00 - 22:00.</div>
+        <button class="btn btn-brand btn-lg w-100 mt-3">Lưu thay đổi</button>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
 </div>

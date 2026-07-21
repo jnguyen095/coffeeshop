@@ -61,6 +61,71 @@ class Court_booking_model extends CI_Model
         return $this->db->get($this->table)->num_rows() > 0;
     }
 
+    /** Sân đầu tiên (theo thứ tự $courts) không trùng lịch trong [start_time, end_time) của $date, hoặc NULL nếu tất cả đều bận. */
+    public function find_available_table(array $courts, $date, $start_time, $end_time)
+    {
+        foreach ($courts as $court)
+        {
+            if ( ! $this->has_conflict($court['id'], $date, $start_time, $end_time))
+            {
+                return $court['id'];
+            }
+        }
+        return NULL;
+    }
+
+    /** Danh sách ngày rơi vào các $weekdays trong khoảng [date_from, date_to], dùng để chọn sân trước khi gọi create_recurring(). */
+    public function occurrence_dates(array $weekdays, $date_from, $date_to)
+    {
+        $dates = array();
+        $cursor = strtotime($date_from);
+        $end = strtotime($date_to);
+
+        while ($cursor <= $end)
+        {
+            if (in_array((int) date('N', $cursor), $weekdays, TRUE))
+            {
+                $dates[] = date('Y-m-d', $cursor);
+            }
+            $cursor = strtotime('+1 day', $cursor);
+        }
+        return $dates;
+    }
+
+    /**
+     * Sân phù hợp nhất cho một chuỗi lịch lặp lại: ưu tiên sân trống hoàn toàn ở
+     * mọi ngày trong $dates; nếu không sân nào trống hết, chọn sân bị trùng ít
+     * ngày nhất (để create_recurring tạo được nhiều buổi nhất, phần còn lại bị bỏ qua).
+     */
+    public function find_best_table_for_dates(array $courts, array $dates, $start_time, $end_time)
+    {
+        $best_id = NULL;
+        $best_conflicts = NULL;
+
+        foreach ($courts as $court)
+        {
+            $conflicts = 0;
+            foreach ($dates as $date)
+            {
+                if ($this->has_conflict($court['id'], $date, $start_time, $end_time))
+                {
+                    $conflicts++;
+                }
+            }
+
+            if ($conflicts === 0)
+            {
+                return $court['id'];
+            }
+            if ($best_conflicts === NULL || $conflicts < $best_conflicts)
+            {
+                $best_conflicts = $conflicts;
+                $best_id = $court['id'];
+            }
+        }
+        return $best_id;
+    }
+
     public function create_booking($data)
     {
         $data['created_at'] = date('Y-m-d H:i:s');

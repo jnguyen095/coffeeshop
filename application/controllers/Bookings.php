@@ -14,12 +14,8 @@ class Bookings extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('Court_booking_model', 'Table_model', 'Order_model', 'Order_item_model', 'Product_model'));
+        $this->load->model(array('Court_booking_model', 'Table_model', 'Order_model', 'Order_item_model', 'Product_model', 'Setting_model'));
     }
-
-    /** Giờ hoạt động hiển thị trên lịch ngày — khớp với biên các khung giá. */
-    const DAY_START_HOUR = 6;
-    const DAY_END_HOUR = 23;
 
     public function index()
     {
@@ -44,10 +40,20 @@ class Bookings extends MY_Controller
         }
     }
 
+    /** Giờ đặt sân (int, làm tròn ra ngoài) theo cấu hình ở /settings — vd '06:30' -> start 6, '21:30' -> end 22. */
+    private function _booking_hour_bounds()
+    {
+        list($sh, $sm) = explode(':', $this->Setting_model->get_booking_start_time());
+        list($eh, $em) = explode(':', $this->Setting_model->get_booking_end_time());
+        return array((int) $sh, ((int) $eh) + ($em > 0 ? 1 : 0));
+    }
+
     private function _day_view($date)
     {
         $bookings = $this->Court_booking_model->get_by_date($date);
         $this->_enrich_with_order_id($bookings);
+
+        list($day_start_hour, $day_end_hour) = $this->_booking_hour_bounds();
 
         $data = array(
             'page_title'      => 'Lịch đặt sân',
@@ -56,8 +62,8 @@ class Bookings extends MY_Controller
             'date'            => $date,
             'courts'          => $this->Table_model->get_courts(),
             'bookings'        => $bookings,
-            'day_start_hour'  => self::DAY_START_HOUR,
-            'day_end_hour'    => self::DAY_END_HOUR,
+            'day_start_hour'  => $day_start_hour,
+            'day_end_hour'    => $day_end_hour,
             'slots'           => \Court_booking_model::SLOTS,
         );
         $this->load->view('layout/header', $data);
@@ -122,9 +128,11 @@ class Bookings extends MY_Controller
     {
         $error = NULL;
         $result = NULL;
+        $courts = $this->Table_model->get_courts();
 
         if ($this->input->method() === 'post')
         {
+            $auto_assign = (bool) $this->input->post('auto_assign');
             $table_id = (int) $this->input->post('table_id');
             $customer_name = $this->input->post('customer_name', TRUE);
             $customer_phone = $this->input->post('customer_phone', TRUE);
@@ -136,13 +144,33 @@ class Bookings extends MY_Controller
             $date_to = $this->input->post('date_to') ?: $date_from;
             $weekdays = $this->input->post('weekdays') ?: array();
 
-            if ( ! $table_id || ! $customer_name || ! $date_from || $end_time <= $start_time)
+            $booking_start_time = $this->Setting_model->get_booking_start_time().':00';
+            $booking_end_time = $this->Setting_model->get_booking_end_time().':00';
+
+            if ( ! $customer_name || ! $date_from || $end_time <= $start_time || ( ! $auto_assign && ! $table_id))
             {
                 $error = 'Vui lòng nhập đầy đủ thông tin hợp lệ.';
             }
+            elseif ($start_time < $booking_start_time || $end_time > $booking_end_time)
+            {
+                $error = 'Chỉ nhận đặt sân trong khung giờ '.substr($booking_start_time, 0, 5).' - '.substr($booking_end_time, 0, 5).'.';
+            }
+            elseif (empty($courts))
+            {
+                $error = 'Chưa có sân nào được cấu hình.';
+            }
             elseif ($repeat === 'none')
             {
-                if ($this->Court_booking_model->has_conflict($table_id, $date_from, $start_time, $end_time))
+                if ($auto_assign)
+                {
+                    $table_id = $this->Court_booking_model->find_available_table($courts, $date_from, $start_time, $end_time);
+                }
+
+                if ($auto_assign && ! $table_id)
+                {
+                    $error = 'Không có sân nào trống trong khung giờ đã chọn.';
+                }
+                elseif ( ! $auto_assign && $this->Court_booking_model->has_conflict($table_id, $date_from, $start_time, $end_time))
                 {
                     $error = 'Khung giờ này đã có lịch đặt khác cho sân đã chọn.';
                 }
@@ -158,7 +186,7 @@ class Bookings extends MY_Controller
                         'notes'          => $notes,
                         'created_by'     => $this->current_user['id'],
                     ));
-                    $this->audit('court_booking', 'CREATE', NULL, array('booking_id' => $booking_id));
+                    $this->audit('court_booking', 'CREATE', NULL, array('booking_id' => $booking_id, 'auto_assign' => $auto_assign));
                     redirect('bookings?date='.$date_from);
                     return;
                 }
@@ -172,25 +200,33 @@ class Bookings extends MY_Controller
                 }
                 else
                 {
+                    if ($auto_assign)
+                    {
+                        $dates = $this->Court_booking_model->occurrence_dates($weekdays, $date_from, $date_to);
+                        $table_id = $this->Court_booking_model->find_best_table_for_dates($courts, $dates, $start_time, $end_time);
+                    }
+
                     $result = $this->Court_booking_model->create_recurring(
                         $table_id, $customer_name, $customer_phone, $notes,
                         $weekdays, $start_time, $end_time, $date_from, $date_to,
                         $this->current_user['id']
                     );
-                    $this->audit('court_booking', 'CREATE_RECURRING', NULL, array('group_id' => $result['group_id'], 'created' => count($result['created']), 'skipped' => count($result['skipped'])));
+                    $this->audit('court_booking', 'CREATE_RECURRING', NULL, array('group_id' => $result['group_id'], 'created' => count($result['created']), 'skipped' => count($result['skipped']), 'auto_assign' => $auto_assign));
                 }
             }
         }
 
         $data = array(
-            'page_title'      => 'Đặt lịch sân',
-            'current_user'    => $this->current_user,
-            'courts'          => $this->Table_model->get_courts(),
-            'error'           => $error,
-            'result'          => $result,
-            'prefill_table'   => $this->input->get('table_id'),
-            'prefill_date'    => $this->input->get('date_from') ?: date('Y-m-d'),
-            'prefill_start'   => $this->input->get('start_time'),
+            'page_title'          => 'Đặt lịch sân',
+            'current_user'        => $this->current_user,
+            'courts'              => $courts,
+            'error'               => $error,
+            'result'              => $result,
+            'prefill_table'       => $this->input->get('table_id'),
+            'prefill_date'        => $this->input->get('date_from') ?: date('Y-m-d'),
+            'prefill_start'       => $this->input->get('start_time'),
+            'booking_start_time'  => $this->Setting_model->get_booking_start_time(),
+            'booking_end_time'    => $this->Setting_model->get_booking_end_time(),
         );
         $this->load->view('layout/header', $data);
         $this->load->view('bookings/create', $data);

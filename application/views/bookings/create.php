@@ -34,6 +34,11 @@
           </option>
         <?php endforeach; ?>
       </select>
+      <div class="form-check mt-2">
+        <input class="form-check-input" type="checkbox" name="auto_assign" value="1" id="autoAssign" onchange="toggleAutoAssign(); updateEstimate();">
+        <label class="form-check-label" for="autoAssign">Tự động chọn sân còn trống</label>
+      </div>
+      <div class="form-text">Hệ thống sẽ tự tìm một sân còn trống trong khung giờ đã chọn, không cần chọn sân cụ thể ở trên.</div>
     </div>
     <div class="row g-2">
       <div class="col-6">
@@ -48,13 +53,18 @@
     <div class="row g-2 mt-1">
       <div class="col-6">
         <label class="form-label">Giờ bắt đầu</label>
-        <input type="time" name="start_time" id="startTime" class="form-control" required value="<?php echo $prefill_start ?: '18:00'; ?>" onchange="updateEstimate()">
+        <input type="time" name="start_time" id="startTime" class="form-control" required
+               min="<?php echo $booking_start_time; ?>" max="<?php echo $booking_end_time; ?>"
+               value="<?php echo $prefill_start ?: '18:00'; ?>" onchange="updateEstimate()">
       </div>
       <div class="col-6">
         <label class="form-label">Giờ kết thúc</label>
-        <input type="time" name="end_time" id="endTime" class="form-control" required value="19:00" onchange="updateEstimate()">
+        <input type="time" name="end_time" id="endTime" class="form-control" required
+               min="<?php echo $booking_start_time; ?>" max="<?php echo $booking_end_time; ?>"
+               value="19:00" onchange="updateEstimate()">
       </div>
     </div>
+    <div class="form-text mb-2">Chỉ nhận đặt sân trong khung giờ <?php echo $booking_start_time; ?> - <?php echo $booking_end_time; ?>.</div>
 
     <div class="alert alert-light border mt-3 mb-0 py-2 small" id="estimateBox">
       <i class="bi bi-cash-coin text-brand"></i> Ước tính mỗi buổi: <strong class="text-brand" id="estimatePerSession">0đ</strong>
@@ -107,6 +117,12 @@
 </div>
 
 <script>
+function toggleAutoAssign(){
+  var auto = document.getElementById('autoAssign').checked;
+  var select = document.getElementById('tableSelect');
+  select.disabled = auto;
+  select.required = !auto;
+}
 function toggleRepeat(){
   var repeat = document.querySelector('input[name="repeat"]:checked').value;
   var showRecurring = repeat !== 'none';
@@ -169,9 +185,16 @@ function countOccurrences(weekdays, dateFrom, dateTo){
 }
 
 function updateEstimate(){
-  var tableId = document.getElementById('tableSelect').value;
   var startTime = document.getElementById('startTime').value;
   var endTime = document.getElementById('endTime').value;
+
+  if (document.getElementById('autoAssign').checked){
+    document.getElementById('estimatePerSession').textContent = 'Tùy sân được tự động chọn';
+    document.getElementById('estimateTotalWrap').classList.add('d-none');
+    return;
+  }
+
+  var tableId = document.getElementById('tableSelect').value;
   var rates = COURT_RATES[tableId];
   if (!rates || !startTime || !endTime || endTime <= startTime){
     document.getElementById('estimatePerSession').textContent = '0đ';
