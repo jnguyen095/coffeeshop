@@ -1,5 +1,26 @@
 <div class="container-fluid py-3 py-md-4">
-  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+  <?php
+    // Trạng thái pha chế theo từng sản phẩm (ưu tiên NEW > PREPARING > COMPLETED trong
+    // mọi ticket của đơn này) — dùng để tô viền ảnh món trong danh sách "Món đã gọi".
+    // Chỉ tính khi đơn còn hoạt động, khớp điều kiện hiển thị của khối ticket status cũ.
+    $kitchen_status_by_product = array();
+    if ($tickets && ! in_array($order['status'], array('PAID', 'CANCELLED'), TRUE))
+    {
+        $rank = array('NEW' => 3, 'PREPARING' => 2, 'COMPLETED' => 1);
+        foreach ($tickets as $t)
+        {
+            foreach ($t['items'] as $ti)
+            {
+                $pid = $ti['product_id'];
+                if ( ! isset($kitchen_status_by_product[$pid]) || $rank[$ti['status']] > $rank[$kitchen_status_by_product[$pid]])
+                {
+                    $kitchen_status_by_product[$pid] = $ti['status'];
+                }
+            }
+        }
+    }
+  ?>
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
     <div>
       <h4 class="fw-bold mb-0">
         <?php if ($order['order_type'] === 'TAKEAWAY'): ?>
@@ -58,7 +79,7 @@
         <div class="card-header bg-white fw-semibold">Món đã gọi</div>
         <div class="list-group list-group-flush">
           <?php foreach ($regular_items as $it): ?>
-            <?php $this->load->view('orders/_item_row', array('it' => $it, 'order' => $order)); ?>
+            <?php $this->load->view('orders/_item_row', array('it' => $it, 'order' => $order, 'kitchen_status' => isset($kitchen_status_by_product[$it['product_id']]) ? $kitchen_status_by_product[$it['product_id']] : NULL)); ?>
           <?php endforeach; ?>
           <?php if (empty($items)): ?>
             <div class="list-group-item text-muted text-center py-4">Chưa có món nào.</div>
@@ -71,40 +92,6 @@
           <div class="d-flex justify-content-between fw-bold fs-5 mt-1"><span>Tổng cộng</span><span class="text-brand"><?php echo money_format_vnd($order['total_amount']); ?></span></div>
         </div>
       </div>
-
-
-
-      <?php if ($tickets && ! in_array($order['status'], array('PAID', 'CANCELLED'), TRUE)): ?>
-      <div class="card border-0 shadow-sm rounded-4 mb-3">
-        <div class="card-header bg-white fw-semibold d-flex justify-content-between align-items-center">
-          <span><i class="bi bi-cup-hot text-brand"></i> Trạng thái pha chế</span>
-          <span class="small text-muted">Tự cập nhật mỗi 5s</span>
-        </div>
-        <div class="list-group list-group-flush" id="ticketStatusList">
-          <?php foreach (array_reverse($tickets) as $t): ?>
-          <div class="list-group-item">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="badge bg-<?php echo kitchen_status_badge($t['status']); ?>"><?php echo kitchen_status_label($t['status']); ?></span>
-              <span class="small text-muted"><i class="bi bi-clock"></i> <?php echo date('H:i d/m', strtotime($t['created_at'])); ?></span>
-            </div>
-            <?php foreach ($t['items'] as $it): ?>
-              <div class="d-flex justify-content-between align-items-center py-1">
-                <div class="d-flex align-items-center gap-2">
-                  <?php if ($it['image']): ?>
-                    <img src="<?php echo base_url('assets/'.$it['image']); ?>" style="width:32px;height:32px;object-fit:cover;" class="rounded border flex-shrink-0">
-                  <?php else: ?>
-                    <div class="d-flex align-items-center justify-content-center bg-light rounded border text-muted flex-shrink-0" style="width:32px;height:32px;"><i class="bi bi-cup-straw"></i></div>
-                  <?php endif; ?>
-                  <span><?php echo htmlspecialchars($it['product_name']); ?> <span class="text-muted">x<?php echo $it['qty']; ?></span></span>
-                </div>
-                <span class="badge bg-<?php echo kitchen_status_badge($it['status']); ?>"><?php echo kitchen_status_label($it['status']); ?></span>
-              </div>
-            <?php endforeach; ?>
-          </div>
-          <?php endforeach; ?>
-        </div>
-      </div>
-      <?php endif; ?>
     </div>
 
     <div class="col-lg-5">
@@ -179,52 +166,6 @@
 </div>
 
 <script>
-var TICKET_STATUS_LABEL = {NEW:'Mới', PREPARING:'Đang pha chế', COMPLETED:'Hoàn thành'};
-var TICKET_STATUS_COLOR = {NEW:'danger', PREPARING:'warning', COMPLETED:'success'};
-var ORDER_BASE_URL = '<?php echo base_url(); ?>';
-
-function escapeHtml(s){ var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
-
-function fmtTicketTime(dt){
-  var d = new Date(dt.replace(' ', 'T'));
-  var pad = function(n){ return n < 10 ? '0'+n : n; };
-  return pad(d.getHours())+':'+pad(d.getMinutes())+' '+pad(d.getDate())+'/'+pad(d.getMonth()+1);
-}
-
-function renderTicketStatus(tickets){
-  var list = document.getElementById('ticketStatusList');
-  if (!list) return;
-  var html = '';
-  tickets.slice().reverse().forEach(function(t){
-    html += '<div class="list-group-item">';
-    html += '<div class="d-flex justify-content-between align-items-center mb-2">'+
-      '<span class="badge bg-'+TICKET_STATUS_COLOR[t.status]+'">'+TICKET_STATUS_LABEL[t.status]+'</span>'+
-      '<span class="small text-muted"><i class="bi bi-clock"></i> '+fmtTicketTime(t.created_at)+'</span>'+
-    '</div>';
-    t.items.forEach(function(it){
-      var thumb = it.image
-        ? '<img src="'+ORDER_BASE_URL+'assets/'+it.image+'" style="width:32px;height:32px;object-fit:cover;" class="rounded border flex-shrink-0">'
-        : '<div class="d-flex align-items-center justify-content-center bg-light rounded border text-muted flex-shrink-0" style="width:32px;height:32px;"><i class="bi bi-cup-straw"></i></div>';
-      html += '<div class="d-flex justify-content-between align-items-center py-1">'+
-        '<div class="d-flex align-items-center gap-2">'+thumb+'<span>'+escapeHtml(it.product_name)+' <span class="text-muted">x'+it.qty+'</span></span></div>'+
-        '<span class="badge bg-'+TICKET_STATUS_COLOR[it.status]+'">'+TICKET_STATUS_LABEL[it.status]+'</span>'+
-      '</div>';
-    });
-    html += '</div>';
-  });
-  list.innerHTML = html;
-}
-
-function pollTicketStatus(){
-  fetch('<?php echo site_url("orders/".$order['id']."/ticket-status"); ?>')
-    .then(function(r){ return r.json(); })
-    .then(function(res){ if (res.success) renderTicketStatus(res.tickets); });
-}
-
-if (document.getElementById('ticketStatusList')){
-  setInterval(pollTicketStatus, 5000);
-}
-
 var addItemCart = {};
 
 function stepAddItemQty(pid, delta){

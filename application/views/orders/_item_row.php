@@ -1,9 +1,23 @@
+<?php
+  // Viền ảnh món tô theo trạng thái pha chế (ưu tiên NEW > PREPARING > COMPLETED) —
+  // chớp khi còn NEW/PREPARING, viền đặc khi COMPLETED. Món hủy hoặc chưa lên bếp thì không tô.
+  $kitchen_status = isset($kitchen_status) ? $kitchen_status : NULL;
+  $img_classes = 'rounded border flex-shrink-0';
+  if ($kitchen_status && $it['status'] !== 'CANCELLED')
+  {
+      $img_classes .= ' border-'.kitchen_status_badge($kitchen_status);
+      if ($kitchen_status !== 'COMPLETED')
+      {
+          $img_classes .= ' order-kitchen-flash';
+      }
+  }
+?>
 <div class="list-group-item d-flex justify-content-between align-items-center <?php echo $it['status']==='CANCELLED' ? 'opacity-50 text-decoration-line-through' : ''; ?>">
   <div class="d-flex align-items-center gap-2">
     <?php if ($it['image']): ?>
-      <img src="<?php echo base_url('assets/'.$it['image']); ?>" style="width:44px;height:44px;object-fit:cover;" class="rounded border flex-shrink-0">
+      <img src="<?php echo base_url('assets/'.$it['image']); ?>" style="width:44px;height:44px;object-fit:cover;" class="<?php echo $img_classes; ?>">
     <?php else: ?>
-      <div class="d-flex align-items-center justify-content-center bg-light rounded border text-muted flex-shrink-0" style="width:44px;height:44px;"><i class="bi bi-cup-straw"></i></div>
+      <div class="d-flex align-items-center justify-content-center bg-light text-muted flex-shrink-0 <?php echo $img_classes; ?>" style="width:44px;height:44px;"><i class="bi bi-cup-straw"></i></div>
     <?php endif; ?>
     <div>
       <div class="fw-semibold"><?php echo htmlspecialchars($it['product_name']); ?></div>
