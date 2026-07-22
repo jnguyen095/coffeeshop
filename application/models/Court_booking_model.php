@@ -273,6 +273,14 @@ class Court_booking_model extends CI_Model
         ));
     }
 
+    /** Đóng lịch đặt khi order/table_session gắn với nó đã thanh toán xong. No-op nếu không có booking CHECKED_IN nào khớp (bàn không qua đặt lịch). */
+    public function mark_completed_by_session($table_session_id)
+    {
+        return $this->db->where('table_session_id', $table_session_id)
+            ->where('status', 'CHECKED_IN')
+            ->update($this->table, array('status' => 'COMPLETED'));
+    }
+
     /** Doanh thu dịch vụ sân (tiền sân + thuê vợt/trang phục/nhặt bóng...) theo từng sân, đơn đã thanh toán. */
     public function revenue_by_court($from, $to)
     {

@@ -8,7 +8,7 @@ class Cashier extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('Order_model', 'Order_item_model', 'Payment_model', 'Table_model', 'Table_session_model'));
+        $this->load->model(array('Order_model', 'Order_item_model', 'Payment_model', 'Table_model', 'Table_session_model', 'Court_booking_model'));
     }
 
     public function index()
@@ -83,6 +83,7 @@ class Cashier extends MY_Controller
         {
             $this->Table_session_model->close($order['table_session_id']);
             $this->Table_model->set_status($order['table_id'], 'AVAILABLE');
+            $this->Court_booking_model->mark_completed_by_session($order['table_session_id']);
         }
 
         $this->audit('payment', 'PAY', NULL, array('order_id' => $id, 'payment_id' => $payment_id, 'method' => $method));
