@@ -8,6 +8,7 @@ $route['translate_uri_dashes'] = FALSE;
 // Auth
 $route['login'] = 'auth/login';
 $route['logout'] = 'auth/logout';
+$route['change-password'] = 'profile/change_password';
 
 // Staff / Cashier / Barista / Admin screens
 $route['dashboard'] = 'dashboard/index';

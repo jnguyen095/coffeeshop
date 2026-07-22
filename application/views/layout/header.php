@@ -68,6 +68,7 @@
             <i class="bi bi-person-circle"></i> <?php echo htmlspecialchars($current_user['fullname']); ?>
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="<?php echo site_url('change-password'); ?>"><i class="bi bi-key"></i> Đổi mật khẩu</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('logout'); ?>"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
           </ul>
         </li>
