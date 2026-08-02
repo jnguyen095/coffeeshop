@@ -36,7 +36,10 @@ class MY_Controller extends CI_Controller
         if ( ! empty($this->allowed_roles) && ! in_array($this->current_user['role'], $this->allowed_roles, TRUE))
         {
             $this->output->set_status_header(403);
-            $this->load->view('errors/forbidden', array('current_user' => $this->current_user));
+            // load->view() buffers into CI's output object, which only flushes at the
+            // natural end of the request — exit; right after would discard it and send
+            // an empty body. Render with $return = TRUE and echo it directly instead.
+            echo $this->load->view('errors/forbidden', array('current_user' => $this->current_user), TRUE);
             exit;
         }
     }

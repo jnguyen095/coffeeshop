@@ -84,6 +84,7 @@ if ( ! function_exists('role_label'))
             'CASHIER' => 'Thu ngân',
             'BARISTA' => 'Pha chế',
             'STAFF'   => 'Nhân viên phục vụ',
+            'BOOKING' => 'Lễ tân đặt sân',
         );
         return isset($map[$role]) ? $map[$role] : $role;
     }
