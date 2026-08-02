@@ -12,7 +12,7 @@
 <?php if ( ! empty($current_user)): ?>
 <nav class="navbar navbar-expand-lg navbar-dark bg-brand sticky-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="<?php echo site_url('dashboard'); ?>"><i class="bi bi-cup-hot-fill me-1"></i>Cafe POS</a>
+    <a class="navbar-brand" href="<?php echo site_url($current_user['role'] === 'BOOKING' ? 'bookings' : 'dashboard'); ?>"><i class="bi bi-cup-hot-fill me-1"></i>Cafe POS</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -27,6 +27,8 @@
         <?php endif; ?>
         <?php if (in_array($current_user['role'], array('STAFF','CASHIER','ADMIN'), TRUE)): ?>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('takeaway/create'); ?>"><i class="bi bi-bag-check"></i> Bán mang đi</a></li>
+        <?php endif; ?>
+        <?php if (in_array($current_user['role'], array('STAFF','CASHIER','ADMIN','BOOKING'), TRUE)): ?>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('bookings'); ?>"><i class="bi bi-calendar-check"></i> Lịch sân</a></li>
         <?php endif; ?>
         <?php if (in_array($current_user['role'], array('BARISTA','ADMIN'), TRUE)): ?>

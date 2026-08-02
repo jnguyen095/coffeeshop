@@ -17,7 +17,7 @@
     <div class="mb-3">
       <label class="form-label">Vai trò</label>
       <select name="role" class="form-select">
-        <?php foreach (array('STAFF','BARISTA','CASHIER','ADMIN') as $r): ?>
+        <?php foreach (array('STAFF','BARISTA','CASHIER','ADMIN','BOOKING') as $r): ?>
           <option value="<?php echo $r; ?>" <?php echo ($user && $user['role']===$r) ? 'selected' : ''; ?>><?php echo role_label($r); ?></option>
         <?php endforeach; ?>
       </select>

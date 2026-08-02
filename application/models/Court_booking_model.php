@@ -7,9 +7,9 @@ class Court_booking_model extends CI_Model
 
     /** Khung giờ tính giá — sáng/chiều/tối. Chỉnh ở đây nếu quán đổi giờ hoạt động. */
     const SLOTS = array(
-        'morning'   => array('label' => 'Sáng',  'start' => '06:00:00', 'end' => '12:00:00'),
-        'afternoon' => array('label' => 'Chiều', 'start' => '12:00:00', 'end' => '18:00:00'),
-        'evening'   => array('label' => 'Tối',   'start' => '18:00:00', 'end' => '23:00:00'),
+        'morning'   => array('label' => 'Sáng',  'start' => '01:00:00', 'end' => '13:00:00'),
+        'afternoon' => array('label' => 'Chiều', 'start' => '13:00:00', 'end' => '17:00:00'),
+        'evening'   => array('label' => 'Tối',   'start' => '17:00:00', 'end' => '23:00:00'),
     );
 
     /**

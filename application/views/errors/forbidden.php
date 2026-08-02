@@ -10,7 +10,19 @@
 <div class="text-center">
   <h1 class="display-4 fw-bold text-danger">403</h1>
   <p class="lead">Tài khoản của bạn không có quyền truy cập trang này.</p>
-  <a href="<?php echo site_url('dashboard'); ?>" class="btn btn-primary">Về trang chủ</a>
+  <?php
+  $home = 'dashboard';
+  if ( ! empty($current_user['role']))
+  {
+      switch ($current_user['role'])
+      {
+          case 'BARISTA': $home = 'kitchen'; break;
+          case 'CASHIER': $home = 'cashier'; break;
+          case 'BOOKING': $home = 'bookings'; break;
+      }
+  }
+  ?>
+  <a href="<?php echo site_url($home); ?>" class="btn btn-primary">Về trang chủ</a>
 </div>
 </body>
 </html>

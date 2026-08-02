@@ -32,17 +32,17 @@
       <label class="form-label d-block mb-1">Giá thuê / giờ theo khung giờ (đ)</label>
       <div class="row g-2 mb-3">
         <div class="col-4">
-          <label class="form-label small text-muted mb-1"><i class="bi bi-sunrise"></i> Sáng (06h-12h)</label>
+          <label class="form-label small text-muted mb-1"><i class="bi bi-sunrise"></i> Sáng (05h-13h)</label>
           <input type="number" name="rate_morning" class="form-control" min="0" step="1000"
                  value="<?php echo $table ? (int) $table['rate_morning'] : 0; ?>">
         </div>
         <div class="col-4">
-          <label class="form-label small text-muted mb-1"><i class="bi bi-sun"></i> Chiều (12h-18h)</label>
+          <label class="form-label small text-muted mb-1"><i class="bi bi-sun"></i> Chiều (13h-17h)</label>
           <input type="number" name="rate_afternoon" class="form-control" min="0" step="1000"
                  value="<?php echo $table ? (int) $table['rate_afternoon'] : 0; ?>">
         </div>
         <div class="col-4">
-          <label class="form-label small text-muted mb-1"><i class="bi bi-moon-stars"></i> Tối (18h-23h)</label>
+          <label class="form-label small text-muted mb-1"><i class="bi bi-moon-stars"></i> Tối (sau 17h)</label>
           <input type="number" name="rate_evening" class="form-control" min="0" step="1000"
                  value="<?php echo $table ? (int) $table['rate_evening'] : 0; ?>">
         </div>

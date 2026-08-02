@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class Bookings extends MY_Controller
 {
-    protected $allowed_roles = array('STAFF', 'CASHIER', 'ADMIN');
+    protected $allowed_roles = array('STAFF', 'CASHIER', 'ADMIN', 'BOOKING');
 
     public function __construct()
     {
@@ -254,6 +254,14 @@ class Bookings extends MY_Controller
 
     public function checkin($id)
     {
+        if ($this->current_user['role'] === 'BOOKING')
+        {
+            // Check-in mở bàn + tạo đơn hàng (module Orders) — ngoài phạm vi của vai trò lễ tân đặt sân.
+            $this->session->set_flashdata('error', 'Vai trò của bạn không có quyền check-in. Vui lòng nhờ nhân viên/thu ngân xử lý.');
+            redirect('bookings?date='.date('Y-m-d'));
+            return;
+        }
+
         $booking = $this->Court_booking_model->get_by_id($id);
         if ( ! $booking || $booking['status'] !== 'BOOKED')
         {

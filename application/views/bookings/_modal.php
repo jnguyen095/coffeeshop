@@ -32,6 +32,9 @@ var STATUS_COLOR = {BOOKED:'primary', CHECKED_IN:'success', COMPLETED:'secondary
 
 function fmtMoney(n){ return Math.round(n).toLocaleString('vi-VN') + 'đ'; }
 
+// Vai trò BOOKING chỉ quản lý lịch đặt sân, không được check-in (mở bàn/đơn hàng) hay xem đơn.
+var CAN_MANAGE_ORDER = <?php echo ($current_user['role'] !== 'BOOKING') ? 'true' : 'false'; ?>;
+
 function showBookingDetail(el){
   var d = el.dataset;
   document.getElementById('modalCourtName').textContent = d.court;
@@ -46,9 +49,11 @@ function showBookingDetail(el){
 
   var actions = '';
   if (d.status === 'BOOKED'){
-    actions += '<button type="button" class="btn btn-success" onclick="submitBookingAction(\'checkinForm\',' + d.id + ')">Check-in</button>';
+    if (CAN_MANAGE_ORDER){
+      actions += '<button type="button" class="btn btn-success" onclick="submitBookingAction(\'checkinForm\',' + d.id + ')">Check-in</button>';
+    }
     actions += '<button type="button" class="btn btn-outline-danger" onclick="if(confirm(\'Hủy lịch đặt này?\')) submitBookingAction(\'cancelForm\',' + d.id + ')">Hủy lịch</button>';
-  } else if (d.status === 'CHECKED_IN' && d.orderId){
+  } else if (d.status === 'CHECKED_IN' && d.orderId && CAN_MANAGE_ORDER){
     actions += '<a href="<?php echo site_url('orders'); ?>/' + d.orderId + '" class="btn btn-outline-primary">Xem đơn</a>';
   }
   document.getElementById('modalActions').innerHTML = actions;
