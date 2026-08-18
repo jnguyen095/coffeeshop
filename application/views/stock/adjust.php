@@ -47,8 +47,48 @@
   var itemsList = document.getElementById('itemsList');
   var noteWrap = document.getElementById('noteWrap');
   var submitWrap = document.getElementById('submitWrap');
+  var noteInput = document.querySelector('input[name="note"]');
   var enteredQty = {}; // item_id -> giá trị staff đã tự sửa, giữ lại khi lọc lại danh sách
   var searchTimer = null;
+
+  // Lưu tạm vào localStorage của trình duyệt để không mất số liệu nếu lỡ
+  // thoát/đóng trình duyệt giữa chừng — chỉ khôi phục được trên đúng máy/
+  // trình duyệt đó, và chỉ thực sự lưu vào hệ thống khi bấm "Xác nhận kiểm kho".
+  var DRAFT_KEY = 'kiemkho_draft_v1';
+  var SUBMIT_SUCCESS = <?php echo $success ? 'true' : 'false'; ?>;
+
+  function saveDraft(){
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ qty: enteredQty, note: noteInput.value, savedAt: Date.now() }));
+    } catch (e) {}
+  }
+
+  function clearDraft(){
+    try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+  }
+
+  function loadDraft(){
+    try {
+      var raw = localStorage.getItem(DRAFT_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function showRestoredBanner(savedAt){
+    var banner = document.createElement('div');
+    banner.className = 'alert alert-info py-2 small d-flex justify-content-between align-items-center gap-2';
+    var time = savedAt ? new Date(savedAt).toLocaleString('vi-VN') : '';
+    banner.innerHTML = '<span><i class="bi bi-arrow-counterclockwise"></i> Đã khôi phục số liệu bạn nhập dở lúc '+time+' (chưa lưu vào hệ thống).</span>' +
+      '<button type="button" class="btn btn-sm btn-outline-secondary text-nowrap">Bỏ, làm lại</button>';
+    itemsList.parentNode.insertBefore(banner, itemsList);
+    banner.querySelector('button').addEventListener('click', function(){
+      clearDraft();
+      enteredQty = {};
+      noteInput.value = '';
+      banner.remove();
+      loadItems();
+    });
+  }
 
   function fmt(n){ n = parseFloat(n); return (Math.round(n*100)/100).toString(); }
 
@@ -87,14 +127,31 @@
     if (e.target.name && e.target.name.indexOf('qty[') === 0){
       var id = e.target.dataset.id;
       if (e.target.value === '') delete enteredQty[id]; else enteredQty[id] = e.target.value;
+      saveDraft();
     }
   });
+  noteInput.addEventListener('input', saveDraft);
 
   categorySelect.addEventListener('change', loadItems);
   searchInput.addEventListener('input', function(){
     clearTimeout(searchTimer);
     searchTimer = setTimeout(loadItems, 300);
   });
+
+  if (SUBMIT_SUCCESS)
+  {
+    clearDraft(); // vừa lưu thành công -> nháp cũ không còn ý nghĩa
+  }
+  else
+  {
+    var draft = loadDraft();
+    if (draft && draft.qty && Object.keys(draft.qty).length > 0)
+    {
+      enteredQty = draft.qty;
+      if (draft.note) noteInput.value = draft.note;
+      showRestoredBanner(draft.savedAt);
+    }
+  }
 
   loadItems(); // tải sẵn "Tất cả danh mục" khi vào trang
 })();
