@@ -12,7 +12,12 @@
 <?php if ( ! empty($current_user)): ?>
 <nav class="navbar navbar-expand-lg navbar-dark bg-brand sticky-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="<?php echo site_url($current_user['role'] === 'BOOKING' ? 'bookings' : 'dashboard'); ?>"><i class="bi bi-cup-hot-fill me-1"></i>Cafe POS</a>
+    <?php
+      $brand_home = 'dashboard';
+      if ($current_user['role'] === 'BOOKING') $brand_home = 'bookings';
+      elseif ($current_user['role'] === 'STOCKTAKER') $brand_home = 'stock/adjust';
+    ?>
+    <a class="navbar-brand" href="<?php echo site_url($brand_home); ?>"><i class="bi bi-cup-hot-fill me-1"></i>Cafe POS</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -38,6 +43,29 @@
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('cashier'); ?>"><i class="bi bi-cash-coin"></i> Thu ngân</a></li>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('payments'); ?>"><i class="bi bi-clock-history"></i> LS Thanh toán</a></li>
         <?php endif; ?>
+        <?php if (in_array($current_user['role'], array('STAFF','BARISTA','CASHIER','ADMIN','STOCKTAKER'), TRUE)):
+          // $this trong view là CI_Loader, không phải controller — phải lấy
+          // singleton thật qua get_instance() để load model tại đây (không
+          // phải controller nào cũng load sẵn Inventory_item_model) và tính
+          // số sản phẩm sắp hết hàng cho badge.
+          $CI =& get_instance();
+          $CI->load->model('Inventory_item_model');
+          $low_stock_count = $CI->Inventory_item_model->count_low_stock();
+        ?>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+            <i class="bi bi-boxes"></i> Kho hàng
+            <?php if ($low_stock_count > 0): ?><span class="badge bg-danger rounded-pill"><?php echo $low_stock_count; ?></span><?php endif; ?>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="<?php echo site_url('stock/in'); ?>"><i class="bi bi-box-arrow-in-down text-success"></i> Nhập kho</a></li>
+            <li><a class="dropdown-item" href="<?php echo site_url('stock/out'); ?>"><i class="bi bi-box-arrow-up text-danger"></i> Xuất kho</a></li>
+            <li><a class="dropdown-item" href="<?php echo site_url('stock/adjust'); ?>"><i class="bi bi-clipboard-check text-primary"></i> Kiểm kho</a></li>
+            <li><a class="dropdown-item" href="<?php echo site_url('inventory/items'); ?>">Danh sách kho<?php if ($low_stock_count > 0): ?> <span class="badge bg-danger rounded-pill"><?php echo $low_stock_count; ?></span><?php endif; ?></a></li>
+            <li><a class="dropdown-item" href="<?php echo site_url('stock/history'); ?>">Lịch sử nhập/xuất</a></li>
+          </ul>
+        </li>
+        <?php endif; ?>
         <?php if ($current_user['role'] === 'ADMIN'): ?>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"><i class="bi bi-gear"></i> Quản trị</a>
@@ -45,6 +73,9 @@
             <li><a class="dropdown-item" href="<?php echo site_url('tables/manage'); ?>">Quản lý bàn</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('categories'); ?>">Danh mục</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('products'); ?>">Sản phẩm</a></li>
+            <li><a class="dropdown-item" href="<?php echo site_url('inventory/categories'); ?>">Danh mục kho</a></li>
+            <li><a class="dropdown-item" href="<?php echo site_url('inventory/units'); ?>">Đơn vị tính</a></li>
+            <li><a class="dropdown-item" href="<?php echo site_url('inventory/dispense-points'); ?>">Điểm xuất kho</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('users'); ?>">Người dùng</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('reports'); ?>">Báo cáo</a></li>
             <li><hr class="dropdown-divider"></li>

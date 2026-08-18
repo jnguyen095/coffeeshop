@@ -85,8 +85,50 @@ if ( ! function_exists('role_label'))
             'BARISTA' => 'Pha chế',
             'STAFF'   => 'Nhân viên phục vụ',
             'BOOKING' => 'Lễ tân đặt sân',
+            'STOCKTAKER' => 'Nhân viên kiểm kho',
         );
         return isset($map[$role]) ? $map[$role] : $role;
+    }
+}
+
+if ( ! function_exists('storage_type_label'))
+{
+    function storage_type_label($storage_type)
+    {
+        $map = array(
+            'COLD' => '<span class="badge bg-info text-dark"><i class="bi bi-snow"></i> Lạnh</span>',
+            'DRY'  => '<span class="badge bg-warning text-dark"><i class="bi bi-sun"></i> Khô</span>',
+        );
+        return isset($map[$storage_type]) ? $map[$storage_type] : $storage_type;
+    }
+}
+
+if ( ! function_exists('vn_to_ascii'))
+{
+    /** Bỏ dấu tiếng Việt (ánh xạ ký tự thủ công — không phụ thuộc iconv/locale). */
+    function vn_to_ascii($str)
+    {
+        static $map = array(
+            'à'=>'a','á'=>'a','ạ'=>'a','ả'=>'a','ã'=>'a','â'=>'a','ầ'=>'a','ấ'=>'a','ậ'=>'a','ẩ'=>'a','ẫ'=>'a','ă'=>'a','ằ'=>'a','ắ'=>'a','ặ'=>'a','ẳ'=>'a','ẵ'=>'a',
+            'è'=>'e','é'=>'e','ẹ'=>'e','ẻ'=>'e','ẽ'=>'e','ê'=>'e','ề'=>'e','ế'=>'e','ệ'=>'e','ể'=>'e','ễ'=>'e',
+            'ì'=>'i','í'=>'i','ị'=>'i','ỉ'=>'i','ĩ'=>'i',
+            'ò'=>'o','ó'=>'o','ọ'=>'o','ỏ'=>'o','õ'=>'o','ô'=>'o','ồ'=>'o','ố'=>'o','ộ'=>'o','ổ'=>'o','ỗ'=>'o','ơ'=>'o','ờ'=>'o','ớ'=>'o','ợ'=>'o','ở'=>'o','ỡ'=>'o',
+            'ù'=>'u','ú'=>'u','ụ'=>'u','ủ'=>'u','ũ'=>'u','ư'=>'u','ừ'=>'u','ứ'=>'u','ự'=>'u','ử'=>'u','ữ'=>'u',
+            'ỳ'=>'y','ý'=>'y','ỵ'=>'y','ỷ'=>'y','ỹ'=>'y',
+            'đ'=>'d',
+        );
+        return strtr(mb_strtolower($str, 'UTF-8'), $map);
+    }
+}
+
+if ( ! function_exists('vn_sku_prefix'))
+{
+    /** "Pha Chế" -> "PH", "Nhà Bếp" -> "NH" — tiền tố SKU tự sinh từ tên danh mục. */
+    function vn_sku_prefix($name, $len = 2)
+    {
+        $ascii = preg_replace('/[^a-z]/', '', vn_to_ascii($name));
+        $prefix = strtoupper(substr($ascii, 0, $len));
+        return $prefix !== '' ? $prefix : 'SP';
     }
 }
 

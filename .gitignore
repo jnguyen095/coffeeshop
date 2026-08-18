@@ -138,3 +138,7 @@ fabric.properties
 .idea/**/azureSettings.xml
 
 # End of https://www.toptal.com/developers/gitignore/api/codeigniter,intellij
+.idea/dataSources.xml
+.idea/dataSources.xml
+.idea/vcs.xml
+.idea/dataSources.xml

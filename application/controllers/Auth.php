@@ -93,6 +93,7 @@ class Auth extends CI_Controller
             case 'BARISTA': return 'kitchen';
             case 'CASHIER': return 'cashier';
             case 'BOOKING': return 'bookings';
+            case 'STOCKTAKER': return 'stock/adjust';
             default: return 'dashboard';
         }
     }

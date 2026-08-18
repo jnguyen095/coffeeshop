@@ -73,6 +73,8 @@ $route['products'] = 'products/index';
 $route['products/create'] = 'products/create';
 $route['products/(:num)/edit'] = 'products/edit/$1';
 $route['products/(:num)/delete'] = 'products/delete/$1';
+$route['products/import'] = 'products/import';
+$route['products/import-template'] = 'products/import_template';
 
 $route['categories'] = 'categories/index';
 $route['categories/create'] = 'categories/create';
@@ -80,6 +82,39 @@ $route['categories/(:num)/edit'] = 'categories/edit/$1';
 $route['categories/(:num)/delete'] = 'categories/delete/$1';
 
 $route['settings'] = 'settings/index';
+
+// Kho hàng (Inventory / Stock)
+$route['inventory/categories'] = 'inventory_categories/index';
+$route['inventory/categories/create'] = 'inventory_categories/create';
+$route['inventory/categories/(:num)/edit'] = 'inventory_categories/edit/$1';
+$route['inventory/categories/(:num)/delete'] = 'inventory_categories/delete/$1';
+
+$route['inventory/dispense-points'] = 'dispense_points/index';
+$route['inventory/dispense-points/create'] = 'dispense_points/create';
+$route['inventory/dispense-points/(:num)/edit'] = 'dispense_points/edit/$1';
+$route['inventory/dispense-points/(:num)/delete'] = 'dispense_points/delete/$1';
+
+$route['inventory/units'] = 'inventory_units/index';
+$route['inventory/units/create'] = 'inventory_units/create';
+$route['inventory/units/(:num)/edit'] = 'inventory_units/edit/$1';
+$route['inventory/units/(:num)/delete'] = 'inventory_units/delete/$1';
+
+$route['inventory/items'] = 'inventory_items/index';
+$route['inventory/items/create'] = 'inventory_items/create';
+$route['inventory/items/(:num)/edit'] = 'inventory_items/edit/$1';
+$route['inventory/items/(:num)/delete'] = 'inventory_items/delete/$1';
+$route['inventory/items/import'] = 'inventory_items/import';
+$route['inventory/items/import-template'] = 'inventory_items/import_template';
+$route['inventory/items/search'] = 'inventory_items/search';
+$route['inventory/items/by-category'] = 'inventory_items/by_category';
+$route['inventory/items/next-sku'] = 'inventory_items/next_sku';
+
+$route['stock/in'] = 'stock/in';
+$route['stock/in/import'] = 'stock/in_import';
+$route['stock/in/import-template'] = 'stock/in_import_template';
+$route['stock/out'] = 'stock/out';
+$route['stock/adjust'] = 'stock/adjust';
+$route['stock/history'] = 'stock/history';
 
 // Customer QR Ordering (public, no auth)
 $route['menu/(:any)'] = 'menu/index/$1';

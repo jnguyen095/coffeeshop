@@ -45,6 +45,24 @@
         <label class="form-label">Mô tả</label>
         <textarea name="description" class="form-control" rows="2"><?php echo $product ? htmlspecialchars($product['description']) : ''; ?></textarea>
       </div>
+      <div class="col-12"><hr class="my-1"></div>
+      <div class="col-6">
+        <label class="form-label">Danh mục kho liên kết</label>
+        <select name="inventory_category_id" class="form-select">
+          <option value="">-- Không liên kết --</option>
+          <?php foreach ($inventory_categories as $ic): ?>
+            <option value="<?php echo $ic['id']; ?>" <?php echo ($product && (int) $product['inventory_category_id'] === (int) $ic['id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($ic['name']); ?></option>
+          <?php endforeach; ?>
+        </select>
+        <div class="form-text">Nhóm vật tư kho mà món này thuộc về (không tự trừ tồn kho khi bán).</div>
+      </div>
+      <div class="col-6 d-flex align-items-end">
+        <div class="form-check">
+          <input type="checkbox" name="track_inventory" value="1" class="form-check-input" id="trackInventory" <?php echo ($product && $product['track_inventory']) ? 'checked' : ''; ?>>
+          <label class="form-check-label" for="trackInventory">Quản lý kho</label>
+          <div class="form-text">Đánh dấu nếu cần theo dõi tồn kho cho món này.</div>
+        </div>
+      </div>
     </div>
     <div class="d-grid gap-2 mt-4">
       <button class="btn btn-brand btn-lg">Lưu</button>

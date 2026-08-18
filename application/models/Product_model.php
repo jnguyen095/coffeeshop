@@ -7,9 +7,10 @@ class Product_model extends CI_Model
 
     public function get_all()
     {
-        return $this->db->select('products.*, categories.name as category_name')
+        return $this->db->select('products.*, categories.name as category_name, inventory_categories.name as inventory_category_name')
             ->from($this->table)
             ->join('categories', 'categories.id = products.category_id', 'left')
+            ->join('inventory_categories', 'inventory_categories.id = products.inventory_category_id', 'left')
             ->order_by('products.product_name', 'ASC')
             ->get()->result_array();
     }
@@ -46,9 +47,10 @@ class Product_model extends CI_Model
 
     public function get_by_id($id)
     {
-        return $this->db->select('products.*, categories.court_only')
+        return $this->db->select('products.*, categories.court_only, inventory_categories.name as inventory_category_name')
             ->from($this->table)
             ->join('categories', 'categories.id = products.category_id', 'left')
+            ->join('inventory_categories', 'inventory_categories.id = products.inventory_category_id', 'left')
             ->where('products.id', $id)
             ->get()->row_array();
     }

@@ -19,6 +19,7 @@
           case 'BARISTA': $home = 'kitchen'; break;
           case 'CASHIER': $home = 'cashier'; break;
           case 'BOOKING': $home = 'bookings'; break;
+          case 'STOCKTAKER': $home = 'stock/adjust'; break;
       }
   }
   ?>
