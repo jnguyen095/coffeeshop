@@ -49,6 +49,36 @@ class Inventory_items extends MY_Controller
         $this->load->view('layout/footer');
     }
 
+    /** Xuất Excel (CSV) danh sách sản phẩm kho, tôn trọng bộ lọc đang xem trên màn hình. */
+    public function export()
+    {
+        $category_id = $this->input->get('category_id');
+        $low_stock_only = $this->input->get('low_stock') === '1';
+        $keyword = trim((string) $this->input->get('q'));
+
+        $items = $this->Inventory_item_model->get_all($category_id ?: NULL, $low_stock_only, $keyword ?: NULL);
+
+        $this->output->set_content_type('text/csv');
+        header('Content-Disposition: attachment; filename="san_pham_kho_'.date('Ymd_His').'.csv"');
+        echo "\xEF\xBB\xBF";
+        $out = fopen('php://output', 'w');
+        fputcsv($out, array('STT', 'Tên', 'Danh Mục', 'ĐVT', 'Tồn Kho', 'SL'));
+
+        $stt = 1;
+        foreach ($items as $it)
+        {
+            fputcsv($out, array(
+                $stt++,
+                $it['name'],
+                $it['category_name'],
+                $it['unit_name'],
+                rtrim(rtrim(number_format($it['qty_on_hand'], 2, '.', ''), '0'), '.'),
+                '', // SL - để trống, dùng khi in ra kiểm đếm tay
+            ));
+        }
+        fclose($out);
+    }
+
     public function create()
     {
         $this->_require_admin();

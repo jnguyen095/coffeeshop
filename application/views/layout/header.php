@@ -17,7 +17,7 @@
       if ($current_user['role'] === 'BOOKING') $brand_home = 'bookings';
       elseif ($current_user['role'] === 'STOCKTAKER') $brand_home = 'stock/adjust';
     ?>
-    <a class="navbar-brand" href="<?php echo site_url($brand_home); ?>"><i class="bi bi-cup-hot-fill me-1"></i>Cafe POS</a>
+    <a class="navbar-brand" href="<?php echo site_url($brand_home); ?>"><i class="bi bi-cup-hot-fill me-1"></i>Pick Angel Park</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
       <span class="navbar-toggler-icon"></span>
     </button>

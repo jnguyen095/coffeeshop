@@ -1,12 +1,19 @@
 <div class="container-fluid py-3 py-md-4">
+  <?php
+    $export_qs = array();
+    if ($category_id) $export_qs['category_id'] = $category_id;
+    if ($low_stock_only) $export_qs['low_stock'] = '1';
+    if ($keyword) $export_qs['q'] = $keyword;
+  ?>
   <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h4 class="fw-bold mb-0">Sản phẩm kho</h4>
-    <?php if ($current_user['role'] === 'ADMIN'): ?>
     <div class="d-flex gap-2">
+      <a href="<?php echo site_url('inventory/items/export').($export_qs ? '?'.http_build_query($export_qs) : ''); ?>" class="btn btn-outline-secondary"><i class="bi bi-file-earmark-arrow-down"></i> Export Excel</a>
+      <?php if ($current_user['role'] === 'ADMIN'): ?>
       <a href="<?php echo site_url('inventory/items/import'); ?>" class="btn btn-outline-secondary"><i class="bi bi-file-earmark-arrow-up"></i> Import Excel</a>
       <a href="<?php echo site_url('inventory/items/create'); ?>" class="btn btn-brand"><i class="bi bi-plus-lg"></i> Thêm sản phẩm</a>
+      <?php endif; ?>
     </div>
-    <?php endif; ?>
   </div>
 
   <?php if ($this->session->flashdata('success')): ?>
