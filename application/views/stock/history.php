@@ -25,8 +25,16 @@
       </select>
     </div>
     <div class="col-auto">
+      <select name="type" class="form-select form-select-sm">
+        <option value="">Tất cả loại</option>
+        <option value="IN" <?php echo $type === 'IN' ? 'selected' : ''; ?>>Nhập</option>
+        <option value="OUT" <?php echo $type === 'OUT' ? 'selected' : ''; ?>>Xuất</option>
+        <option value="ADJUST" <?php echo $type === 'ADJUST' ? 'selected' : ''; ?>>Kiểm kho</option>
+      </select>
+    </div>
+    <div class="col-auto">
       <button class="btn btn-sm btn-brand">Lọc</button>
-      <?php if ($date_from || $date_to || $created_by): ?>
+      <?php if ($date_from || $date_to || $created_by || $type): ?>
         <a href="<?php echo site_url('stock/history'); ?>" class="btn btn-sm btn-outline-secondary">Xóa lọc</a>
       <?php endif; ?>
     </div>
@@ -92,6 +100,7 @@
       if ($date_from) $page_qs['date_from'] = $date_from;
       if ($date_to) $page_qs['date_to'] = $date_to;
       if ($created_by) $page_qs['created_by'] = $created_by;
+      if ($type) $page_qs['type'] = $type;
 
       $window = 2;
       $pages_to_show = array();

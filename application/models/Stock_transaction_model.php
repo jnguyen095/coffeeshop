@@ -142,6 +142,10 @@ class Stock_transaction_model extends CI_Model
         {
             $this->db->where('stock_transactions.created_by', $filters['created_by']);
         }
+        if ( ! empty($filters['type']))
+        {
+            $this->db->where('stock_transactions.type', $filters['type']);
+        }
     }
 
     /** Tổng số lô (batch) khớp bộ lọc — dùng để tính phân trang. */

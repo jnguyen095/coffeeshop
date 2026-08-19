@@ -313,11 +313,13 @@ class Stock extends MY_Controller
         $date_from = $this->input->get('date_from');
         $date_to = $this->input->get('date_to');
         $created_by = $this->input->get('created_by');
+        $type = $this->input->get('type');
 
         $filters = array();
         if ($date_from) $filters['date_from'] = $date_from;
         if ($date_to) $filters['date_to'] = $date_to;
         if ($created_by) $filters['created_by'] = $created_by;
+        if ($type) $filters['type'] = $type;
 
         $total = $this->Stock_transaction_model->count_batches($filters);
         $total_pages = max(1, (int) ceil($total / self::PER_PAGE));
@@ -332,6 +334,7 @@ class Stock extends MY_Controller
             'date_from'    => $date_from,
             'date_to'      => $date_to,
             'created_by'   => $created_by,
+            'type'         => $type,
             'page'         => $page,
             'total_pages'  => $total_pages,
             'total'        => $total,
