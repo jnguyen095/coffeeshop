@@ -56,10 +56,11 @@
     }
     itemsList.innerHTML = items.map(function(it){
       var val = enteredQty[it.id] || '';
+      var lowStock = parseFloat(it.qty_on_hand) < parseFloat(it.low_stock_threshold);
       return '<div class="d-flex align-items-center gap-2 py-2 border-bottom">'+
         '<div class="flex-grow-1">'+
           '<div class="fw-semibold">'+it.name+'</div>'+
-          '<div class="small text-muted">'+it.sku+' &middot; Tồn: '+fmt(it.qty_on_hand)+' '+it.unit_name+'</div>'+
+          '<div class="small text-muted">Tồn: <span class="fw-semibold '+(lowStock ? 'text-danger' : 'text-success')+'">'+fmt(it.qty_on_hand)+'</span> '+it.unit_name+'</div>'+
         '</div>'+
         '<input type="number" step="0.01" min="0" name="qty['+it.id+']" data-id="'+it.id+'" class="form-control" style="width:110px;" placeholder="0" value="'+val+'">'+
       '</div>';

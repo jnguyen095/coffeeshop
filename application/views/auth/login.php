@@ -13,10 +13,10 @@
   <div class="row justify-content-center">
     <div class="col-11 col-sm-8 col-md-5 col-lg-4">
       <div class="card shadow-lg border-0 rounded-4">
-        <div class="card-body p-4 p-sm-5">
+        <div class="card-body p-4 p-sm-5 pt-sm-0">
           <div class="text-center mb-4">
-            <i class="bi bi-cup-hot-fill text-brand" style="font-size:2.5rem;"></i>
-            <h4 class="mt-2 mb-0 fw-bold">Pick Angel Park &amp; KDS</h4>
+            <img src="<?=base_url('/assets/img/logo_sm-removebg.png')?>" width="200px" ?>
+            <h4 class="mt-2 mb-0 fw-bold">Pick Angel Park</h4>
             <small class="text-muted">Đăng nhập hệ thống</small>
           </div>
 
@@ -39,10 +39,6 @@
             </div>
             <button type="submit" class="btn btn-brand btn-lg w-100">Đăng nhập</button>
           <?php echo form_close(); ?>
-
-          <div class="text-center mt-4">
-            <small class="text-muted">Khách quét mã QR trên bàn để đặt món, không cần đăng nhập.</small>
-          </div>
         </div>
       </div>
     </div>

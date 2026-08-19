@@ -54,12 +54,12 @@
   <div class="table-responsive">
     <table class="table bg-white shadow-sm rounded align-middle">
       <thead class="table-light">
-        <tr><th>SKU</th><th>Tên</th><th>Danh mục</th><th>ĐVT</th><th>Bảo quản</th><th class="text-end">Tồn kho</th><th class="text-end">Ngưỡng</th><th>Trạng thái</th><?php if ($current_user['role'] === 'ADMIN'): ?><th></th><?php endif; ?></tr>
+        <tr><th>STT</th><th>Tên</th><th>Danh mục</th><th>ĐVT</th><th>Bảo quản</th><th class="text-end">Tồn kho</th><th class="text-end">Ngưỡng</th><th>Trạng thái</th><?php if ($current_user['role'] === 'ADMIN'): ?><th></th><?php endif; ?></tr>
       </thead>
       <tbody>
-      <?php foreach ($items as $it): $low = $it['qty_on_hand'] < $it['low_stock_threshold']; ?>
+      <?php $stt = 1; foreach ($items as $it): $low = $it['qty_on_hand'] < $it['low_stock_threshold']; ?>
         <tr class="<?php echo $low ? 'table-danger' : ''; ?>">
-          <td><?php echo htmlspecialchars($it['sku']); ?></td>
+          <td><?php echo $stt++; ?></td>
           <td><?php echo htmlspecialchars($it['name']); ?></td>
           <td><?php echo htmlspecialchars($it['category_name']); ?></td>
           <td><?php echo htmlspecialchars($it['unit_name']); ?></td>
@@ -72,9 +72,6 @@
           <?php if ($current_user['role'] === 'ADMIN'): ?>
           <td>
             <a href="<?php echo site_url('inventory/items/'.$it['id'].'/edit'); ?>" class="btn btn-sm btn-outline-primary">Sửa</a>
-            <?php echo form_open('inventory/items/'.$it['id'].'/delete', array('class'=>'d-inline', 'onsubmit'=>"return confirm('Ẩn sản phẩm này?');")); ?>
-              <button class="btn btn-sm btn-outline-danger">Ẩn</button>
-            <?php echo form_close(); ?>
           </td>
           <?php endif; ?>
         </tr>
