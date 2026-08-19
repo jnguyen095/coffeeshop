@@ -72,12 +72,12 @@
           <td colspan="7" class="p-0">
             <table class="table table-sm mb-0 bg-light">
               <thead>
-                <tr class="text-muted small"><th>SKU</th><th>Sản phẩm</th><th class="text-end">Số lượng</th></tr>
+                <tr class="text-muted small"><th>STT</th><th>Sản phẩm</th><th class="text-end">Số lượng</th></tr>
               </thead>
               <tbody>
-              <?php foreach ($b['lines'] as $l): ?>
+              <?php $line_stt = 1; foreach ($b['lines'] as $l): ?>
                 <tr>
-                  <td><?php echo htmlspecialchars($l['sku']); ?></td>
+                  <td><?php echo $line_stt++; ?></td>
                   <td><?php echo htmlspecialchars($l['item_name']); ?></td>
                   <td class="text-end"><?php echo ($b['type'] === 'ADJUST' && $l['qty'] > 0 ? '+' : '').rtrim(rtrim(number_format($l['qty'], 2, '.', ''), '0'), '.'); ?> <?php echo htmlspecialchars($l['unit']); ?></td>
                 </tr>
