@@ -8,7 +8,7 @@
     if ($stock_status) $export_qs['stock_status'] = $stock_status;
   ?>
   <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-    <h4 class="fw-bold mb-0">Sản phẩm kho</h4>
+    <h4 class="fw-bold mb-0">Hàng Trong Kho</h4>
     <div class="d-flex gap-2">
       <a href="<?php echo site_url('inventory/items/print').($export_qs ? '?'.http_build_query($export_qs) : ''); ?>" target="_blank" class="btn btn-outline-secondary"><i class="bi bi-printer"></i> In danh sách</a>
       <a href="<?php echo site_url('inventory/items/export').($export_qs ? '?'.http_build_query($export_qs) : ''); ?>" class="btn btn-outline-secondary"><i class="bi bi-file-earmark-arrow-down"></i> Export Excel</a>

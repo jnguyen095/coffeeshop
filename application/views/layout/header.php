@@ -63,7 +63,7 @@
             <li><a class="dropdown-item" href="<?php echo site_url('stock/in'); ?>"><i class="bi bi-box-arrow-in-down text-success"></i> Nhập kho</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('stock/out'); ?>"><i class="bi bi-box-arrow-up text-danger"></i> Xuất kho</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('stock/adjust'); ?>"><i class="bi bi-clipboard-check text-primary"></i> Kiểm kho</a></li>
-            <li><a class="dropdown-item" href="<?php echo site_url('inventory/items'); ?>">Danh sách kho<?php if ($low_stock_count > 0): ?> <span class="badge bg-danger rounded-pill"><?php echo $low_stock_count; ?></span><?php endif; ?></a></li>
+            <li><a class="dropdown-item" href="<?php echo site_url('inventory/items'); ?>">Hàng trong kho<?php if ($low_stock_count > 0): ?> <span class="badge bg-danger rounded-pill"><?php echo $low_stock_count; ?></span><?php endif; ?></a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('stock/history'); ?>">Lịch sử nhập/xuất</a></li>
           </ul>
         </li>
