@@ -14,7 +14,11 @@ class Inventory_item_model extends CI_Model
             ->join('inventory_units', 'inventory_units.id = inventory_items.unit_id', 'left');
     }
 
-    public function get_all($category_id = NULL, $low_stock_only = FALSE, $keyword = NULL)
+    /**
+     * $stock_status: 'LOW' (sắp hết hàng — tồn < ngưỡng), 'OK' (đủ hàng —
+     * tồn >= ngưỡng), hoặc NULL (không lọc theo tồn kho).
+     */
+    public function get_all($category_id = NULL, $stock_status = NULL, $keyword = NULL)
     {
         $this->_with_joins()->where('inventory_items.status', 'ACTIVE');
 
@@ -22,9 +26,13 @@ class Inventory_item_model extends CI_Model
         {
             $this->db->where('inventory_items.category_id', $category_id);
         }
-        if ($low_stock_only)
+        if ($stock_status === 'LOW')
         {
             $this->db->where('inventory_items.qty_on_hand <', 'inventory_items.low_stock_threshold', FALSE);
+        }
+        elseif ($stock_status === 'OK')
+        {
+            $this->db->where('inventory_items.qty_on_hand >=', 'inventory_items.low_stock_threshold', FALSE);
         }
         if ($keyword)
         {

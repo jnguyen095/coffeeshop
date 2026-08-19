@@ -32,17 +32,17 @@ class Inventory_items extends MY_Controller
     public function index()
     {
         $category_id = $this->input->get('category_id');
-        $low_stock_only = $this->input->get('low_stock') === '1';
+        $stock_status = $this->input->get('stock_status'); // 'LOW' | 'OK' | rỗng = tất cả
         $keyword = trim((string) $this->input->get('q'));
 
         $data = array(
-            'page_title'     => 'Sản phẩm kho',
-            'current_user'   => $this->current_user,
-            'items'          => $this->Inventory_item_model->get_all($category_id ?: NULL, $low_stock_only, $keyword ?: NULL),
-            'categories'     => $this->Inventory_category_model->get_active(),
-            'category_id'    => $category_id,
-            'low_stock_only' => $low_stock_only,
-            'keyword'        => $keyword,
+            'page_title'    => 'Sản phẩm kho',
+            'current_user'  => $this->current_user,
+            'items'         => $this->Inventory_item_model->get_all($category_id ?: NULL, $stock_status ?: NULL, $keyword ?: NULL),
+            'categories'    => $this->Inventory_category_model->get_active(),
+            'category_id'   => $category_id,
+            'stock_status'  => $stock_status,
+            'keyword'       => $keyword,
         );
         $this->load->view('layout/header', $data);
         $this->load->view('inventory_items/index', $data);
@@ -53,10 +53,10 @@ class Inventory_items extends MY_Controller
     public function export()
     {
         $category_id = $this->input->get('category_id');
-        $low_stock_only = $this->input->get('low_stock') === '1';
+        $stock_status = $this->input->get('stock_status');
         $keyword = trim((string) $this->input->get('q'));
 
-        $items = $this->Inventory_item_model->get_all($category_id ?: NULL, $low_stock_only, $keyword ?: NULL);
+        $items = $this->Inventory_item_model->get_all($category_id ?: NULL, $stock_status ?: NULL, $keyword ?: NULL);
 
         $this->output->set_content_type('text/csv');
         header('Content-Disposition: attachment; filename="san_pham_kho_'.date('Ymd_His').'.csv"');
@@ -77,6 +77,29 @@ class Inventory_items extends MY_Controller
             ));
         }
         fclose($out);
+    }
+
+    /** Trang in danh sách sản phẩm kho (khổ A4), tôn trọng bộ lọc đang xem trên màn hình. */
+    public function print_list()
+    {
+        $category_id = $this->input->get('category_id');
+        $stock_status = $this->input->get('stock_status');
+        $keyword = trim((string) $this->input->get('q'));
+
+        $category_name = NULL;
+        if ($category_id)
+        {
+            $category = $this->Inventory_category_model->get_by_id($category_id);
+            $category_name = $category ? $category['name'] : NULL;
+        }
+
+        $data = array(
+            'items'         => $this->Inventory_item_model->get_all($category_id ?: NULL, $stock_status ?: NULL, $keyword ?: NULL),
+            'category_name' => $category_name,
+            'stock_status'  => $stock_status,
+            'keyword'       => $keyword,
+        );
+        $this->load->view('inventory_items/print', $data);
     }
 
     public function create()

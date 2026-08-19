@@ -1,13 +1,16 @@
 <div class="container-fluid py-3 py-md-4">
   <?php
-    $export_qs = array();
-    if ($category_id) $export_qs['category_id'] = $category_id;
-    if ($low_stock_only) $export_qs['low_stock'] = '1';
-    if ($keyword) $export_qs['q'] = $keyword;
+    $base_qs = array();
+    if ($category_id) $base_qs['category_id'] = $category_id;
+    if ($keyword) $base_qs['q'] = $keyword;
+
+    $export_qs = $base_qs;
+    if ($stock_status) $export_qs['stock_status'] = $stock_status;
   ?>
   <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h4 class="fw-bold mb-0">Sản phẩm kho</h4>
     <div class="d-flex gap-2">
+      <a href="<?php echo site_url('inventory/items/print').($export_qs ? '?'.http_build_query($export_qs) : ''); ?>" target="_blank" class="btn btn-outline-secondary"><i class="bi bi-printer"></i> In danh sách</a>
       <a href="<?php echo site_url('inventory/items/export').($export_qs ? '?'.http_build_query($export_qs) : ''); ?>" class="btn btn-outline-secondary"><i class="bi bi-file-earmark-arrow-down"></i> Export Excel</a>
       <?php if ($current_user['role'] === 'ADMIN'): ?>
       <a href="<?php echo site_url('inventory/items/import'); ?>" class="btn btn-outline-secondary"><i class="bi bi-file-earmark-arrow-up"></i> Import Excel</a>
@@ -21,6 +24,7 @@
   <?php endif; ?>
 
   <?php echo form_open('inventory/items', array('method' => 'get', 'class' => 'row g-2 mb-3')); ?>
+    <?php if ($stock_status): ?><input type="hidden" name="stock_status" value="<?php echo htmlspecialchars($stock_status); ?>"><?php endif; ?>
     <div class="col-auto">
       <input type="text" name="q" class="form-control" placeholder="Tìm theo tên hoặc SKU..." value="<?php echo htmlspecialchars($keyword); ?>" style="min-width:220px;">
     </div>
@@ -36,8 +40,12 @@
       <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-search"></i> Tìm</button>
     </div>
     <div class="col-auto">
-      <a href="<?php echo site_url('inventory/items').($low_stock_only ? '' : '?low_stock=1'.($category_id ? '&category_id='.$category_id : '').($keyword ? '&q='.urlencode($keyword) : '')); ?>"
-         class="btn <?php echo $low_stock_only ? 'btn-danger' : 'btn-outline-danger'; ?>">
+      <a href="<?php echo site_url('inventory/items').'?'.http_build_query(array_merge($base_qs, $stock_status === 'OK' ? array() : array('stock_status' => 'OK'))); ?>"
+         class="btn <?php echo $stock_status === 'OK' ? 'btn-success' : 'btn-outline-success'; ?>">
+        <i class="bi bi-check-circle"></i> Đủ hàng
+      </a>
+      <a href="<?php echo site_url('inventory/items').'?'.http_build_query(array_merge($base_qs, $stock_status === 'LOW' ? array() : array('stock_status' => 'LOW'))); ?>"
+         class="btn <?php echo $stock_status === 'LOW' ? 'btn-danger' : 'btn-outline-danger'; ?>">
         <i class="bi bi-exclamation-triangle"></i> Sắp hết hàng
       </a>
     </div>

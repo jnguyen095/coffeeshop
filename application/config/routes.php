@@ -106,6 +106,7 @@ $route['inventory/items/(:num)/delete'] = 'inventory_items/delete/$1';
 $route['inventory/items/import'] = 'inventory_items/import';
 $route['inventory/items/import-template'] = 'inventory_items/import_template';
 $route['inventory/items/export'] = 'inventory_items/export';
+$route['inventory/items/print'] = 'inventory_items/print_list';
 $route['inventory/items/search'] = 'inventory_items/search';
 $route['inventory/items/by-category'] = 'inventory_items/by_category';
 $route['inventory/items/next-sku'] = 'inventory_items/next_sku';
