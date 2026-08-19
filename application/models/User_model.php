@@ -5,9 +5,30 @@ class User_model extends CI_Model
 {
     protected $table = 'users';
 
-    public function get_all()
+    public function get_all($role = NULL, $status = NULL, $keyword = NULL)
     {
+        if ($role)
+        {
+            $this->db->where('role', $role);
+        }
+        if ($status)
+        {
+            $this->db->where('status', $status);
+        }
+        if ($keyword)
+        {
+            $this->db->group_start()
+                ->like('username', $keyword)
+                ->or_like('fullname', $keyword)
+            ->group_end();
+        }
+
         return $this->db->order_by('fullname', 'ASC')->get($this->table)->result_array();
+    }
+
+    public function get_by_roles($roles)
+    {
+        return $this->db->where_in('role', $roles)->order_by('fullname', 'ASC')->get($this->table)->result_array();
     }
 
     public function get_by_id($id)

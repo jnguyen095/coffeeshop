@@ -13,10 +13,17 @@ class Users extends MY_Controller
 
     public function index()
     {
+        $role = $this->input->get('role');
+        $status = $this->input->get('status');
+        $keyword = trim((string) $this->input->get('q'));
+
         $data = array(
             'page_title'   => 'Người dùng',
             'current_user' => $this->current_user,
-            'users'        => $this->User_model->get_all(),
+            'users'        => $this->User_model->get_all($role ?: NULL, $status ?: NULL, $keyword ?: NULL),
+            'role'         => $role,
+            'status'       => $status,
+            'keyword'      => $keyword,
         );
         $this->load->view('layout/header', $data);
         $this->load->view('users/index', $data);

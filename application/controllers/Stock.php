@@ -328,7 +328,7 @@ class Stock extends MY_Controller
             'page_title'   => 'Lịch sử nhập/xuất kho',
             'current_user' => $this->current_user,
             'batches'      => $this->Stock_transaction_model->get_recent_batches($filters, self::PER_PAGE, $offset),
-            'users'        => $this->User_model->get_all(),
+            'users'        => $this->User_model->get_by_roles(array('STOCKTAKER', 'ADMIN')),
             'date_from'    => $date_from,
             'date_to'      => $date_to,
             'created_by'   => $created_by,
