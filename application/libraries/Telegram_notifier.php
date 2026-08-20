@@ -108,21 +108,81 @@ class Telegram_notifier
         $this->_send($token, $chat_id, $text);
     }
 
+    /**
+     * Gửi bàn phím inline — mỗi nút là 1 danh mục, bấm vào là ra ngay báo
+     * cáo tồn kho (không cần gõ tay tên danh mục). $categories: mỗi phần
+     * tử cần có 'id', 'name'.
+     */
+    public function send_category_picker($chat_id, $categories)
+    {
+        $token = $this->ci->config->item('telegram_bot_token', 'telegram');
+        if ( ! $token || ! $chat_id)
+        {
+            return;
+        }
+
+        $rows = array();
+        $row = array();
+        foreach ($categories as $c)
+        {
+            $row[] = array('text' => $c['name'], 'callback_data' => 'lsc:'.$c['id']);
+            if (count($row) === 2)
+            {
+                $rows[] = $row;
+                $row = array();
+            }
+        }
+        if ( ! empty($row))
+        {
+            $rows[] = $row;
+        }
+        $rows[] = array(array('text' => '📋 Tất cả danh mục', 'callback_data' => 'lsc:0'));
+
+        $this->_send($token, $chat_id, '📦 Chọn danh mục để xem tồn kho:', array('inline_keyboard' => $rows));
+    }
+
+    /** Tắt trạng thái "đang tải" trên nút vừa bấm — bắt buộc gọi sau mỗi callback_query. */
+    public function answer_callback_query($callback_query_id)
+    {
+        $token = $this->ci->config->item('telegram_bot_token', 'telegram');
+        if ( ! $token || ! $callback_query_id)
+        {
+            return;
+        }
+
+        $ch = curl_init('https://api.telegram.org/bot'.$token.'/answerCallbackQuery');
+        curl_setopt_array($ch, array(
+            CURLOPT_POST           => TRUE,
+            CURLOPT_POSTFIELDS     => http_build_query(array('callback_query_id' => $callback_query_id)),
+            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_TIMEOUT        => 5,
+            CURLOPT_CONNECTTIMEOUT => 3,
+        ));
+        curl_exec($ch);
+        curl_close($ch);
+    }
+
     private function _esc($text)
     {
         return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
     }
 
-    private function _send($token, $chat_id, $text)
+    private function _send($token, $chat_id, $text, $reply_markup = NULL)
     {
+        $fields = array(
+            'chat_id'    => $chat_id,
+            'text'       => $text,
+            'parse_mode' => 'HTML',
+        );
+        if ($reply_markup !== NULL)
+        {
+            $fields['reply_markup'] = json_encode($reply_markup);
+        }
+
         $ch = curl_init('https://api.telegram.org/bot'.$token.'/sendMessage');
         curl_setopt_array($ch, array(
             CURLOPT_POST           => TRUE,
-            CURLOPT_POSTFIELDS     => http_build_query(array(
-                'chat_id'    => $chat_id,
-                'text'       => $text,
-                'parse_mode' => 'HTML',
-            )),
+            CURLOPT_POSTFIELDS     => http_build_query($fields),
             CURLOPT_RETURNTRANSFER => TRUE,
             CURLOPT_TIMEOUT        => 5,
             CURLOPT_CONNECTTIMEOUT => 3,

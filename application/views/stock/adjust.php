@@ -139,6 +139,16 @@
     searchTimer = setTimeout(loadItems, 300);
   });
 
+  document.getElementById('stockAdjustForm').addEventListener('submit', function(e){
+    var btn = submitWrap.querySelector('button');
+    if (btn.disabled){
+      e.preventDefault(); // đã bấm rồi -> chặn bấm/gửi trùng lần 2
+      return;
+    }
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
+  });
+
   if (SUBMIT_SUCCESS)
   {
     clearDraft(); // vừa lưu thành công -> nháp cũ không còn ý nghĩa
