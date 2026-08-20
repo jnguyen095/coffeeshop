@@ -60,6 +60,54 @@ class Telegram_notifier
         $this->_send($token, $chat_id, implode("\n", $lines));
     }
 
+    /**
+     * Trả lời lệnh /low-stock từ Telegram — báo danh sách sản phẩm sắp hết
+     * hàng (tồn < ngưỡng) trong 1 danh mục, hoặc tất cả nếu không lọc.
+     * $items: mỗi phần tử cần có 'name', 'unit_name', 'qty_on_hand',
+     * 'low_stock_threshold'.
+     */
+    public function send_low_stock_report($chat_id, $category_label, $items)
+    {
+        $token = $this->ci->config->item('telegram_bot_token', 'telegram');
+        if ( ! $token || ! $chat_id)
+        {
+            return;
+        }
+
+        $count = count($items);
+        if ($count === 0)
+        {
+            $this->_send($token, $chat_id, '✅ Không có sản phẩm nào sắp hết hàng — <u>'.$this->_esc($category_label).'</u>.');
+            return;
+        }
+
+        $lines = array();
+        $lines[] = '⚠️ <b>GẦN HẾT HÀNG</b> — '.$count.' sản phẩm ('.$this->_esc($category_label).')';
+        $lines[] = '';
+
+        $i = 1;
+        foreach ($items as $it)
+        {
+            $qty = rtrim(rtrim(number_format($it['qty_on_hand'], 2, '.', ''), '0'), '.');
+            $threshold = rtrim(rtrim(number_format($it['low_stock_threshold'], 2, '.', ''), '0'), '.');
+            $lines[] = $i.'. <b>'.$this->_esc($it['name']).'</b>: '.$qty.' / '.$threshold.' '.$this->_esc($it['unit_name']);
+            $i++;
+        }
+
+        $this->_send($token, $chat_id, implode("\n", $lines));
+    }
+
+    /** Trả lời lỗi/thông báo chung cho 1 lệnh Telegram (vd danh mục không tồn tại). */
+    public function send_raw($chat_id, $text)
+    {
+        $token = $this->ci->config->item('telegram_bot_token', 'telegram');
+        if ( ! $token || ! $chat_id)
+        {
+            return;
+        }
+        $this->_send($token, $chat_id, $text);
+    }
+
     private function _esc($text)
     {
         return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');

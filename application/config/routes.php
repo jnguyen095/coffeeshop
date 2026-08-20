@@ -139,3 +139,6 @@ $route['api/kitchen/ticket-item/(:num)/status'] = 'api_kitchen/update_item_statu
 $route['api/tables/status'] = 'api_tables/status';
 $route['api/assistance/pending'] = 'api_assistance/pending';
 $route['api/assistance/(:num)/resolve'] = 'api_assistance/resolve/$1';
+
+// Telegram bot webhook (public, secret-token based — see application/config/telegram.php)
+$route['telegram/webhook'] = 'telegram_webhook/handle';
