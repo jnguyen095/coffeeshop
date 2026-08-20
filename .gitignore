@@ -143,3 +143,5 @@ fabric.properties
 .idea/vcs.xml
 .idea/dataSources.xml
 application/config/telegram.php
+application/config/database.php
+application/config/database.php
