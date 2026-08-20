@@ -1,0 +1,98 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+/**
+ * Gửi tin nhắn Telegram báo sản phẩm tụt xuống dưới ngưỡng cảnh báo ngay
+ * sau khi ai đó tạo phiếu nhập/xuất/kiểm kho. Chỉ cần cấu hình bot_token +
+ * chat_id trong application/config/telegram.php; để trống thì tính năng
+ * tự tắt (không báo lỗi). Lỗi gọi Telegram API chỉ được ghi log — không
+ * được làm hỏng luồng nhập/xuất kho của người dùng.
+ */
+class Telegram_notifier
+{
+    private $ci;
+
+    public function __construct()
+    {
+        $this->ci =& get_instance();
+        $this->ci->config->load('telegram', TRUE);
+    }
+
+    /**
+     * $type: 'IN' | 'OUT' | 'ADJUST'.
+     * $category_names: mảng tên danh mục liên quan tới phiếu vừa tạo.
+     * $low_items: mảng sản phẩm đang dưới ngưỡng, mỗi phần tử cần có
+     * 'name', 'unit_name', 'qty_on_hand'.
+     */
+    public function notify_low_stock($user_name, $type, $category_names, $low_items)
+    {
+        if (empty($low_items))
+        {
+            return;
+        }
+
+        $token = $this->ci->config->item('telegram_bot_token', 'telegram');
+        $chat_id = $this->ci->config->item('telegram_chat_id', 'telegram');
+        if ( ! $token || ! $chat_id)
+        {
+            return; // chưa cấu hình -> bỏ qua, không báo lỗi
+        }
+
+        $type_labels = array('IN' => 'Nhập kho', 'OUT' => 'Xuất kho', 'ADJUST' => 'Kiểm kho');
+        $type_icons = array('IN' => '📥', 'OUT' => '📤', 'ADJUST' => '📋');
+        $action = isset($type_labels[$type]) ? $type_labels[$type] : $type;
+        $icon = isset($type_icons[$type]) ? $type_icons[$type] : '📦';
+        $category_text = ! empty($category_names) ? implode(', ', $category_names) : 'nhiều danh mục';
+
+        $lines = array();
+        $lines[] = $icon.' <b>'.$this->_esc($user_name).'</b> '.$this->_esc($action).' <u>'.$this->_esc($category_text).'</u>:';
+        $lines[] = '';
+        $lines[] = '⚠️ SL dưới mức an toàn:';
+
+        $i = 1;
+        foreach ($low_items as $it)
+        {
+            $qty = rtrim(rtrim(number_format($it['qty_on_hand'], 2, '.', ''), '0'), '.');
+            $lines[] = $i.'. <b>'.$this->_esc($it['name']).'</b> - '.$qty.' '.$this->_esc($it['unit_name']);
+            $i++;
+        }
+
+        $this->_send($token, $chat_id, implode("\n", $lines));
+    }
+
+    private function _esc($text)
+    {
+        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+    }
+
+    private function _send($token, $chat_id, $text)
+    {
+        $ch = curl_init('https://api.telegram.org/bot'.$token.'/sendMessage');
+        curl_setopt_array($ch, array(
+            CURLOPT_POST           => TRUE,
+            CURLOPT_POSTFIELDS     => http_build_query(array(
+                'chat_id'    => $chat_id,
+                'text'       => $text,
+                'parse_mode' => 'HTML',
+            )),
+            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_TIMEOUT        => 5,
+            CURLOPT_CONNECTTIMEOUT => 3,
+        ));
+        $response = curl_exec($ch);
+        $curl_error = curl_error($ch);
+        curl_close($ch);
+
+        if ($curl_error)
+        {
+            log_message('error', 'Telegram notify: '.$curl_error);
+            return;
+        }
+
+        $decoded = json_decode($response, TRUE);
+        if ( ! is_array($decoded) || empty($decoded['ok']))
+        {
+            log_message('error', 'Telegram notify failed: '.$response);
+        }
+    }
+}

@@ -40,6 +40,7 @@ class Stock extends MY_Controller
                 $batch_id = $this->Stock_transaction_model->new_batch_id();
                 $count = 0;
                 $lines = array();
+                $processed_item_ids = array();
 
                 foreach ($qtys as $item_id => $qty)
                 {
@@ -60,6 +61,7 @@ class Stock extends MY_Controller
                     {
                         $count++;
                         $lines[] = $item['name'].': +'.$qty.' '.$item['unit_name'];
+                        $processed_item_ids[] = (int) $item_id;
                     }
                 }
 
@@ -67,6 +69,7 @@ class Stock extends MY_Controller
                 {
                     $this->audit('stock_transaction', 'STOCK_IN_BATCH', NULL, array('count' => $count));
                     $success = 'Đã nhập kho '.$count.' sản phẩm — '.implode('; ', $lines).'.';
+                    $this->_notify_low_stock($processed_item_ids, 'IN');
                 }
                 else
                 {
@@ -113,6 +116,7 @@ class Stock extends MY_Controller
                 $ok_count = 0;
                 $ok_lines = array();
                 $fail_lines = array();
+                $processed_item_ids = array();
 
                 foreach ($qtys as $item_id => $qty)
                 {
@@ -133,6 +137,7 @@ class Stock extends MY_Controller
                     {
                         $ok_count++;
                         $ok_lines[] = $item['name'].': -'.$qty.' '.$item['unit_name'];
+                        $processed_item_ids[] = (int) $item_id;
                     }
                     else
                     {
@@ -144,6 +149,7 @@ class Stock extends MY_Controller
                 {
                     $this->audit('stock_transaction', 'STOCK_OUT_BATCH', NULL, array('count' => $ok_count, 'dispense_point_id' => $dispense_point_id));
                     $success = 'Đã xuất kho '.$ok_count.' sản phẩm — '.implode('; ', $ok_lines).'.';
+                    $this->_notify_low_stock($processed_item_ids, 'OUT');
                 }
                 if (count($fail_lines) > 0)
                 {
@@ -194,6 +200,7 @@ class Stock extends MY_Controller
                 $changed_count = 0;
                 $checked_count = 0;
                 $lines = array();
+                $processed_item_ids = array();
 
                 foreach ($qtys as $item_id => $qty)
                 {
@@ -217,6 +224,7 @@ class Stock extends MY_Controller
                         $delta = (float) $qty - (float) $item['qty_on_hand'];
                         $sign = $delta > 0 ? '+' : '';
                         $lines[] = $item['name'].': '.$item['qty_on_hand'].' → '.$qty.' ('.$sign.rtrim(rtrim(number_format($delta, 2, '.', ''), '0'), '.').')';
+                        $processed_item_ids[] = (int) $item_id;
                     }
                     elseif ($result !== 'NO_CHANGE')
                     {
@@ -228,6 +236,7 @@ class Stock extends MY_Controller
                 {
                     $this->audit('stock_transaction', 'STOCK_ADJUST_BATCH', NULL, array('checked' => $checked_count, 'changed' => $changed_count));
                     $success = 'Đã kiểm '.$checked_count.' sản phẩm, '.$changed_count.' sản phẩm có chênh lệch'.($lines ? ' — '.implode('; ', $lines) : '').'.';
+                    $this->_notify_low_stock($processed_item_ids, 'ADJUST');
                 }
                 else
                 {
@@ -404,5 +413,54 @@ class Stock extends MY_Controller
         }
 
         return $preview;
+    }
+
+    /**
+     * Sau khi nhập/xuất/kiểm kho xong, kiểm tra các sản phẩm vừa xử lý có
+     * sản phẩm nào tụt xuống dưới ngưỡng cảnh báo không rồi báo qua
+     * Telegram. Lỗi gửi Telegram (chưa cấu hình, mất mạng...) chỉ được ghi
+     * log — không được làm hỏng luồng nhập/xuất/kiểm kho của người dùng.
+     */
+    private function _notify_low_stock($item_ids, $type)
+    {
+        if (empty($item_ids))
+        {
+            return;
+        }
+
+        $low_items = array();
+        $category_names = array();
+
+        foreach (array_unique($item_ids) as $item_id)
+        {
+            $item = $this->Inventory_item_model->get_by_id($item_id);
+            if ( ! $item)
+            {
+                continue;
+            }
+            if ($item['category_name'] && ! in_array($item['category_name'], $category_names, TRUE))
+            {
+                $category_names[] = $item['category_name'];
+            }
+            if ($item['qty_on_hand'] < $item['low_stock_threshold'])
+            {
+                $low_items[] = $item;
+            }
+        }
+
+        if (empty($low_items))
+        {
+            return;
+        }
+
+        try
+        {
+            $this->load->library('telegram_notifier');
+            $this->telegram_notifier->notify_low_stock($this->current_user['fullname'], $type, $category_names, $low_items);
+        }
+        catch (Exception $e)
+        {
+            log_message('error', 'Telegram notify exception: '.$e->getMessage());
+        }
     }
 }
