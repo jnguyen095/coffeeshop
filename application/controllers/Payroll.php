@@ -157,7 +157,12 @@ class Payroll extends MY_Controller
         $this->load->view('layout/footer');
     }
 
-    /** Bảng tổng hợp lương tất cả nhân viên đang hoạt động trong 1 tháng — ADMIN. */
+    /**
+     * Bảng tổng hợp lương tất cả nhân viên trong 1 tháng — ADMIN. Nhân viên
+     * đã nghỉ việc vẫn hiện ra cho tháng họ còn làm (xem
+     * User_model::get_for_payroll()) để vẫn chi được lương tháng cuối,
+     * biến mất kể từ tháng sau.
+     */
     public function admin()
     {
         $this->_require_admin();
@@ -167,7 +172,7 @@ class Payroll extends MY_Controller
         $salary_type_filter = $this->input->get('salary_type');
         $paid_status_filter = $this->input->get('paid_status');
 
-        $users = $this->User_model->get_all($role_filter ?: NULL, 'ACTIVE', $keyword ?: NULL);
+        $users = $this->User_model->get_for_payroll($period, $role_filter ?: NULL, $keyword ?: NULL);
         $records_by_user = $this->Payroll_record_model->get_all_by_period($period);
 
         $rows = array();

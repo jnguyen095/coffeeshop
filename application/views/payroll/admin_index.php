@@ -90,7 +90,10 @@
       <?php $stt = 1; foreach ($rows as $r): $u = $r['user']; $s = $r['salary']; ?>
         <tr>
           <td><?php echo $stt++; ?></td>
-          <td><?php echo htmlspecialchars($u['fullname']); ?></td>
+          <td>
+            <?php echo htmlspecialchars($u['fullname']); ?>
+            <?php if ($u['status'] === 'INACTIVE'): ?><span class="badge bg-secondary">Đã nghỉ việc</span><?php endif; ?>
+          </td>
           <td><?php echo role_label($u['role']); ?></td>
           <td><?php echo $s['salary_type'] === 'HOURLY' ? 'Theo giờ' : 'Cố định'; ?></td>
           <td class="text-end text-nowrap">
