@@ -35,13 +35,16 @@
 
   <div class="table-responsive">
     <table class="table bg-white shadow-sm rounded align-middle">
-      <thead class="table-light"><tr><th>Tên đăng nhập</th><th>Họ tên</th><th>Vai trò</th><th>Trạng thái</th><th></th></tr></thead>
+      <thead class="table-light"><tr><th>STT</th><th>Tên đăng nhập</th><th>Họ tên</th><th>Vai trò</th><th>Ngày bắt đầu</th><th>Ngày nghỉ</th><th>Trạng thái</th><th></th></tr></thead>
       <tbody>
-      <?php foreach ($users as $u): ?>
+      <?php $stt = 1; foreach ($users as $u): ?>
         <tr>
+          <td><?php echo $stt++; ?></td>
           <td><?php echo htmlspecialchars($u['username']); ?></td>
           <td><?php echo htmlspecialchars($u['fullname']); ?></td>
           <td><?php echo role_label($u['role']); ?></td>
+          <td><?php echo $u['start_date'] ? date('d/m/Y', strtotime($u['start_date'])) : '—'; ?></td>
+          <td><?php echo $u['end_date'] ? date('d/m/Y', strtotime($u['end_date'])) : '—'; ?></td>
           <td><span class="badge bg-<?php echo $u['status']==='ACTIVE'?'success':'secondary'; ?>"><?php echo $u['status']; ?></span></td>
           <td>
             <a href="<?php echo site_url('users/'.$u['id'].'/edit'); ?>" class="btn btn-sm btn-outline-primary">Sửa</a>
