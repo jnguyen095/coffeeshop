@@ -47,9 +47,10 @@
         $can_admin_users = $can('admin.users');
         $can_admin_payroll = $can('admin.payroll');
         $can_admin_reports = $can('admin.reports');
+        $can_admin_audit_logs = $can('admin.audit_logs');
         $can_admin_settings = $can('admin.settings');
         $show_admin_menu = $can_admin_tables_manage || $can_admin_categories || $can_admin_products || $can_admin_inventory_categories
-          || $can_admin_inventory_units || $can_admin_dispense_points || $can_admin_users || $can_admin_payroll || $can_admin_reports || $can_admin_settings;
+          || $can_admin_inventory_units || $can_admin_dispense_points || $can_admin_users || $can_admin_payroll || $can_admin_reports || $can_admin_audit_logs || $can_admin_settings;
       ?>
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <?php if ($can('dashboard')): ?>
@@ -108,6 +109,7 @@
             <?php if ($current_user['role'] === 'ADMIN'): ?><li><a class="dropdown-item" href="<?php echo site_url('menu-permissions'); ?>">Gán quyền menu</a></li><?php endif; ?>
             <?php if ($can_admin_payroll): ?><li><a class="dropdown-item" href="<?php echo site_url('payroll/admin'); ?>">Quản lý lương</a></li><?php endif; ?>
             <?php if ($can_admin_reports): ?><li><a class="dropdown-item" href="<?php echo site_url('reports'); ?>">Báo cáo</a></li><?php endif; ?>
+            <?php if ($can_admin_audit_logs): ?><li><a class="dropdown-item" href="<?php echo site_url('audit-logs'); ?>"><i class="bi bi-journal-text"></i> Nhật ký hệ thống</a></li><?php endif; ?>
             <?php if ($can_admin_settings): ?>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="<?php echo site_url('settings'); ?>"><i class="bi bi-gear"></i> Cài đặt</a></li>
@@ -133,7 +135,7 @@
             <i class="bi bi-person-circle"></i> <?php echo htmlspecialchars($current_user['fullname']); ?>
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="<?php echo site_url('payroll'); ?>"><i class="bi bi-cash-coin"></i> Lương</a></li>
+            <li><a class="dropdown-item" href="<?php echo site_url('payroll'); ?>"><i class="bi bi-cash-coin"></i> Chấm công</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('change-password'); ?>"><i class="bi bi-key"></i> Đổi mật khẩu</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('logout'); ?>"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
           </ul>

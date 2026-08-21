@@ -103,6 +103,39 @@ if ( ! function_exists('storage_type_label'))
     }
 }
 
+if ( ! function_exists('audit_module_label'))
+{
+    /** Tên tiếng Việt cho module trong audit_logs — dùng cho màn nhật ký hệ thống. */
+    function audit_module_label($module)
+    {
+        $map = array(
+            'auth'                   => 'Đăng nhập/xuất',
+            'user'                   => 'Người dùng',
+            'category'               => 'Danh mục món',
+            'product'                => 'Sản phẩm',
+            'table'                  => 'Bàn',
+            'order'                  => 'Đơn hàng',
+            'order_item'             => 'Món trong đơn',
+            'kitchen_ticket'         => 'Ticket bếp',
+            'payment'                => 'Thanh toán',
+            'court_booking'          => 'Đặt sân',
+            'assistance_call'        => 'Gọi hỗ trợ',
+            'inventory_category'     => 'Danh mục kho',
+            'inventory_unit'         => 'Đơn vị tính',
+            'inventory_item'         => 'Sản phẩm kho',
+            'dispense_point'         => 'Điểm xuất kho',
+            'stock_transaction'      => 'Nhập/xuất/kiểm kho',
+            'payroll_settings'       => 'Cấu hình lương',
+            'payroll_record'         => 'Dữ liệu lương',
+            'payroll_hours'          => 'Giờ làm/ngày nghỉ',
+            'role_menu_permissions'  => 'Quyền menu theo vai trò',
+            'user_menu_permissions'  => 'Quyền menu riêng nhân viên',
+            'settings'               => 'Cài đặt hệ thống',
+        );
+        return isset($map[$module]) ? $map[$module] : $module;
+    }
+}
+
 if ( ! function_exists('vn_to_ascii'))
 {
     /** Bỏ dấu tiếng Việt (ánh xạ ký tự thủ công — không phụ thuộc iconv/locale). */

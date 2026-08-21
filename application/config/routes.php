@@ -90,6 +90,7 @@ $route['categories/(:num)/edit'] = 'categories/edit/$1';
 $route['categories/(:num)/delete'] = 'categories/delete/$1';
 
 $route['settings'] = 'settings/index';
+$route['audit-logs'] = 'audit_logs/index';
 
 // RBAC động — gán menu theo vai trò / cấp thêm cho riêng 1 nhân viên
 $route['menu-permissions'] = 'menu_permissions/index';
