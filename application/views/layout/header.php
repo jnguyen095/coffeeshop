@@ -57,25 +57,25 @@
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('dashboard'); ?>"><i class="bi bi-speedometer2"></i> Tổng quan</a></li>
         <?php endif; ?>
         <?php if ($can('tables')): ?>
-        <li class="nav-item"><a class="nav-link" href="<?php echo site_url('tables'); ?>"><i class="bi bi-grid-3x3-gap"></i> Bàn</a></li>
+        <!-- <li class="nav-item"><a class="nav-link" href="<?php echo site_url('tables'); ?>"><i class="bi bi-grid-3x3-gap"></i> Bàn</a></li> -->
         <?php endif; ?>
         <?php if ($can('orders')): ?>
-        <li class="nav-item"><a class="nav-link" href="<?php echo site_url('orders'); ?>"><i class="bi bi-receipt"></i> Đơn hàng</a></li>
+        <!-- <li class="nav-item"><a class="nav-link" href="<?php echo site_url('orders'); ?>"><i class="bi bi-receipt"></i> Đơn hàng</a></li> -->
         <?php endif; ?>
         <?php if ($can('takeaway')): ?>
-        <li class="nav-item"><a class="nav-link" href="<?php echo site_url('takeaway/create'); ?>"><i class="bi bi-bag-check"></i> Bán mang đi</a></li>
+        <!-- <li class="nav-item"><a class="nav-link" href="<?php echo site_url('takeaway/create'); ?>"><i class="bi bi-bag-check"></i> Bán mang đi</a></li> -->
         <?php endif; ?>
         <?php if ($can('bookings')): ?>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('bookings'); ?>"><i class="bi bi-calendar-check"></i> Lịch sân</a></li>
         <?php endif; ?>
         <?php if ($can('kitchen')): ?>
-        <li class="nav-item"><a class="nav-link" href="<?php echo site_url('kitchen'); ?>"><i class="bi bi-fire"></i> Bếp (KDS)</a></li>
+        <!-- <li class="nav-item"><a class="nav-link" href="<?php echo site_url('kitchen'); ?>"><i class="bi bi-fire"></i> Bếp (KDS)</a></li> -->
         <?php endif; ?>
         <?php if ($can('cashier')): ?>
-        <li class="nav-item"><a class="nav-link" href="<?php echo site_url('cashier'); ?>"><i class="bi bi-cash-coin"></i> Thu ngân</a></li>
+        <!-- <li class="nav-item"><a class="nav-link" href="<?php echo site_url('cashier'); ?>"><i class="bi bi-cash-coin"></i> Thu ngân</a></li> -->
         <?php endif; ?>
         <?php if ($can('payments')): ?>
-        <li class="nav-item"><a class="nav-link" href="<?php echo site_url('payments'); ?>"><i class="bi bi-clock-history"></i> LS Thanh toán</a></li>
+        <!-- <li class="nav-item"><a class="nav-link" href="<?php echo site_url('payments'); ?>"><i class="bi bi-clock-history"></i> LS Thanh toán</a></li> -->
         <?php endif; ?>
         <?php if ($show_inventory_menu):
           $CI->load->model('Inventory_item_model');
