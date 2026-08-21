@@ -119,6 +119,31 @@ class Inventory_item_model extends CI_Model
             ->count_all_results($this->table);
     }
 
+    public function count_active()
+    {
+        return $this->db->where('status', 'ACTIVE')->count_all_results($this->table);
+    }
+
+    /**
+     * Số sản phẩm sắp hết hàng / tổng số sản phẩm theo từng danh mục — dùng
+     * cho dashboard kho hàng (vd "Pha Chế: 2/200").
+     */
+    public function get_category_stock_summary()
+    {
+        return $this->db->select("
+                inventory_categories.id as category_id,
+                inventory_categories.name as category_name,
+                COUNT(*) as total,
+                SUM(CASE WHEN inventory_items.qty_on_hand < inventory_items.low_stock_threshold THEN 1 ELSE 0 END) as low
+            ", FALSE)
+            ->from($this->table)
+            ->join('inventory_categories', 'inventory_categories.id = inventory_items.category_id', 'left')
+            ->where('inventory_items.status', 'ACTIVE')
+            ->group_by('inventory_categories.id')
+            ->order_by('inventory_categories.sort_order', 'ASC')
+            ->get()->result_array();
+    }
+
     public function create($data)
     {
         $data['created_at'] = date('Y-m-d H:i:s');

@@ -2,127 +2,126 @@
   <h4 class="fw-bold mb-3">Xin chào, <?php echo htmlspecialchars($current_user['fullname']); ?> 👋</h4>
 
   <div class="row g-3">
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4">
       <div class="card border-0 shadow-sm rounded-4 h-100">
         <div class="card-body text-center">
-          <i class="bi bi-grid-3x3-gap text-brand fs-2"></i>
-          <div class="fs-4 fw-bold mt-1"><?php echo $status_counts['OPEN']; ?>/<?php echo $tables_total; ?></div>
-          <div class="text-muted small">Bàn đang phục vụ</div>
+          <i class="bi bi-boxes text-brand fs-2"></i>
+          <div class="fs-4 fw-bold mt-1"><?php echo $total_items; ?></div>
+          <div class="text-muted small">Sản phẩm trong kho</div>
         </div>
       </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-md-4">
       <div class="card border-0 shadow-sm rounded-4 h-100">
         <div class="card-body text-center">
-          <i class="bi bi-cash-stack text-success fs-2"></i>
-          <div class="fs-4 fw-bold mt-1"><?php echo money_format_vnd($today_revenue); ?></div>
-          <div class="text-muted small">Doanh thu hôm nay</div>
-          <div class="small text-muted mt-1 border-top pt-1">
-            <i class="bi bi-cup-hot"></i> <?php echo money_format_vnd($drink_revenue_today); ?>
-            <span class="mx-1">·</span>
-            <i class="bi bi-dribbble"></i> <?php echo money_format_vnd($court_revenue_today); ?>
-          </div>
+          <i class="bi bi-exclamation-triangle text-danger fs-2"></i>
+          <div class="fs-4 fw-bold mt-1"><?php echo $total_low_stock; ?></div>
+          <div class="text-muted small">Sản phẩm sắp hết hàng</div>
         </div>
       </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-12 col-md-4">
       <div class="card border-0 shadow-sm rounded-4 h-100">
         <div class="card-body text-center">
-          <i class="bi bi-fire text-danger fs-2"></i>
-          <div class="fs-4 fw-bold mt-1"><?php echo $active_tickets; ?></div>
-          <div class="text-muted small">Ticket bếp đang xử lý</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card border-0 shadow-sm rounded-4 h-100">
-        <div class="card-body text-center">
-          <i class="bi bi-receipt text-warning fs-2"></i>
-          <div class="fs-4 fw-bold mt-1"><?php echo $wait_payment; ?></div>
-          <div class="text-muted small">Chờ thanh toán</div>
+          <i class="bi bi-tags text-primary fs-2"></i>
+          <div class="fs-4 fw-bold mt-1"><?php echo $total_categories; ?></div>
+          <div class="text-muted small">Danh mục kho</div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="row g-3 mt-1">
-    <?php if (in_array($current_user['role'], array('STAFF','ADMIN'), TRUE)): ?>
-    <div class="col-6 col-md-3">
-      <a href="<?php echo site_url('tables'); ?>" class="btn btn-brand w-100 py-3"><i class="bi bi-grid-3x3-gap d-block fs-3 mb-1"></i>Sơ đồ bàn</a>
-    </div>
-    <div class="col-6 col-md-3">
-      <a href="<?php echo site_url('orders'); ?>" class="btn btn-outline-secondary w-100 py-3"><i class="bi bi-receipt d-block fs-3 mb-1"></i>Đơn hàng</a>
-    </div>
-    <?php endif; ?>
-    <?php if (in_array($current_user['role'], array('CASHIER','ADMIN'), TRUE)): ?>
-    <div class="col-6 col-md-3">
-      <a href="<?php echo site_url('cashier'); ?>" class="btn btn-outline-success w-100 py-3"><i class="bi bi-cash-coin d-block fs-3 mb-1"></i>Thu ngân</a>
-    </div>
-    <?php endif; ?>
-    <?php if ($current_user['role'] === 'ADMIN'): ?>
-    <div class="col-6 col-md-3">
-      <a href="<?php echo site_url('reports'); ?>" class="btn btn-outline-dark w-100 py-3"><i class="bi bi-bar-chart d-block fs-3 mb-1"></i>Báo cáo</a>
-    </div>
-    <?php endif; ?>
-  </div>
-
-  <?php if ($courts_total > 0): ?>
-  <h5 class="fw-bold mt-4 mb-3"><i class="bi bi-dribbble text-brand"></i> Sân pickleball hôm nay</h5>
-  <div class="row g-3">
-    <div class="col-6 col-md-3">
-      <div class="card border-0 shadow-sm rounded-4 h-100">
-        <div class="card-body text-center">
-          <i class="bi bi-dribbble text-brand fs-2"></i>
-          <div class="fs-4 fw-bold mt-1"><?php echo $courts_occupied; ?>/<?php echo $courts_total; ?></div>
-          <div class="text-muted small">Sân đang có khách</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="card border-0 shadow-sm rounded-4 h-100">
-        <div class="card-body text-center">
-          <i class="bi bi-cash-stack text-success fs-2"></i>
-          <div class="fs-5 fw-bold mt-1"><?php echo money_format_vnd($court_revenue_today); ?></div>
-          <div class="text-muted small">Doanh thu dịch vụ sân hôm nay</div>
-        </div>
-      </div>
-    </div>
     <div class="col-md-6">
       <div class="card border-0 shadow-sm rounded-4 h-100">
         <div class="card-body">
-          <div class="small text-muted mb-1">Doanh thu sân 7 ngày gần nhất</div>
-          <canvas id="chartCourtRevenue7d" height="70"></canvas>
+          <h6 class="fw-bold mb-3"><i class="bi bi-tags"></i> Tồn kho theo danh mục</h6>
+          <?php if (empty($category_summary)): ?>
+            <p class="text-muted small mb-0">Chưa có sản phẩm kho nào.</p>
+          <?php else: ?>
+            <?php foreach ($category_summary as $c): $has_low = $c['low'] > 0; ?>
+              <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                <span><?php echo htmlspecialchars($c['category_name'] ?: 'Chưa phân loại'); ?></span>
+                <span class="fw-semibold <?php echo $has_low ? 'text-danger' : 'text-success'; ?>">
+                  <?php echo (int) $c['low']; ?>/<?php echo (int) $c['total']; ?>
+                  <?php if ($has_low): ?><i class="bi bi-exclamation-triangle-fill ms-1"></i><?php endif; ?>
+                </span>
+              </div>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0"><i class="bi bi-exclamation-triangle text-danger"></i> Sắp hết hàng</h6>
+            <a href="<?php echo site_url('inventory/items?stock_status=LOW'); ?>" class="small">Xem tất cả</a>
+          </div>
+          <?php if (empty($top_low_stock)): ?>
+            <p class="text-muted small mb-0">Không có sản phẩm nào sắp hết hàng.</p>
+          <?php else: ?>
+            <table class="table table-sm mb-0">
+              <tbody>
+              <?php foreach ($top_low_stock as $it): ?>
+                <tr>
+                  <td>
+                    <div><?php echo htmlspecialchars($it['name']); ?></div>
+                    <div class="text-muted small"><?php echo htmlspecialchars($it['category_name']); ?></div>
+                  </td>
+                  <td class="text-end text-danger fw-semibold text-nowrap">
+                    <?php echo rtrim(rtrim(number_format($it['qty_on_hand'], 2, '.', ''), '0'), '.'); ?> / <?php echo rtrim(rtrim(number_format($it['low_stock_threshold'], 2, '.', ''), '0'), '.'); ?> <?php echo htmlspecialchars($it['unit_name']); ?>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+              </tbody>
+            </table>
+          <?php endif; ?>
         </div>
       </div>
     </div>
   </div>
-  <?php if ($current_user['role'] === 'ADMIN'): ?>
-    <a href="<?php echo site_url('reports/court-performance'); ?>" class="small">Xem báo cáo chi tiết <i class="bi bi-arrow-right"></i></a>
-  <?php endif; ?>
-  <?php endif; ?>
+
+  <div class="row g-3 mt-1">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0"><i class="bi bi-clock-history"></i> Lịch sử nhập/xuất/kiểm kho gần đây</h6>
+            <a href="<?php echo site_url('stock/history'); ?>" class="small">Xem tất cả</a>
+          </div>
+          <?php if (empty($recent_batches)): ?>
+            <p class="text-muted small mb-0">Chưa có giao dịch nào.</p>
+          <?php else: ?>
+            <div class="table-responsive">
+              <table class="table table-sm mb-0">
+                <thead class="text-muted small"><tr><th>Thời gian</th><th>Loại</th><th>Số SP</th><th class="text-end">Tổng SL</th><th>Người thực hiện</th></tr></thead>
+                <tbody>
+                <?php foreach ($recent_batches as $b): ?>
+                  <tr>
+                    <td class="text-nowrap"><?php echo date('d/m/Y H:i', strtotime($b['created_at'])); ?></td>
+                    <td>
+                      <?php if ($b['type'] === 'IN'): ?>
+                        <span class="badge bg-success">Nhập</span>
+                      <?php elseif ($b['type'] === 'OUT'): ?>
+                        <span class="badge bg-danger">Xuất</span>
+                      <?php else: ?>
+                        <span class="badge bg-primary">Kiểm kho</span>
+                      <?php endif; ?>
+                    </td>
+                    <td><?php echo (int) $b['item_count']; ?></td>
+                    <td class="text-end"><?php echo ($b['type'] === 'ADJUST' && $b['total_qty'] > 0 ? '+' : '').rtrim(rtrim(number_format($b['total_qty'], 2, '.', ''), '0'), '.'); ?></td>
+                    <td><?php echo htmlspecialchars((string) $b['created_by_name']); ?></td>
+                  </tr>
+                <?php endforeach; ?>
+                </tbody>
+              </table>
+            </div>
+          <?php endif; ?>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-
-<?php if ($courts_total > 0): ?>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<script>
-var courtRevenueTrend = <?php echo json_encode($court_revenue_trend, JSON_UNESCAPED_UNICODE); ?>;
-var trendMap = {};
-courtRevenueTrend.forEach(function(r){ trendMap[r.day] = parseFloat(r.total_revenue); });
-
-var days = [];
-var values = [];
-for (var i = 6; i >= 0; i--){
-  var d = new Date();
-  d.setDate(d.getDate() - i);
-  var key = d.toISOString().slice(0, 10);
-  days.push(key.slice(5));
-  values.push(trendMap[key] || 0);
-}
-
-new Chart(document.getElementById('chartCourtRevenue7d'), {
-  type: 'bar',
-  data: { labels: days, datasets: [{ label: 'Doanh thu', data: values, backgroundColor: '#6f4e37' }] },
-  options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
-});
-</script>
-<?php endif; ?>

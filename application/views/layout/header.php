@@ -24,33 +24,59 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="mainNav">
+      <?php
+        // $this trong view là CI_Loader, không phải controller — phải lấy
+        // singleton thật qua get_instance() để load helper/model tại đây.
+        $CI =& get_instance();
+        $CI->load->helper('menu_permission');
+        $can = function($key) use ($current_user, $CI) { return menu_permission_user_can_key($current_user, $key); };
+
+        $can_stock_in = $can('inventory.stock_in');
+        $can_stock_out = $can('inventory.stock_out');
+        $can_stock_adjust = $can('inventory.stock_adjust');
+        $can_inventory_items = $can('inventory.items');
+        $can_inventory_history = $can('inventory.history');
+        $show_inventory_menu = $can_stock_in || $can_stock_out || $can_stock_adjust || $can_inventory_items || $can_inventory_history;
+
+        $can_admin_tables_manage = $current_user['role'] === 'ADMIN'; // luôn gắn với inline _require_admin() trong Tables::manage*, không đưa vào RBAC động
+        $can_admin_categories = $can('admin.categories');
+        $can_admin_products = $can('admin.products');
+        $can_admin_inventory_categories = $can('admin.inventory_categories');
+        $can_admin_inventory_units = $can('admin.inventory_units');
+        $can_admin_dispense_points = $can('admin.dispense_points');
+        $can_admin_users = $can('admin.users');
+        $can_admin_payroll = $can('admin.payroll');
+        $can_admin_reports = $can('admin.reports');
+        $can_admin_settings = $can('admin.settings');
+        $show_admin_menu = $can_admin_tables_manage || $can_admin_categories || $can_admin_products || $can_admin_inventory_categories
+          || $can_admin_inventory_units || $can_admin_dispense_points || $can_admin_users || $can_admin_payroll || $can_admin_reports || $can_admin_settings;
+      ?>
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <?php if (in_array($current_user['role'], array('STAFF','CASHIER','ADMIN'), TRUE)): ?>
+        <?php if ($can('dashboard')): ?>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('dashboard'); ?>"><i class="bi bi-speedometer2"></i> Tổng quan</a></li>
         <?php endif; ?>
-        <?php if (in_array($current_user['role'], array('STAFF', 'CASHIER','ADMIN'), TRUE)): ?>
+        <?php if ($can('tables')): ?>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('tables'); ?>"><i class="bi bi-grid-3x3-gap"></i> Bàn</a></li>
+        <?php endif; ?>
+        <?php if ($can('orders')): ?>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('orders'); ?>"><i class="bi bi-receipt"></i> Đơn hàng</a></li>
         <?php endif; ?>
-        <?php if (in_array($current_user['role'], array('STAFF','CASHIER','ADMIN'), TRUE)): ?>
+        <?php if ($can('takeaway')): ?>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('takeaway/create'); ?>"><i class="bi bi-bag-check"></i> Bán mang đi</a></li>
         <?php endif; ?>
-        <?php if (in_array($current_user['role'], array('STAFF','CASHIER','ADMIN','BOOKING'), TRUE)): ?>
+        <?php if ($can('bookings')): ?>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('bookings'); ?>"><i class="bi bi-calendar-check"></i> Lịch sân</a></li>
         <?php endif; ?>
-        <?php if (in_array($current_user['role'], array('BARISTA','ADMIN'), TRUE)): ?>
+        <?php if ($can('kitchen')): ?>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('kitchen'); ?>"><i class="bi bi-fire"></i> Bếp (KDS)</a></li>
         <?php endif; ?>
-        <?php if (in_array($current_user['role'], array('CASHIER','ADMIN'), TRUE)): ?>
+        <?php if ($can('cashier')): ?>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('cashier'); ?>"><i class="bi bi-cash-coin"></i> Thu ngân</a></li>
+        <?php endif; ?>
+        <?php if ($can('payments')): ?>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('payments'); ?>"><i class="bi bi-clock-history"></i> LS Thanh toán</a></li>
         <?php endif; ?>
-        <?php if (in_array($current_user['role'], array('STAFF','BARISTA','CASHIER','ADMIN','STOCKTAKER'), TRUE)):
-          // $this trong view là CI_Loader, không phải controller — phải lấy
-          // singleton thật qua get_instance() để load model tại đây (không
-          // phải controller nào cũng load sẵn Inventory_item_model) và tính
-          // số sản phẩm sắp hết hàng cho badge.
-          $CI =& get_instance();
+        <?php if ($show_inventory_menu):
           $CI->load->model('Inventory_item_model');
           $low_stock_count = $CI->Inventory_item_model->count_low_stock();
         ?>
@@ -60,29 +86,32 @@
             <?php if ($low_stock_count > 0): ?><span class="badge bg-danger rounded-pill"><?php echo $low_stock_count; ?></span><?php endif; ?>
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="<?php echo site_url('stock/in'); ?>"><i class="bi bi-box-arrow-in-down text-success"></i> Nhập kho</a></li>
-            <li><a class="dropdown-item" href="<?php echo site_url('stock/out'); ?>"><i class="bi bi-box-arrow-up text-danger"></i> Xuất kho</a></li>
-            <li><a class="dropdown-item" href="<?php echo site_url('stock/adjust'); ?>"><i class="bi bi-clipboard-check text-primary"></i> Kiểm kho</a></li>
-            <li><a class="dropdown-item" href="<?php echo site_url('inventory/items'); ?>">Hàng trong kho<?php if ($low_stock_count > 0): ?> <span class="badge bg-danger rounded-pill"><?php echo $low_stock_count; ?></span><?php endif; ?></a></li>
-            <li><a class="dropdown-item" href="<?php echo site_url('stock/history'); ?>">Lịch sử nhập/xuất</a></li>
+            <?php if ($can_stock_in): ?><li><a class="dropdown-item" href="<?php echo site_url('stock/in'); ?>"><i class="bi bi-box-arrow-in-down text-success"></i> Nhập kho</a></li><?php endif; ?>
+            <?php if ($can_stock_out): ?><li><a class="dropdown-item" href="<?php echo site_url('stock/out'); ?>"><i class="bi bi-box-arrow-up text-danger"></i> Xuất kho</a></li><?php endif; ?>
+            <?php if ($can_stock_adjust): ?><li><a class="dropdown-item" href="<?php echo site_url('stock/adjust'); ?>"><i class="bi bi-clipboard-check text-primary"></i> Kiểm kho</a></li><?php endif; ?>
+            <?php if ($can_inventory_items): ?><li><a class="dropdown-item" href="<?php echo site_url('inventory/items'); ?>">Hàng trong kho<?php if ($low_stock_count > 0): ?> <span class="badge bg-danger rounded-pill"><?php echo $low_stock_count; ?></span><?php endif; ?></a></li><?php endif; ?>
+            <?php if ($can_inventory_history): ?><li><a class="dropdown-item" href="<?php echo site_url('stock/history'); ?>">Lịch sử nhập/xuất</a></li><?php endif; ?>
           </ul>
         </li>
         <?php endif; ?>
-        <?php if ($current_user['role'] === 'ADMIN'): ?>
+        <?php if ($show_admin_menu): ?>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"><i class="bi bi-gear"></i> Quản trị</a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="<?php echo site_url('tables/manage'); ?>">Quản lý bàn</a></li>
-            <li><a class="dropdown-item" href="<?php echo site_url('categories'); ?>">Danh mục</a></li>
-            <li><a class="dropdown-item" href="<?php echo site_url('products'); ?>">Sản phẩm</a></li>
-            <li><a class="dropdown-item" href="<?php echo site_url('inventory/categories'); ?>">Danh mục kho</a></li>
-            <li><a class="dropdown-item" href="<?php echo site_url('inventory/units'); ?>">Đơn vị tính</a></li>
-            <li><a class="dropdown-item" href="<?php echo site_url('inventory/dispense-points'); ?>">Điểm xuất kho</a></li>
-            <li><a class="dropdown-item" href="<?php echo site_url('users'); ?>">Người dùng</a></li>
-            <li><a class="dropdown-item" href="<?php echo site_url('payroll/admin'); ?>">Quản lý lương</a></li>
-            <li><a class="dropdown-item" href="<?php echo site_url('reports'); ?>">Báo cáo</a></li>
+            <?php if ($can_admin_tables_manage): ?><li><a class="dropdown-item" href="<?php echo site_url('tables/manage'); ?>">Quản lý bàn</a></li><?php endif; ?>
+            <?php if ($can_admin_categories): ?><li><a class="dropdown-item" href="<?php echo site_url('categories'); ?>">Danh mục</a></li><?php endif; ?>
+            <?php if ($can_admin_products): ?><li><a class="dropdown-item" href="<?php echo site_url('products'); ?>">Sản phẩm</a></li><?php endif; ?>
+            <?php if ($can_admin_inventory_categories): ?><li><a class="dropdown-item" href="<?php echo site_url('inventory/categories'); ?>">Danh mục kho</a></li><?php endif; ?>
+            <?php if ($can_admin_inventory_units): ?><li><a class="dropdown-item" href="<?php echo site_url('inventory/units'); ?>">Đơn vị tính</a></li><?php endif; ?>
+            <?php if ($can_admin_dispense_points): ?><li><a class="dropdown-item" href="<?php echo site_url('inventory/dispense-points'); ?>">Điểm xuất kho</a></li><?php endif; ?>
+            <?php if ($can_admin_users): ?><li><a class="dropdown-item" href="<?php echo site_url('users'); ?>">Người dùng</a></li><?php endif; ?>
+            <?php if ($current_user['role'] === 'ADMIN'): ?><li><a class="dropdown-item" href="<?php echo site_url('menu-permissions'); ?>">Gán quyền menu</a></li><?php endif; ?>
+            <?php if ($can_admin_payroll): ?><li><a class="dropdown-item" href="<?php echo site_url('payroll/admin'); ?>">Quản lý lương</a></li><?php endif; ?>
+            <?php if ($can_admin_reports): ?><li><a class="dropdown-item" href="<?php echo site_url('reports'); ?>">Báo cáo</a></li><?php endif; ?>
+            <?php if ($can_admin_settings): ?>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="<?php echo site_url('settings'); ?>"><i class="bi bi-gear"></i> Cài đặt</a></li>
+            <?php endif; ?>
           </ul>
         </li>
         <?php endif; ?>

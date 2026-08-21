@@ -91,6 +91,11 @@ $route['categories/(:num)/delete'] = 'categories/delete/$1';
 
 $route['settings'] = 'settings/index';
 
+// RBAC động — gán menu theo vai trò / cấp thêm cho riêng 1 nhân viên
+$route['menu-permissions'] = 'menu_permissions/index';
+$route['menu-permissions/user'] = 'menu_permissions/user';
+$route['menu-permissions/user/(:num)'] = 'menu_permissions/user/$1';
+
 // Kho hàng (Inventory / Stock)
 $route['inventory/categories'] = 'inventory_categories/index';
 $route['inventory/categories/create'] = 'inventory_categories/create';

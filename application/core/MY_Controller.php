@@ -33,6 +33,31 @@ class MY_Controller extends CI_Controller
             return;
         }
 
+        // ADMIN luôn có toàn quyền — không bị RBAC động hay $allowed_roles
+        // tĩnh chi phối, tránh tự khóa mình nếu lỡ cấu hình menu sai.
+        if ($this->current_user['role'] === 'ADMIN')
+        {
+            return;
+        }
+
+        $this->load->helper('menu_permission');
+        $menu_item = menu_permission_resolve($this->router->class, $this->router->method);
+
+        if ($menu_item !== NULL)
+        {
+            // (controller, method) này đã được đưa vào danh mục menu gán
+            // quyền động -> RBAC động là thẩm quyền DUY NHẤT cho request
+            // này, không còn xét $allowed_roles tĩnh nữa.
+            if ( ! menu_permission_user_can($this->current_user, $menu_item['id']))
+            {
+                $this->output->set_status_header(403);
+                echo $this->load->view('errors/forbidden', array('current_user' => $this->current_user), TRUE);
+                exit;
+            }
+            return;
+        }
+
+        // Chưa được đưa vào danh mục menu -> giữ nguyên hành vi cũ.
         if ( ! empty($this->allowed_roles) && ! in_array($this->current_user['role'], $this->allowed_roles, TRUE))
         {
             $this->output->set_status_header(403);
