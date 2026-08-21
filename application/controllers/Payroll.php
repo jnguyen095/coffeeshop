@@ -15,7 +15,7 @@ class Payroll extends MY_Controller
     {
         parent::__construct();
         $this->load->helper('payroll');
-        $this->load->model(array('Payroll_setting_model', 'Payroll_record_model', 'Payroll_hours_model', 'Payroll_absence_model', 'User_model'));
+        $this->load->model(array('Payroll_setting_model', 'Payroll_record_model', 'Payroll_hours_model', 'Payroll_absence_model', 'Payroll_rate_history_model', 'User_model'));
     }
 
     private function _require_admin()
@@ -42,6 +42,28 @@ class Payroll extends MY_Controller
         return TRUE;
     }
 
+    /**
+     * Loại lương + mức lương CÓ HIỆU LỰC cho đúng tháng đang xem — lấy từ
+     * payroll_rate_history (dòng effective_from gần nhất mà <= tháng đó),
+     * không phải cấu hình "hiện tại" — nhờ vậy đổi lương "áp dụng từ tháng
+     * sau" không làm sai lệch lương các tháng trước đã tính. Tháng chưa có
+     * lịch sử nào áp dụng được (vd nhân viên mới, hoặc dữ liệu trước khi có
+     * tính năng này) thì rơi về cấu hình hiện tại trong payroll_settings.
+     */
+    private function _effective_settings($user_id, $period)
+    {
+        $history = $this->Payroll_rate_history_model->get_effective_for_period($user_id, $period);
+        if ($history)
+        {
+            return array(
+                'salary_type'  => $history['salary_type'],
+                'fixed_salary' => $history['fixed_salary'],
+                'hourly_rate'  => $history['hourly_rate'],
+            );
+        }
+        return $this->Payroll_setting_model->get_by_user_or_default($user_id);
+    }
+
     /** $total_hours cho HOURLY, $absence_days cho FIXED — luôn tính cả 2 và bỏ qua giá trị không dùng cho gọn code gọi. */
     private function _compute($settings, $record, $user_id, $period)
     {
@@ -56,7 +78,7 @@ class Payroll extends MY_Controller
         $period = $this->input->get('period') ?: date('Y-m');
         $user_id = $this->current_user['id'];
 
-        $settings = $this->Payroll_setting_model->get_by_user_or_default($user_id);
+        $settings = $this->_effective_settings($user_id, $period);
         $record = $this->Payroll_record_model->get_by_user_period_or_default($user_id, $period);
 
         $data = array(
@@ -64,6 +86,11 @@ class Payroll extends MY_Controller
             'current_user' => $this->current_user,
             'period'       => $period,
             'settings'     => $settings,
+            // Thông tin ngân hàng không phụ thuộc tháng đang xem, luôn lấy
+            // cấu hình hiện tại — $settings ở trên chỉ có
+            // salary_type/fixed_salary/hourly_rate khi lấy từ lịch sử mức
+            // lương, không có các trường ngân hàng.
+            'bank_info'    => $this->Payroll_setting_model->get_by_user_or_default($user_id),
             'salary'       => $this->_compute($settings, $record, $user_id, $period),
         );
         $this->load->view('layout/header', $data);
@@ -80,7 +107,7 @@ class Payroll extends MY_Controller
     {
         $period = $this->input->get('period') ?: date('Y-m');
         $user_id = $this->current_user['id'];
-        $settings = $this->Payroll_setting_model->get_by_user_or_default($user_id);
+        $settings = $this->_effective_settings($user_id, $period);
 
         $weekday_labels = array(1 => 'T2', 2 => 'T3', 3 => 'T4', 4 => 'T5', 5 => 'T6', 6 => 'T7', 7 => 'CN');
         $hour_entries = array();
@@ -136,30 +163,63 @@ class Payroll extends MY_Controller
         $this->_require_admin();
         $period = $this->input->get('period') ?: date('Y-m');
         $keyword = trim((string) $this->input->get('q'));
+        $role_filter = $this->input->get('role');
+        $salary_type_filter = $this->input->get('salary_type');
+        $paid_status_filter = $this->input->get('paid_status');
 
-        $users = $this->User_model->get_all(NULL, 'ACTIVE', $keyword ?: NULL);
+        $users = $this->User_model->get_all($role_filter ?: NULL, 'ACTIVE', $keyword ?: NULL);
         $records_by_user = $this->Payroll_record_model->get_all_by_period($period);
 
         $rows = array();
         foreach ($users as $u)
         {
-            $settings = $this->Payroll_setting_model->get_by_user_or_default($u['id']);
+            $settings = $this->_effective_settings($u['id'], $period);
             $record = isset($records_by_user[$u['id']])
                 ? $records_by_user[$u['id']]
                 : $this->Payroll_record_model->get_by_user_period_or_default($u['id'], $period);
 
+            $salary = $this->_compute($settings, $record, $u['id'], $period);
+
+            if ($salary_type_filter && $salary['salary_type'] !== $salary_type_filter)
+            {
+                continue;
+            }
+            if ($paid_status_filter && $salary['paid_status'] !== $paid_status_filter)
+            {
+                continue;
+            }
+
             $rows[] = array(
                 'user'   => $u,
-                'salary' => $this->_compute($settings, $record, $u['id'], $period),
+                'salary' => $salary,
             );
         }
 
+        $total_unpaid = 0;
+        $unpaid_count = 0;
+        $total_net = 0;
+        foreach ($rows as $r)
+        {
+            $total_net += $r['salary']['net_salary'];
+            if ($r['salary']['paid_status'] === 'UNPAID')
+            {
+                $total_unpaid += $r['salary']['net_salary'];
+                $unpaid_count++;
+            }
+        }
+
         $data = array(
-            'page_title'   => 'Quản lý lương',
-            'current_user' => $this->current_user,
-            'period'       => $period,
-            'keyword'      => $keyword,
-            'rows'         => $rows,
+            'page_title'         => 'Quản lý lương',
+            'current_user'       => $this->current_user,
+            'period'             => $period,
+            'keyword'            => $keyword,
+            'role_filter'        => $role_filter,
+            'salary_type_filter' => $salary_type_filter,
+            'paid_status_filter' => $paid_status_filter,
+            'rows'               => $rows,
+            'total_unpaid'       => $total_unpaid,
+            'unpaid_count'       => $unpaid_count,
+            'total_net'          => $total_net,
         );
         $this->load->view('layout/header', $data);
         $this->load->view('payroll/admin_index', $data);
@@ -175,19 +235,25 @@ class Payroll extends MY_Controller
 
         if ($this->input->method() === 'post')
         {
+            $salary_type = $this->input->post('salary_type') === 'HOURLY' ? 'HOURLY' : 'FIXED';
+            $fixed_salary = (float) $this->input->post('fixed_salary');
+            $hourly_rate = (float) $this->input->post('hourly_rate');
+            $effective_from = $this->input->post('effective_from') ?: date('Y-m');
+
             $data = array(
-                'salary_type'         => $this->input->post('salary_type') === 'HOURLY' ? 'HOURLY' : 'FIXED',
-                'fixed_salary'        => (float) $this->input->post('fixed_salary'),
-                'hourly_rate'         => (float) $this->input->post('hourly_rate'),
+                'salary_type'         => $salary_type,
+                'fixed_salary'        => $fixed_salary,
+                'hourly_rate'         => $hourly_rate,
                 'bank_name'           => $this->input->post('bank_name', TRUE),
                 'bank_branch'         => $this->input->post('bank_branch', TRUE),
                 'bank_account_number' => $this->input->post('bank_account_number', TRUE),
                 'bank_account_name'   => $this->input->post('bank_account_name', TRUE),
             );
             $this->Payroll_setting_model->upsert($user_id, $data);
-            $this->audit('payroll_settings', 'UPDATE', NULL, array('user_id' => $user_id));
-            $this->session->set_flashdata('success', 'Đã lưu cấu hình lương cho '.$user['fullname'].'.');
-            redirect('payroll/admin');
+            $this->Payroll_rate_history_model->upsert($user_id, $salary_type, $fixed_salary, $hourly_rate, $effective_from, $this->current_user['id']);
+            $this->audit('payroll_settings', 'UPDATE', NULL, array('user_id' => $user_id, 'effective_from' => $effective_from));
+            $this->session->set_flashdata('success', 'Đã lưu cấu hình lương cho '.$user['fullname'].', áp dụng từ '.payroll_period_label($effective_from).'.');
+            redirect('payroll/settings/'.$user_id);
             return;
         }
 
@@ -196,6 +262,7 @@ class Payroll extends MY_Controller
             'current_user' => $this->current_user,
             'target_user'  => $user,
             'settings'     => $this->Payroll_setting_model->get_by_user_or_default($user_id),
+            'rate_history' => $this->Payroll_rate_history_model->get_all_for_user($user_id),
         );
         $this->load->view('layout/header', $data);
         $this->load->view('payroll/settings_form', $data);
@@ -225,7 +292,7 @@ class Payroll extends MY_Controller
             return;
         }
 
-        $settings = $this->Payroll_setting_model->get_by_user_or_default($user_id);
+        $settings = $this->_effective_settings($user_id, $period);
         $record = $this->Payroll_record_model->get_by_user_period_or_default($user_id, $period);
 
         $data = array(
@@ -233,6 +300,7 @@ class Payroll extends MY_Controller
             'current_user' => $this->current_user,
             'target_user'  => $user,
             'settings'     => $settings,
+            'bank_info'    => $this->Payroll_setting_model->get_by_user_or_default($user_id),
             'record'       => $record,
             'salary'       => $this->_compute($settings, $record, $user_id, $period),
             'period'       => $period,
@@ -253,10 +321,10 @@ class Payroll extends MY_Controller
         $user = $this->User_model->get_by_id($user_id);
         if ( ! $user) show_404();
 
-        $settings = $this->Payroll_setting_model->get_by_user_or_default($user_id);
+        $period = $this->input->get('period') ?: date('Y-m');
+        $settings = $this->_effective_settings($user_id, $period);
         $is_hourly = $settings['salary_type'] === 'HOURLY';
 
-        $period = $this->input->get('period') ?: date('Y-m');
         $days_in_month = (int) date('t', strtotime($period.'-01'));
 
         if ($this->input->method() === 'post')

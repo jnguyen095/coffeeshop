@@ -4,8 +4,18 @@
     <a href="<?php echo site_url('payroll/admin'); ?>" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Quay lại</a>
   </div>
 
+  <?php if ($this->session->flashdata('success')): ?>
+    <div class="alert alert-success py-2 small"><?php echo $this->session->flashdata('success'); ?></div>
+  <?php endif; ?>
+
   <?php echo form_open(current_url(), array('class' => 'card border-0 shadow-sm rounded-4')); ?>
     <div class="card-body">
+      <div class="mb-3">
+        <label class="form-label">Áp dụng từ tháng</label>
+        <input type="month" name="effective_from" class="form-control" style="max-width:200px;" value="<?php echo date('Y-m'); ?>">
+        <div class="form-text">Mức lương bên dưới chỉ áp dụng từ tháng này trở đi — các tháng trước đó vẫn giữ nguyên mức lương đã tính.</div>
+      </div>
+
       <div class="mb-3">
         <label class="form-label fw-semibold">Loại lương</label>
         <div class="form-check">
@@ -53,6 +63,28 @@
       <button type="submit" class="btn btn-brand"><i class="bi bi-check-lg"></i> Lưu cấu hình</button>
     </div>
   <?php echo form_close(); ?>
+
+  <?php if ( ! empty($rate_history)): ?>
+  <div class="card border-0 shadow-sm rounded-4 mt-3">
+    <div class="card-body">
+      <h6 class="fw-bold mb-3"><i class="bi bi-clock-history"></i> Lịch sử mức lương</h6>
+      <table class="table table-sm mb-0">
+        <thead class="text-muted small"><tr><th>Áp dụng từ</th><th>Loại lương</th><th class="text-end">Mức lương</th></tr></thead>
+        <tbody>
+        <?php foreach ($rate_history as $h): ?>
+          <tr>
+            <td><?php echo payroll_period_label($h['effective_from']); ?></td>
+            <td><?php echo $h['salary_type'] === 'HOURLY' ? 'Theo giờ' : 'Cố định'; ?></td>
+            <td class="text-end">
+              <?php echo $h['salary_type'] === 'HOURLY' ? money_format_vnd($h['hourly_rate']).'/giờ' : money_format_vnd($h['fixed_salary']).'/tháng'; ?>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <?php endif; ?>
 </div>
 
 <script>

@@ -62,12 +62,12 @@
   <div class="card border-0 shadow-sm rounded-4 mt-3">
     <div class="card-body">
       <h6 class="fw-bold mb-3"><i class="bi bi-bank"></i> Thông tin thanh toán</h6>
-      <?php if ($settings['bank_name'] || $settings['bank_account_number']): ?>
+      <?php if ($bank_info['bank_name'] || $bank_info['bank_account_number']): ?>
         <table class="table table-sm mb-0">
-          <tr><td class="text-muted" style="width:40%;">Ngân hàng</td><td><?php echo htmlspecialchars((string) $settings['bank_name']); ?></td></tr>
-          <tr><td class="text-muted">Chi nhánh</td><td><?php echo htmlspecialchars((string) $settings['bank_branch']); ?></td></tr>
-          <tr><td class="text-muted">Số tài khoản</td><td class="fw-semibold"><?php echo htmlspecialchars((string) $settings['bank_account_number']); ?></td></tr>
-          <tr><td class="text-muted">Chủ tài khoản</td><td><?php echo htmlspecialchars((string) $settings['bank_account_name']); ?></td></tr>
+          <tr><td class="text-muted" style="width:40%;">Ngân hàng</td><td><?php echo htmlspecialchars((string) $bank_info['bank_name']); ?></td></tr>
+          <tr><td class="text-muted">Chi nhánh</td><td><?php echo htmlspecialchars((string) $bank_info['bank_branch']); ?></td></tr>
+          <tr><td class="text-muted">Số tài khoản</td><td class="fw-semibold"><?php echo htmlspecialchars((string) $bank_info['bank_account_number']); ?></td></tr>
+          <tr><td class="text-muted">Chủ tài khoản</td><td><?php echo htmlspecialchars((string) $bank_info['bank_account_name']); ?></td></tr>
         </table>
       <?php else: ?>
         <p class="text-muted small mb-0">Nhân viên chưa cập nhật thông tin ngân hàng. <a href="<?php echo site_url('payroll/settings/'.$target_user['id']); ?>">Cập nhật ngay</a>.</p>
