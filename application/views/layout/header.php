@@ -79,6 +79,7 @@
             <li><a class="dropdown-item" href="<?php echo site_url('inventory/units'); ?>">Đơn vị tính</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('inventory/dispense-points'); ?>">Điểm xuất kho</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('users'); ?>">Người dùng</a></li>
+            <li><a class="dropdown-item" href="<?php echo site_url('payroll/admin'); ?>">Quản lý lương</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('reports'); ?>">Báo cáo</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="<?php echo site_url('settings'); ?>"><i class="bi bi-gear"></i> Cài đặt</a></li>
@@ -103,6 +104,7 @@
             <i class="bi bi-person-circle"></i> <?php echo htmlspecialchars($current_user['fullname']); ?>
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="<?php echo site_url('payroll'); ?>"><i class="bi bi-cash-coin"></i> Lương</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('change-password'); ?>"><i class="bi bi-key"></i> Đổi mật khẩu</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('logout'); ?>"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
           </ul>

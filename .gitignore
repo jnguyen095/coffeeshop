@@ -145,3 +145,4 @@ fabric.properties
 application/config/telegram.php
 application/config/database.php
 application/config/database.php
+application/controllers/Migrate_runner.php

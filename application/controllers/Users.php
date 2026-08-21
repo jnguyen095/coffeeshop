@@ -43,11 +43,13 @@ class Users extends MY_Controller
             else
             {
                 $id = $this->User_model->create(array(
-                    'username' => $username,
-                    'password' => $this->input->post('password'),
-                    'fullname' => $this->input->post('fullname', TRUE),
-                    'role'     => $this->input->post('role'),
-                    'status'   => 'ACTIVE',
+                    'username'   => $username,
+                    'password'   => $this->input->post('password'),
+                    'fullname'   => $this->input->post('fullname', TRUE),
+                    'role'       => $this->input->post('role'),
+                    'start_date' => $this->input->post('start_date') ?: NULL,
+                    'end_date'   => $this->input->post('end_date') ?: NULL,
+                    'status'     => 'ACTIVE',
                 ));
                 $this->audit('user', 'CREATE', NULL, array('id' => $id));
                 redirect('users');
@@ -77,11 +79,13 @@ class Users extends MY_Controller
             else
             {
                 $this->User_model->update($id, array(
-                    'username' => $username,
-                    'password' => $this->input->post('password'),
-                    'fullname' => $this->input->post('fullname', TRUE),
-                    'role'     => $this->input->post('role'),
-                    'status'   => $this->input->post('status'),
+                    'username'   => $username,
+                    'password'   => $this->input->post('password'),
+                    'fullname'   => $this->input->post('fullname', TRUE),
+                    'role'       => $this->input->post('role'),
+                    'start_date' => $this->input->post('start_date') ?: NULL,
+                    'end_date'   => $this->input->post('end_date') ?: NULL,
+                    'status'     => $this->input->post('status'),
                 ));
                 $this->audit('user', 'UPDATE', array('id' => $id), NULL);
                 redirect('users');

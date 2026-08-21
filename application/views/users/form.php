@@ -22,6 +22,16 @@
         <?php endforeach; ?>
       </select>
     </div>
+    <div class="row g-2 mb-3">
+      <div class="col-sm-6">
+        <label class="form-label">Ngày bắt đầu làm việc</label>
+        <input type="date" name="start_date" class="form-control" value="<?php echo $user && $user['start_date'] ? $user['start_date'] : ''; ?>">
+      </div>
+      <div class="col-sm-6">
+        <label class="form-label">Ngày nghỉ việc</label>
+        <input type="date" name="end_date" class="form-control" value="<?php echo $user && $user['end_date'] ? $user['end_date'] : ''; ?>">
+      </div>
+    </div>
     <?php if ($user): ?>
     <div class="mb-3">
       <label class="form-label">Trạng thái</label>
