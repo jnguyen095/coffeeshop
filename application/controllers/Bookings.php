@@ -14,7 +14,7 @@ class Bookings extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('Court_booking_model', 'Table_model', 'Order_model', 'Order_item_model', 'Product_model', 'Setting_model'));
+        $this->load->model(array('Court_booking_model', 'Court_booking_note_model', 'Table_model', 'Order_model', 'Order_item_model', 'Product_model', 'Setting_model'));
     }
 
     public function index()
@@ -250,6 +250,135 @@ class Bookings extends MY_Controller
         $this->Court_booking_model->cancel_group($group_id);
         $this->audit('court_booking', 'CANCEL_GROUP', NULL, array('group_id' => $group_id));
         redirect('bookings');
+    }
+
+    /**
+     * Sửa 1 buổi đặt — nếu buổi này thuộc 1 chuỗi lặp lại, người dùng chọn
+     * áp dụng cho riêng buổi này hay cả chuỗi (giữ nguyên ngày riêng từng
+     * buổi, chỉ đổi giờ/sân/thông tin khách).
+     */
+    public function edit($id)
+    {
+        $booking = $this->Court_booking_model->get_by_id($id);
+        if ( ! $booking || $booking['status'] !== 'BOOKED') show_404();
+
+        $courts = $this->Table_model->get_courts();
+        $group_bookings = $booking['booking_group_id'] ? $this->Court_booking_model->get_by_group($booking['booking_group_id']) : array();
+        $error = NULL;
+
+        if ($this->input->method() === 'post')
+        {
+            $scope = $this->input->post('scope') === 'group' && $booking['booking_group_id'] ? 'group' : 'single';
+            $table_id = (int) $this->input->post('table_id');
+            $customer_name = $this->input->post('customer_name', TRUE);
+            $customer_phone = $this->input->post('customer_phone', TRUE);
+            $notes = $this->input->post('notes', TRUE) ?: NULL;
+            $start_time = $this->input->post('start_time').':00';
+            $end_time = $this->input->post('end_time').':00';
+            $is_paid = $this->input->post('is_paid') === 'YES' ? 'YES' : 'NO';
+            $payment_order_no = $is_paid === 'YES' ? ($this->input->post('payment_order_no', TRUE) ?: NULL) : NULL;
+            $payment_amount = $is_paid === 'YES' ? $this->input->post('payment_amount') : NULL;
+
+            $booking_start_time = $this->Setting_model->get_booking_start_time().':00';
+            $booking_end_time = $this->Setting_model->get_booking_end_time().':00';
+
+            if ( ! $customer_name || ! $table_id || $end_time <= $start_time)
+            {
+                $error = 'Vui lòng nhập đầy đủ thông tin hợp lệ.';
+            }
+            elseif ($start_time < $booking_start_time || $end_time > $booking_end_time)
+            {
+                $error = 'Chỉ nhận đặt sân trong khung giờ '.substr($booking_start_time, 0, 5).' - '.substr($booking_end_time, 0, 5).'.';
+            }
+            elseif ($is_paid === 'YES' && ! ($payment_amount > 0))
+            {
+                $error = 'Vui lòng nhập số tiền đã thanh toán.';
+            }
+            else
+            {
+                $this->Court_booking_model->update_payment($id, array(
+                    'is_paid'           => $is_paid,
+                    'payment_order_no'  => $payment_order_no,
+                    'payment_amount'    => $is_paid === 'YES' ? $payment_amount : NULL,
+                ));
+
+                $data = array(
+                    'table_id'       => $table_id,
+                    'customer_name'  => $customer_name,
+                    'customer_phone' => $customer_phone,
+                    'notes'          => $notes,
+                    'start_time'     => $start_time,
+                    'end_time'       => $end_time,
+                );
+
+                if ($scope === 'group')
+                {
+                    if ($this->Court_booking_model->has_conflict($table_id, $booking['booking_date'], $start_time, $end_time, $id))
+                    {
+                        $error = 'Khung giờ này đã có lịch đặt khác cho sân đã chọn vào ngày '.date('d/m/Y', strtotime($booking['booking_date'])).'.';
+                    }
+                    else
+                    {
+                        $result = $this->Court_booking_model->update_group($booking['booking_group_id'], $data);
+                        $this->audit('court_booking', 'UPDATE_GROUP', $booking, array('group_id' => $booking['booking_group_id'], 'updated' => count($result['updated']), 'skipped' => count($result['skipped'])));
+                        $msg = 'Đã cập nhật '.count($result['updated']).' buổi trong chuỗi.';
+                        if ($result['skipped']) $msg .= ' Bỏ qua '.count($result['skipped']).' buổi bị trùng lịch với giờ/sân mới.';
+                        $this->session->set_flashdata('success', $msg);
+                        redirect('bookings?date='.$booking['booking_date']);
+                        return;
+                    }
+                }
+                else
+                {
+                    if ($this->Court_booking_model->has_conflict($table_id, $booking['booking_date'], $start_time, $end_time, $id))
+                    {
+                        $error = 'Khung giờ này đã có lịch đặt khác cho sân đã chọn.';
+                    }
+                    else
+                    {
+                        $this->Court_booking_model->update($id, $data);
+                        $this->audit('court_booking', 'UPDATE', $booking, $data);
+                        $this->session->set_flashdata('success', 'Đã cập nhật lịch đặt.');
+                        redirect('bookings?date='.$booking['booking_date']);
+                        return;
+                    }
+                }
+            }
+        }
+
+        // Đọc lại booking mới nhất (có thể vừa cập nhật payment ở trên) để form hiện đúng giá trị hiện tại.
+        $booking = $this->Court_booking_model->get_by_id($id);
+
+        $data = array(
+            'page_title'         => 'Sửa lịch đặt sân',
+            'current_user'       => $this->current_user,
+            'booking'             => $booking,
+            'courts'              => $courts,
+            'group_count'         => count($group_bookings),
+            'notes_log'           => $this->Court_booking_note_model->get_for_booking($booking),
+            'error'               => $error,
+            'booking_start_time'  => $this->Setting_model->get_booking_start_time(),
+            'booking_end_time'    => $this->Setting_model->get_booking_end_time(),
+        );
+        $this->load->view('layout/header', $data);
+        $this->load->view('bookings/edit', $data);
+        $this->load->view('layout/footer');
+    }
+
+    /** Thêm 1 ghi chú vào nhật ký — nếu buổi này thuộc chuỗi lặp lại, ghi chú hiện ra ở mọi buổi trong chuỗi. */
+    public function add_note($id)
+    {
+        $booking = $this->Court_booking_model->get_by_id($id);
+        if ( ! $booking) show_404();
+
+        $note = trim((string) $this->input->post('note', TRUE));
+        if ($note !== '')
+        {
+            $this->Court_booking_note_model->add($booking, $note, $this->current_user['id']);
+            $this->audit('court_booking', 'ADD_NOTE', NULL, array('booking_id' => $id, 'group_id' => $booking['booking_group_id']));
+        }
+
+        redirect('bookings/'.$id.'/edit');
     }
 
     public function checkin($id)

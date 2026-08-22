@@ -48,6 +48,8 @@ $route['takeaway/create'] = 'takeaway/create';
 $route['bookings'] = 'bookings/index';
 $route['bookings/create'] = 'bookings/create';
 $route['bookings/(:num)/cancel'] = 'bookings/cancel/$1';
+$route['bookings/(:num)/edit'] = 'bookings/edit/$1';
+$route['bookings/(:num)/add-note'] = 'bookings/add_note/$1';
 $route['bookings/(:num)/checkin'] = 'bookings/checkin/$1';
 $route['bookings/group/(:any)/cancel'] = 'bookings/cancel_group/$1';
 

@@ -265,6 +265,50 @@ class Court_booking_model extends CI_Model
         return $this->db->where('booking_group_id', $group_id)->where('status', 'BOOKED')->update($this->table, array('status' => 'CANCELLED'));
     }
 
+    /** Sửa 1 buổi đặt — không đổi booking_date qua đây (sửa ngày coi như đặt lại lịch mới). */
+    public function update($id, $data)
+    {
+        return $this->db->where('id', $id)->update($this->table, $data);
+    }
+
+    /**
+     * Sửa cả chuỗi lặp lại cùng lúc (sân/giờ/thông tin khách) — mỗi buổi
+     * vẫn giữ nguyên ngày riêng của nó, chỉ áp cùng 1 thay đổi. Buổi nào bị
+     * trùng lịch với sân/giờ mới thì bỏ qua (giữ nguyên như cũ) thay vì làm
+     * hỏng cả chuỗi; chỉ áp dụng cho buổi còn ở trạng thái BOOKED.
+     */
+    public function update_group($group_id, $data)
+    {
+        $rows = $this->db->where('booking_group_id', $group_id)->where('status', 'BOOKED')->get($this->table)->result_array();
+
+        $updated = array();
+        $skipped = array();
+
+        foreach ($rows as $row)
+        {
+            $table_id = isset($data['table_id']) ? $data['table_id'] : $row['table_id'];
+            $start_time = isset($data['start_time']) ? $data['start_time'] : $row['start_time'];
+            $end_time = isset($data['end_time']) ? $data['end_time'] : $row['end_time'];
+
+            if ($this->has_conflict($table_id, $row['booking_date'], $start_time, $end_time, $row['id']))
+            {
+                $skipped[] = $row['id'];
+                continue;
+            }
+
+            $this->db->where('id', $row['id'])->update($this->table, $data);
+            $updated[] = $row['id'];
+        }
+
+        return array('updated' => $updated, 'skipped' => $skipped);
+    }
+
+    /** Đánh dấu thanh toán cho 1 buổi đặt — luôn áp riêng cho buổi này, không lan sang cả chuỗi. */
+    public function update_payment($id, $data)
+    {
+        return $this->db->where('id', $id)->update($this->table, $data);
+    }
+
     public function mark_checked_in($id, $table_session_id)
     {
         return $this->db->where('id', $id)->update($this->table, array(

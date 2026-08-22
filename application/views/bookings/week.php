@@ -57,7 +57,11 @@
                       data-notes="<?php echo htmlspecialchars($b['notes'], ENT_QUOTES); ?>"
                       data-status="<?php echo $b['status']; ?>"
                       data-order-id="<?php echo $b['order_id']; ?>"
-                      data-fee="<?php echo (int) $b['estimated_fee']; ?>">
+                      data-fee="<?php echo (int) $b['estimated_fee']; ?>"
+                      data-group="<?php echo htmlspecialchars((string) $b['booking_group_id'], ENT_QUOTES); ?>"
+                      data-is-paid="<?php echo $b['is_paid']; ?>"
+                      data-payment-order-no="<?php echo htmlspecialchars((string) $b['payment_order_no'], ENT_QUOTES); ?>"
+                      data-payment-amount="<?php echo $b['payment_amount'] !== NULL ? (float) $b['payment_amount'] : ''; ?>">
                   <div class="week-chip-line"><?php echo substr($b['start_time'],0,5); ?>-<?php echo substr($b['end_time'],0,5); ?> <?php echo htmlspecialchars(mb_strimwidth($b['customer_name'], 0, 10, '…')); ?></div>
                   <?php if ( ! empty($b['customer_phone'])): ?>
                     <div class="week-chip-line week-chip-phone"><?php echo htmlspecialchars($b['customer_phone']); ?></div>

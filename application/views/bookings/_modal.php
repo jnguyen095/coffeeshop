@@ -12,6 +12,7 @@
         <div class="mb-1"><i class="bi bi-telephone"></i> <span id="modalPhone"></span></div>
         <div class="mb-2 text-muted small" id="modalNotes"></div>
         <div class="mb-2"><i class="bi bi-cash-coin"></i> Tiền sân ước tính: <strong class="text-brand" id="modalFee"></strong></div>
+        <div class="mb-2 small" id="modalPayment"></div>
         <span class="badge" id="modalStatus"></span>
       </div>
       <div class="modal-footer" id="modalActions"></div>
@@ -23,6 +24,9 @@
   <?php echo form_hidden($this->security->get_csrf_token_name(), $this->security->get_csrf_hash()); ?>
 </form>
 <form id="cancelForm" method="post" class="d-none">
+  <?php echo form_hidden($this->security->get_csrf_token_name(), $this->security->get_csrf_hash()); ?>
+</form>
+<form id="cancelGroupForm" method="post" class="d-none">
   <?php echo form_hidden($this->security->get_csrf_token_name(), $this->security->get_csrf_hash()); ?>
 </form>
 
@@ -43,6 +47,17 @@ function showBookingDetail(el){
   document.getElementById('modalPhone').textContent = d.phone || '—';
   document.getElementById('modalNotes').textContent = d.notes || '';
   document.getElementById('modalFee').textContent = fmtMoney(d.fee || 0);
+
+  var paymentEl = document.getElementById('modalPayment');
+  if (d.isPaid === 'YES'){
+    var parts = ['<span class="badge bg-success">Đã thanh toán</span>'];
+    if (d.paymentAmount) parts.push(fmtMoney(d.paymentAmount));
+    if (d.paymentOrderNo) parts.push('Order #' + d.paymentOrderNo);
+    paymentEl.innerHTML = parts.join(' · ');
+  } else {
+    paymentEl.innerHTML = '<span class="badge bg-warning text-dark">Chưa thanh toán</span>';
+  }
+
   var statusEl = document.getElementById('modalStatus');
   statusEl.textContent = STATUS_LABEL[d.status] || d.status;
   statusEl.className = 'badge bg-' + (STATUS_COLOR[d.status] || 'secondary');
@@ -52,7 +67,11 @@ function showBookingDetail(el){
     if (CAN_MANAGE_ORDER){
       actions += '<button type="button" class="btn btn-success" onclick="submitBookingAction(\'checkinForm\',' + d.id + ')">Check-in</button>';
     }
+    actions += '<a href="<?php echo site_url('bookings'); ?>/' + d.id + '/edit" class="btn btn-outline-secondary">Sửa</a>';
     actions += '<button type="button" class="btn btn-outline-danger" onclick="if(confirm(\'Hủy lịch đặt này?\')) submitBookingAction(\'cancelForm\',' + d.id + ')">Hủy lịch</button>';
+    if (d.group){
+      actions += '<button type="button" class="btn btn-outline-danger" onclick="if(confirm(\'Hủy toàn bộ chuỗi lặp lại này?\')) submitGroupCancel(\'' + d.group + '\')">Hủy cả chuỗi</button>';
+    }
   } else if (d.status === 'CHECKED_IN' && d.orderId && CAN_MANAGE_ORDER){
     actions += '<a href="<?php echo site_url('orders'); ?>/' + d.orderId + '" class="btn btn-outline-primary">Xem đơn</a>';
   }
@@ -64,6 +83,12 @@ function showBookingDetail(el){
 function submitBookingAction(formId, bookingId){
   var form = document.getElementById(formId);
   form.action = '<?php echo site_url('bookings'); ?>/' + bookingId + '/' + (formId === 'checkinForm' ? 'checkin' : 'cancel');
+  form.submit();
+}
+
+function submitGroupCancel(groupId){
+  var form = document.getElementById('cancelGroupForm');
+  form.action = '<?php echo site_url('bookings/group'); ?>/' + groupId + '/cancel';
   form.submit();
 }
 </script>

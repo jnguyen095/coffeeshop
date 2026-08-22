@@ -75,7 +75,11 @@
                        data-notes="<?php echo htmlspecialchars($b['notes'], ENT_QUOTES); ?>"
                        data-status="<?php echo $b['status']; ?>"
                        data-order-id="<?php echo $b['order_id']; ?>"
-                       data-fee="<?php echo (int) $b['estimated_fee']; ?>">
+                       data-fee="<?php echo (int) $b['estimated_fee']; ?>"
+                       data-group="<?php echo htmlspecialchars((string) $b['booking_group_id'], ENT_QUOTES); ?>"
+                       data-is-paid="<?php echo $b['is_paid']; ?>"
+                       data-payment-order-no="<?php echo htmlspecialchars((string) $b['payment_order_no'], ENT_QUOTES); ?>"
+                       data-payment-amount="<?php echo $b['payment_amount'] !== NULL ? (float) $b['payment_amount'] : ''; ?>">
                     <?php echo substr($b['start_time'],0,5); ?>
                   </div>
                 <?php endforeach; ?>
