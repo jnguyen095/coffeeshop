@@ -103,6 +103,35 @@ if ( ! function_exists('storage_type_label'))
     }
 }
 
+if ( ! function_exists('revenue_category_label'))
+{
+    function revenue_category_label($category)
+    {
+        $map = array(
+            'KHU_VUI_CHOI' => 'Khu Vui Chơi',
+            'NUOC_DO_AN'   => 'Nước & Đồ Ăn',
+            'PICKLEBALL'   => 'Pickleball',
+            'PHOTOBOOTH'   => 'Photobooth',
+        );
+        return isset($map[$category]) ? $map[$category] : $category;
+    }
+}
+
+if ( ! function_exists('revenue_category_color'))
+{
+    /** Màu đồng bộ giữa biểu đồ cột (xu hướng theo tháng) và biểu đồ tròn (tỷ lệ theo danh mục). */
+    function revenue_category_color($category)
+    {
+        $map = array(
+            'KHU_VUI_CHOI' => '#f59e0b',
+            'NUOC_DO_AN'   => '#10b981',
+            'PICKLEBALL'   => '#3b82f6',
+            'PHOTOBOOTH'   => '#ec4899',
+        );
+        return isset($map[$category]) ? $map[$category] : '#6f4e37';
+    }
+}
+
 if ( ! function_exists('audit_module_label'))
 {
     /** Tên tiếng Việt cho module trong audit_logs — dùng cho màn nhật ký hệ thống. */

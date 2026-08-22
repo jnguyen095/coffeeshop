@@ -99,16 +99,16 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"><i class="bi bi-gear"></i> Quản trị</a>
           <ul class="dropdown-menu">
-            <?php if ($can_admin_tables_manage): ?><li><a class="dropdown-item" href="<?php echo site_url('tables/manage'); ?>">Quản lý bàn</a></li><?php endif; ?>
-            <?php if ($can_admin_categories): ?><li><a class="dropdown-item" href="<?php echo site_url('categories'); ?>">Danh mục</a></li><?php endif; ?>
-            <?php if ($can_admin_products): ?><li><a class="dropdown-item" href="<?php echo site_url('products'); ?>">Sản phẩm</a></li><?php endif; ?>
+            <!-- <?php if ($can_admin_tables_manage): ?><li><a class="dropdown-item" href="<?php echo site_url('tables/manage'); ?>">Quản lý bàn</a></li><?php endif; ?> -->
+            <!-- <?php if ($can_admin_categories): ?><li><a class="dropdown-item" href="<?php echo site_url('categories'); ?>">Danh mục</a></li><?php endif; ?> -->
+            <!-- <?php if ($can_admin_products): ?><li><a class="dropdown-item" href="<?php echo site_url('products'); ?>">Sản phẩm</a></li><?php endif; ?> -->
             <?php if ($can_admin_inventory_categories): ?><li><a class="dropdown-item" href="<?php echo site_url('inventory/categories'); ?>">Danh mục kho</a></li><?php endif; ?>
             <?php if ($can_admin_inventory_units): ?><li><a class="dropdown-item" href="<?php echo site_url('inventory/units'); ?>">Đơn vị tính</a></li><?php endif; ?>
             <?php if ($can_admin_dispense_points): ?><li><a class="dropdown-item" href="<?php echo site_url('inventory/dispense-points'); ?>">Điểm xuất kho</a></li><?php endif; ?>
             <?php if ($can_admin_users): ?><li><a class="dropdown-item" href="<?php echo site_url('users'); ?>">Người dùng</a></li><?php endif; ?>
             <?php if ($current_user['role'] === 'ADMIN'): ?><li><a class="dropdown-item" href="<?php echo site_url('menu-permissions'); ?>">Gán quyền menu</a></li><?php endif; ?>
             <?php if ($can_admin_payroll): ?><li><a class="dropdown-item" href="<?php echo site_url('payroll/admin'); ?>">Quản lý lương</a></li><?php endif; ?>
-            <?php if ($can_admin_reports): ?><li><a class="dropdown-item" href="<?php echo site_url('reports'); ?>">Báo cáo</a></li><?php endif; ?>
+            <?php if ($can_admin_reports): ?><li><a class="dropdown-item" href="<?php echo site_url('reports'); ?>">Báo cáo doanh thu</a></li><?php endif; ?>
             <?php if ($can_admin_audit_logs): ?><li><a class="dropdown-item" href="<?php echo site_url('audit-logs'); ?>"><i class="bi bi-journal-text"></i> Nhật ký hệ thống</a></li><?php endif; ?>
             <?php if ($can_admin_settings): ?>
             <li><hr class="dropdown-divider"></li>

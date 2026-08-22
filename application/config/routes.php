@@ -63,14 +63,9 @@ $route['cashier/(:num)/invoice'] = 'cashier/invoice/$1';
 
 $route['payments'] = 'payments/index';
 
-$route['reports'] = 'reports/index';
-$route['reports/daily-revenue'] = 'reports/daily_revenue';
-$route['reports/monthly-revenue'] = 'reports/monthly_revenue';
-$route['reports/top-products'] = 'reports/top_products';
-$route['reports/table-usage'] = 'reports/table_usage';
-$route['reports/kitchen-performance'] = 'reports/kitchen_performance';
-$route['reports/payment-summary'] = 'reports/payment_summary';
-$route['reports/court-performance'] = 'reports/court_performance';
+// Báo cáo doanh thu — nhập tay theo tháng/danh mục (POS bán hàng dùng hệ thống khác, không tự tính từ orders trong app này nữa)
+$route['reports'] = 'revenue_report/index';
+$route['reports/entry'] = 'revenue_report/entry';
 
 $route['users'] = 'users/index';
 $route['users/create'] = 'users/create';
