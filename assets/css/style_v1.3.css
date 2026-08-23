@@ -134,12 +134,20 @@ body{
 .kds-item-qty{ flex:0 0 auto; font-weight:700; font-size:.85rem; color: var(--brand); min-width:1.8em; text-align:center; }
 
 /* ---------- Booking calendar (lịch đặt sân) ---------- */
+/* Header tên sân nằm ở hàng riêng, TÁCH khỏi vùng 900px chứa giờ/lịch đặt bên
+   dưới — để gutter giờ và các cột sân cùng bắt đầu tại 1 mốc Y duy nhất, tránh
+   lệch vạch giờ so với nhãn giờ (trước đây header nằm trong từng cột sân làm
+   cột sân bị đẩy xuống thấp hơn gutter một khoảng bằng chiều cao header). */
+.calendar-day-header{ display:flex; }
+.calendar-gutter-spacer{ width:46px; flex:0 0 46px; }
+.calendar-courts-header{ flex:1 1 auto; display:flex; gap:8px; overflow:hidden; }
 .calendar-day{ display:flex; align-items:flex-start; }
 .calendar-gutter{ width:46px; flex:0 0 46px; position:relative; }
 .calendar-gutter-label{ position:absolute; right:6px; font-size:.7rem; color:#888; transform:translateY(-50%); white-space:nowrap; }
 .calendar-courts{ flex:1 1 auto; display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; }
 .calendar-court-col{ flex:1 0 150px; min-width:150px; }
 .calendar-court-header{
+  flex:1 0 150px; min-width:150px;
   font-weight:600; text-align:center; padding:8px 4px; background:#fff; font-size:.85rem;
   border:1px solid #eee; border-bottom:none; border-radius:.5rem .5rem 0 0;
 }

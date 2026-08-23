@@ -196,9 +196,7 @@ class Tables extends MY_Controller
                     'table_name'     => $this->input->post('table_name', TRUE),
                     'capacity'       => (int) $this->input->post('capacity'),
                     'table_type'     => $this->input->post('table_type') === 'COURT' ? 'COURT' : 'CAFE',
-                    'rate_morning'   => (float) $this->input->post('rate_morning'),
-                    'rate_afternoon' => (float) $this->input->post('rate_afternoon'),
-                    'rate_evening'   => (float) $this->input->post('rate_evening'),
+                    'sort_order'     => (int) $this->input->post('sort_order'),
                     'status'         => 'AVAILABLE',
                 ));
                 $this->audit('table', 'CREATE', NULL, array('id' => $id));
@@ -235,9 +233,7 @@ class Tables extends MY_Controller
                     'table_name'     => $this->input->post('table_name', TRUE),
                     'capacity'       => (int) $this->input->post('capacity'),
                     'table_type'     => $this->input->post('table_type') === 'COURT' ? 'COURT' : 'CAFE',
-                    'rate_morning'   => (float) $this->input->post('rate_morning'),
-                    'rate_afternoon' => (float) $this->input->post('rate_afternoon'),
-                    'rate_evening'   => (float) $this->input->post('rate_evening'),
+                    'sort_order'     => (int) $this->input->post('sort_order'),
                 ));
                 $this->audit('table', 'UPDATE', $table, array('id' => $id));
                 redirect('tables/manage');

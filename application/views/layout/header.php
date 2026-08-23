@@ -39,6 +39,7 @@
         $show_inventory_menu = $can_stock_in || $can_stock_out || $can_stock_adjust || $can_inventory_items || $can_inventory_history;
 
         $can_admin_tables_manage = $current_user['role'] === 'ADMIN'; // luôn gắn với inline _require_admin() trong Tables::manage*, không đưa vào RBAC động
+        $can_admin_court_time_slots = $current_user['role'] === 'ADMIN'; // Court_time_slots::$allowed_roles, không đưa vào RBAC động
         $can_admin_categories = $can('admin.categories');
         $can_admin_products = $can('admin.products');
         $can_admin_inventory_categories = $can('admin.inventory_categories');
@@ -49,7 +50,7 @@
         $can_admin_reports = $can('admin.reports');
         $can_admin_audit_logs = $can('admin.audit_logs');
         $can_admin_settings = $can('admin.settings');
-        $show_admin_menu = $can_admin_tables_manage || $can_admin_categories || $can_admin_products || $can_admin_inventory_categories
+        $show_admin_menu = $can_admin_tables_manage || $can_admin_court_time_slots || $can_admin_categories || $can_admin_products || $can_admin_inventory_categories
           || $can_admin_inventory_units || $can_admin_dispense_points || $can_admin_users || $can_admin_payroll || $can_admin_reports || $can_admin_audit_logs || $can_admin_settings;
       ?>
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -100,6 +101,7 @@
           <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"><i class="bi bi-gear"></i> Quản trị</a>
           <ul class="dropdown-menu">
             <!-- <?php if ($can_admin_tables_manage): ?><li><a class="dropdown-item" href="<?php echo site_url('tables/manage'); ?>">Quản lý bàn</a></li><?php endif; ?> -->
+            <?php if ($can_admin_court_time_slots): ?><li><a class="dropdown-item" href="<?php echo site_url('court-time-slots'); ?>"><i class="bi bi-clock-history"></i> Khung giờ & giá sân</a></li><?php endif; ?>
             <!-- <?php if ($can_admin_categories): ?><li><a class="dropdown-item" href="<?php echo site_url('categories'); ?>">Danh mục</a></li><?php endif; ?> -->
             <!-- <?php if ($can_admin_products): ?><li><a class="dropdown-item" href="<?php echo site_url('products'); ?>">Sản phẩm</a></li><?php endif; ?> -->
             <?php if ($can_admin_inventory_categories): ?><li><a class="dropdown-item" href="<?php echo site_url('inventory/categories'); ?>">Danh mục kho</a></li><?php endif; ?>

@@ -1,7 +1,10 @@
 <div class="container-fluid py-3 py-md-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="fw-bold mb-0">Quản lý bàn</h4>
-    <a href="<?php echo site_url('tables/manage/create'); ?>" class="btn btn-brand"><i class="bi bi-plus-lg"></i> Thêm bàn</a>
+    <div class="d-flex gap-2">
+      <a href="<?php echo site_url('court-time-slots'); ?>" class="btn btn-outline-secondary"><i class="bi bi-clock-history"></i> Khung giờ & giá sân</a>
+      <a href="<?php echo site_url('tables/manage/create'); ?>" class="btn btn-brand"><i class="bi bi-plus-lg"></i> Thêm bàn</a>
+    </div>
   </div>
 
   <?php if ($this->session->flashdata('error')): ?>
@@ -10,19 +13,15 @@
 
   <div class="table-responsive">
     <table class="table bg-white shadow-sm rounded align-middle">
-      <thead class="table-light"><tr><th>Mã bàn</th><th>Tên bàn</th><th>Loại</th><th class="text-end">Sức chứa</th><th>Giá/giờ (Sáng/Chiều/Tối)</th><th>Trạng thái</th><th></th></tr></thead>
+      <thead class="table-light"><tr><th class="text-end">Thứ tự</th><th>Mã bàn</th><th>Tên bàn</th><th>Loại</th><th class="text-end">Sức chứa</th><th>Trạng thái</th><th></th></tr></thead>
       <tbody>
       <?php foreach ($tables as $t): ?>
         <tr>
+          <td class="text-end text-muted"><?php echo (int) $t['sort_order']; ?></td>
           <td><?php echo htmlspecialchars($t['table_code']); ?></td>
           <td><?php echo htmlspecialchars($t['table_name']); ?></td>
           <td><?php echo $t['table_type'] === 'COURT' ? '<span class="badge bg-info-subtle text-info-emphasis"><i class="bi bi-dribbble"></i> Sân</span>' : '<span class="badge bg-light text-dark"><i class="bi bi-cup-hot"></i> Bàn cafe</span>'; ?></td>
           <td class="text-end"><?php echo $t['capacity']; ?></td>
-          <td class="small">
-            <?php if ($t['table_type'] === 'COURT'): ?>
-              <?php echo money_format_vnd($t['rate_morning']); ?> / <?php echo money_format_vnd($t['rate_afternoon']); ?> / <?php echo money_format_vnd($t['rate_evening']); ?>
-            <?php else: ?>—<?php endif; ?>
-          </td>
           <td><span class="badge bg-<?php echo table_status_badge($t['status']); ?>"><?php echo $t['status']; ?></span></td>
           <td class="text-nowrap">
             <a href="<?php echo site_url('tables/manage/'.$t['id'].'/edit'); ?>" class="btn btn-sm btn-outline-primary">Sửa</a>

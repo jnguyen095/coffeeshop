@@ -7,12 +7,12 @@ class Table_model extends CI_Model
 
     public function get_all()
     {
-        return $this->db->order_by('table_code', 'ASC')->get($this->table)->result_array();
+        return $this->db->order_by('sort_order', 'ASC')->order_by('table_name', 'ASC')->get($this->table)->result_array();
     }
 
     public function get_courts()
     {
-        return $this->db->where('table_type', 'COURT')->order_by('table_code', 'ASC')->get($this->table)->result_array();
+        return $this->db->where('table_type', 'COURT')->order_by('sort_order', 'ASC')->order_by('table_name', 'ASC')->get($this->table)->result_array();
     }
 
     public function get_by_id($id)

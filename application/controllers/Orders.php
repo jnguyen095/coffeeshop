@@ -8,7 +8,7 @@ class Orders extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('Order_model', 'Order_item_model', 'Product_model', 'Category_model', 'Kitchen_ticket_model', 'Table_model', 'Court_booking_model'));
+        $this->load->model(array('Order_model', 'Order_item_model', 'Product_model', 'Category_model', 'Kitchen_ticket_model', 'Table_model', 'Court_booking_model', 'Court_time_slot_model'));
     }
 
     const PER_PAGE = 20;
@@ -78,6 +78,7 @@ class Orders extends MY_Controller
             'items'                 => $items,
             'products_by_category'  => $products_by_category,
             'tickets'               => $tickets,
+            'court_time_slots'      => $order['table_type'] === 'COURT' ? $this->Court_time_slot_model->get_active() : array(),
         );
         $this->load->view('layout/header', $data);
         $this->load->view('orders/detail', $data);
@@ -166,7 +167,7 @@ class Orders extends MY_Controller
             return;
         }
 
-        $amount = $this->Court_booking_model->calc_fee($order, $start_time.':00', $end_time.':00');
+        $amount = $this->Court_booking_model->calc_fee($start_time.':00', $end_time.':00');
 
         if ($amount > 0)
         {

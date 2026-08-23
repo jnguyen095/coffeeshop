@@ -30,7 +30,6 @@
         <?php foreach ($courts as $c): ?>
           <option value="<?php echo $c['id']; ?>" <?php echo ((string) $prefill_table === (string) $c['id']) ? 'selected' : ''; ?>>
             <?php echo htmlspecialchars($c['table_name']); ?>
-            (Sáng <?php echo money_format_vnd($c['rate_morning']); ?> / Chiều <?php echo money_format_vnd($c['rate_afternoon']); ?> / Tối <?php echo money_format_vnd($c['rate_evening']); ?>)
           </option>
         <?php endforeach; ?>
       </select>
@@ -39,6 +38,13 @@
         <label class="form-check-label" for="autoAssign">Tự động chọn sân còn trống</label>
       </div>
       <div class="form-text">Hệ thống sẽ tự tìm một sân còn trống trong khung giờ đã chọn, không cần chọn sân cụ thể ở trên.</div>
+      <?php if ($court_time_slots): ?>
+        <div class="form-text">
+          Giá sân theo giờ (áp dụng cho mọi sân):
+          <?php $slot_labels = array(); foreach ($court_time_slots as $s): $slot_labels[] = htmlspecialchars($s['label']).' ('.substr($s['start_time'],0,5).'-'.substr($s['end_time'],0,5).') '.money_format_vnd($s['price_per_hour']).'/giờ'; endforeach; ?>
+          <?php echo implode(', ', $slot_labels); ?>.
+        </div>
+      <?php endif; ?>
     </div>
     <div class="row g-2">
       <div class="col-6">
@@ -141,16 +147,12 @@ function autoFillDateTo(){
   document.getElementById('dateTo').value = d.toISOString().slice(0,10);
 }
 
-var COURT_RATES = {
-  <?php foreach ($courts as $c): ?>
-  <?php echo $c['id']; ?>: {morning: <?php echo (float) $c['rate_morning']; ?>, afternoon: <?php echo (float) $c['rate_afternoon']; ?>, evening: <?php echo (float) $c['rate_evening']; ?>},
+// Giá sân theo khung giờ, dùng chung cho mọi sân — cấu hình ở /court-time-slots.
+var TIME_SLOTS = [
+  <?php foreach ($court_time_slots as $s): ?>
+  {start: <?php echo (int) substr($s['start_time'],0,2) * 60 + (int) substr($s['start_time'],3,2); ?>, end: <?php echo (int) substr($s['end_time'],0,2) * 60 + (int) substr($s['end_time'],3,2); ?>, price: <?php echo (float) $s['price_per_hour']; ?>},
   <?php endforeach; ?>
-};
-var SLOTS = {
-  morning:   {start: 6*60,  end: 12*60},
-  afternoon: {start: 12*60, end: 18*60},
-  evening:   {start: 18*60, end: 23*60}
-};
+];
 
 function timeToMinutes(t){
   var parts = t.split(':');
@@ -159,15 +161,14 @@ function timeToMinutes(t){
 
 function fmtMoney(n){ return Math.round(n).toLocaleString('vi-VN') + 'đ'; }
 
-function calcFee(rates, startTime, endTime){
+function calcFee(startTime, endTime){
   var start = timeToMinutes(startTime);
   var end = timeToMinutes(endTime);
   var fee = 0;
-  for (var key in SLOTS){
-    var slot = SLOTS[key];
+  TIME_SLOTS.forEach(function(slot){
     var overlap = Math.max(0, Math.min(end, slot.end) - Math.max(start, slot.start));
-    fee += (overlap / 60) * rates[key];
-  }
+    fee += (overlap / 60) * slot.price;
+  });
   return Math.round(fee);
 }
 
@@ -194,15 +195,13 @@ function updateEstimate(){
     return;
   }
 
-  var tableId = document.getElementById('tableSelect').value;
-  var rates = COURT_RATES[tableId];
-  if (!rates || !startTime || !endTime || endTime <= startTime){
+  if ( ! startTime || ! endTime || endTime <= startTime){
     document.getElementById('estimatePerSession').textContent = '0đ';
     document.getElementById('estimateTotalWrap').classList.add('d-none');
     return;
   }
 
-  var perSession = calcFee(rates, startTime, endTime);
+  var perSession = calcFee(startTime, endTime);
   document.getElementById('estimatePerSession').textContent = fmtMoney(perSession);
 
   var repeat = document.querySelector('input[name="repeat"]:checked').value;

@@ -86,6 +86,11 @@ $route['categories/create'] = 'categories/create';
 $route['categories/(:num)/edit'] = 'categories/edit/$1';
 $route['categories/(:num)/delete'] = 'categories/delete/$1';
 
+$route['court-time-slots'] = 'court_time_slots/index';
+$route['court-time-slots/create'] = 'court_time_slots/create';
+$route['court-time-slots/(:num)/edit'] = 'court_time_slots/edit/$1';
+$route['court-time-slots/(:num)/delete'] = 'court_time_slots/delete/$1';
+
 $route['settings'] = 'settings/index';
 $route['audit-logs'] = 'audit_logs/index';
 

@@ -118,7 +118,12 @@
                 <button class="btn btn-brand w-100"><i class="bi bi-plus-lg"></i></button>
               </div>
             </div>
-            <div class="form-text">Tự tính tiền theo khung giờ (Sáng <?php echo money_format_vnd($order['rate_morning']); ?> / Chiều <?php echo money_format_vnd($order['rate_afternoon']); ?> / Tối <?php echo money_format_vnd($order['rate_evening']); ?>). Không cần đặt lịch trước, có thể thêm nhiều lần nếu chơi thêm giờ.</div>
+            <div class="form-text">
+              Tự tính tiền theo khung giờ:
+              <?php $slot_labels = array(); foreach ($court_time_slots as $s): $slot_labels[] = htmlspecialchars($s['label']).' ('.substr($s['start_time'],0,5).'-'.substr($s['end_time'],0,5).') '.money_format_vnd($s['price_per_hour']).'/giờ'; endforeach; ?>
+              <?php echo implode(', ', $slot_labels); ?>.
+              Không cần đặt lịch trước, có thể thêm nhiều lần nếu chơi thêm giờ.
+            </div>
           <?php echo form_close(); ?>
         </div>
       </div>

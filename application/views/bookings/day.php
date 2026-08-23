@@ -40,6 +40,15 @@
     <div class="alert alert-warning">Chưa có sân nào được cấu hình. Vào <a href="<?php echo site_url('tables/manage'); ?>">Quản lý bàn</a> để thêm sân (loại "Sân pickleball").</div>
   <?php else: ?>
 
+  <div class="calendar-day-header">
+    <div class="calendar-gutter-spacer"></div>
+    <div class="calendar-courts-header" id="courtsHeaderScroll">
+      <?php foreach ($courts as $c): ?>
+        <div class="calendar-court-header"><?php echo htmlspecialchars($c['table_name']); ?></div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+
   <div class="calendar-day" style="position:relative; height:900px;">
     <div class="calendar-gutter" style="height:900px;">
       <?php for ($h = $day_start_hour; $h <= $day_end_hour; $h++):
@@ -49,10 +58,9 @@
       <?php endfor; ?>
     </div>
 
-    <div class="calendar-courts">
+    <div class="calendar-courts" id="courtsBodyScroll">
       <?php foreach ($courts as $c): ?>
       <div class="calendar-court-col">
-        <div class="calendar-court-header"><?php echo htmlspecialchars($c['table_name']); ?></div>
         <div class="calendar-court-body" style="height:900px;" data-table-id="<?php echo $c['id']; ?>" onclick="handleEmptyClick(event, <?php echo $c['id']; ?>);">
           <?php for ($h = $day_start_hour; $h <= $day_end_hour; $h++):
             $pct = (($h - $day_start_hour) * 60 / $total_minutes) * 100;
@@ -129,4 +137,12 @@ function handleEmptyClick(evt, tableId){
   var startTime = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
   location.href = '<?php echo site_url('bookings/create'); ?>?table_id=' + tableId + '&date_from=' + CURRENT_DATE + '&start_time=' + startTime;
 }
+
+(function(){
+  var header = document.getElementById('courtsHeaderScroll');
+  var body = document.getElementById('courtsBodyScroll');
+  if (header && body){
+    body.addEventListener('scroll', function(){ header.scrollLeft = body.scrollLeft; });
+  }
+})();
 </script>

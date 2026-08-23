@@ -14,26 +14,23 @@ class Court_booking_model extends CI_Model
 
     /**
      * Tính tiền sân cho một khoảng [start_time, end_time), cộng dồn phần thời
-     * lượng rơi vào từng khung giờ nhân với giá của khung đó (một buổi đặt có
-     * thể chạy qua nhiều khung, ví dụ 11:00-13:00 tính nửa giờ giá sáng + 1 giờ giá chiều).
+     * lượng rơi vào từng khung giờ (do admin cấu hình ở court_time_slots) nhân
+     * với giá của khung đó — dùng chung cho mọi sân. Một buổi đặt có thể chạy
+     * qua nhiều khung, ví dụ 12:00-14:00 rơi vào cả khung sáng lẫn khung chiều.
      */
-    public function calc_fee($table, $start_time, $end_time)
+    public function calc_fee($start_time, $end_time)
     {
+        $slots = $this->db->where('status', 'ACTIVE')->get('court_time_slots')->result_array();
         $start = $this->_to_minutes($start_time);
         $end = $this->_to_minutes($end_time);
-        $rates = array(
-            'morning'   => (float) $table['rate_morning'],
-            'afternoon' => (float) $table['rate_afternoon'],
-            'evening'   => (float) $table['rate_evening'],
-        );
 
         $fee = 0;
-        foreach (self::SLOTS as $key => $slot)
+        foreach ($slots as $slot)
         {
-            $slot_start = $this->_to_minutes($slot['start']);
-            $slot_end = $this->_to_minutes($slot['end']);
+            $slot_start = $this->_to_minutes($slot['start_time']);
+            $slot_end = $this->_to_minutes($slot['end_time']);
             $overlap_minutes = max(0, min($end, $slot_end) - max($start, $slot_start));
-            $fee += ($overlap_minutes / 60) * $rates[$key];
+            $fee += ($overlap_minutes / 60) * (float) $slot['price_per_hour'];
         }
         return round($fee);
     }
@@ -183,7 +180,7 @@ class Court_booking_model extends CI_Model
 
     public function get_by_id($id)
     {
-        return $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code, cafe_tables.rate_morning, cafe_tables.rate_afternoon, cafe_tables.rate_evening')
+        return $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code')
             ->from($this->table)
             ->join('cafe_tables', 'cafe_tables.id = court_bookings.table_id')
             ->where('court_bookings.id', $id)
@@ -192,7 +189,7 @@ class Court_booking_model extends CI_Model
 
     public function get_by_date($date, $table_id = NULL, $search = '')
     {
-        $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code, cafe_tables.rate_morning, cafe_tables.rate_afternoon, cafe_tables.rate_evening')
+        $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code')
             ->from($this->table)
             ->join('cafe_tables', 'cafe_tables.id = court_bookings.table_id')
             ->where('court_bookings.booking_date', $date)
@@ -211,7 +208,7 @@ class Court_booking_model extends CI_Model
     /** Dùng cho lịch xem theo Tuần/Tháng — mọi lịch đặt còn hiệu lực trong khoảng ngày. */
     public function get_by_range($date_from, $date_to, $search = '')
     {
-        $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code, cafe_tables.rate_morning, cafe_tables.rate_afternoon, cafe_tables.rate_evening')
+        $this->db->select('court_bookings.*, cafe_tables.table_name, cafe_tables.table_code')
             ->from($this->table)
             ->join('cafe_tables', 'cafe_tables.id = court_bookings.table_id')
             ->where('court_bookings.booking_date >=', $date_from)
@@ -242,7 +239,7 @@ class Court_booking_model extends CI_Model
     {
         foreach ($bookings as &$b)
         {
-            $b['estimated_fee'] = $this->calc_fee($b, $b['start_time'], $b['end_time']);
+            $b['estimated_fee'] = $this->calc_fee($b['start_time'], $b['end_time']);
         }
         return $bookings;
     }

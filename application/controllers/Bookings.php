@@ -14,7 +14,7 @@ class Bookings extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(array('Court_booking_model', 'Court_booking_note_model', 'Table_model', 'Order_model', 'Order_item_model', 'Product_model', 'Setting_model'));
+        $this->load->model(array('Court_booking_model', 'Court_booking_note_model', 'Court_time_slot_model', 'Table_model', 'Order_model', 'Order_item_model', 'Product_model', 'Setting_model'));
     }
 
     public function index()
@@ -224,6 +224,7 @@ class Bookings extends MY_Controller
             'page_title'          => 'Đặt lịch sân',
             'current_user'        => $this->current_user,
             'courts'              => $courts,
+            'court_time_slots'    => $this->Court_time_slot_model->get_active(),
             'error'               => $error,
             'result'              => $result,
             'prefill_table'       => $this->input->get('table_id'),
@@ -409,7 +410,7 @@ class Bookings extends MY_Controller
         $result = $this->Order_model->open_table_with_order($table['id'], $this->current_user['id']);
         $order_id = $result['order_id'];
 
-        $amount = $this->Court_booking_model->calc_fee($table, $booking['start_time'], $booking['end_time']);
+        $amount = $this->Court_booking_model->calc_fee($booking['start_time'], $booking['end_time']);
         if ($amount > 0)
         {
             $court_fee_product = $this->Product_model->get_by_sku('COURT_FEE');
