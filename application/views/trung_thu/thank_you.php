@@ -63,6 +63,7 @@
     border:2px solid #c1272d; color:#c1272d; background:#fff; flex-shrink:0;
   }
   .btn-copy:active{ background:#fff3cd; }
+  .tt-share-hint{ font-size:.9rem; color:#198754; font-weight:600; min-height:1.3em; }
 </style>
 </head>
 <body>
@@ -83,14 +84,16 @@
         <div class="tt-share-row">
           <button type="button" class="btn-share btn-share-native" id="nativeShareBtn"><i class="bi bi-share-fill"></i> Chia sẻ</button>
           <a class="btn-share btn-share-fb" href="https://www.facebook.com/sharer/sharer.php?u=<?php echo rawurlencode($share_url); ?>" target="_blank" rel="noopener"><i class="bi bi-facebook"></i> Facebook</a>
-          <a class="btn-share btn-share-zalo" href="https://sp.zalo.me/plugin/share?u=<?php echo rawurlencode($share_url); ?>" target="_blank" rel="noopener"><i class="bi bi-chat-dots-fill"></i> Zalo</a>
+          <button type="button" class="btn-share btn-share-zalo" id="zaloShareBtn"><i class="bi bi-chat-dots-fill"></i> Zalo</button>
         </div>
+        <div class="tt-share-hint" id="shareHint"></div>
       </div>
     </div>
   </div>
 
 <script>
 var shareUrl = <?php echo json_encode($share_url); ?>;
+
 var nativeBtn = document.getElementById('nativeShareBtn');
 if (navigator.share){
   nativeBtn.addEventListener('click', function(){
@@ -100,23 +103,44 @@ if (navigator.share){
   nativeBtn.style.display = 'none';
 }
 
+function copyShareLink(onDone){
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(shareUrl).then(onDone).catch(function(){ fallbackCopy(); onDone(); });
+  } else {
+    fallbackCopy();
+    onDone();
+  }
+}
+function fallbackCopy(){
+  var tmp = document.createElement('textarea');
+  tmp.value = shareUrl;
+  tmp.style.position = 'fixed';
+  tmp.style.opacity = '0';
+  document.body.appendChild(tmp);
+  tmp.select();
+  document.execCommand('copy');
+  document.body.removeChild(tmp);
+}
+
+// Zalo chưa đăng ký App ID nên nút share widget của Zalo không dùng được — thay
+// bằng sao chép link, dán trực tiếp vào Zalo vẫn tự hiện preview đẹp từ thẻ og:.
+document.getElementById('zaloShareBtn').addEventListener('click', function(){
+  copyShareLink(function(){
+    document.getElementById('shareHint').textContent = '✅ Đã sao chép link! Mở Zalo và dán vào cuộc trò chuyện để chia sẻ.';
+  });
+});
+
 var copyBtn = document.getElementById('copyLinkBtn');
 if (copyBtn){
   copyBtn.addEventListener('click', function(){
     var btn = this;
     var input = document.getElementById('shareUrlInput');
     if (input){ input.select(); input.setSelectionRange(0, 99999); }
-    var done = function(){
+    copyShareLink(function(){
       var old = btn.textContent;
       btn.textContent = 'Đã sao chép!';
       setTimeout(function(){ btn.textContent = old; }, 1500);
-    };
-    if (navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(shareUrl).then(done).catch(function(){ document.execCommand('copy'); done(); });
-    } else {
-      document.execCommand('copy');
-      done();
-    }
+    });
   });
 }
 </script>
