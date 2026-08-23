@@ -100,23 +100,25 @@ if (navigator.share){
   nativeBtn.style.display = 'none';
 }
 
-document.getElementById('copyLinkBtn').addEventListener('click', function(){
-  var btn = this;
-  var input = document.getElementById('shareUrlInput');
-  input.select();
-  input.setSelectionRange(0, 99999);
-  var done = function(){
-    var old = btn.textContent;
-    btn.textContent = 'Đã sao chép!';
-    setTimeout(function(){ btn.textContent = old; }, 1500);
-  };
-  if (navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(shareUrl).then(done).catch(function(){ document.execCommand('copy'); done(); });
-  } else {
-    document.execCommand('copy');
-    done();
-  }
-});
+var copyBtn = document.getElementById('copyLinkBtn');
+if (copyBtn){
+  copyBtn.addEventListener('click', function(){
+    var btn = this;
+    var input = document.getElementById('shareUrlInput');
+    if (input){ input.select(); input.setSelectionRange(0, 99999); }
+    var done = function(){
+      var old = btn.textContent;
+      btn.textContent = 'Đã sao chép!';
+      setTimeout(function(){ btn.textContent = old; }, 1500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(shareUrl).then(done).catch(function(){ document.execCommand('copy'); done(); });
+    } else {
+      document.execCommand('copy');
+      done();
+    }
+  });
+}
 </script>
 </body>
 </html>
