@@ -262,6 +262,18 @@ class Court_booking_model extends CI_Model
         return $this->db->where('booking_group_id', $group_id)->where('status', 'BOOKED')->update($this->table, array('status' => 'CANCELLED'));
     }
 
+    /** Hủy buổi $from_date trở đi (bao gồm chính nó) trong cùng chuỗi lặp lại. */
+    public function cancel_onward($group_id, $from_date)
+    {
+        return $this->db->where('booking_group_id', $group_id)->where('status', 'BOOKED')->where('booking_date >=', $from_date)->update($this->table, array('status' => 'CANCELLED'));
+    }
+
+    /** Hủy buổi $from_date trở về trước (bao gồm chính nó) trong cùng chuỗi lặp lại. */
+    public function cancel_backward($group_id, $from_date)
+    {
+        return $this->db->where('booking_group_id', $group_id)->where('status', 'BOOKED')->where('booking_date <=', $from_date)->update($this->table, array('status' => 'CANCELLED'));
+    }
+
     /** Sửa 1 buổi đặt — không đổi booking_date qua đây (sửa ngày coi như đặt lại lịch mới). */
     public function update($id, $data)
     {

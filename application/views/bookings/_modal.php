@@ -68,9 +68,19 @@ function showBookingDetail(el){
       actions += '<button type="button" class="btn btn-success" onclick="submitBookingAction(\'checkinForm\',' + d.id + ')">Check-in</button>';
     }
     actions += '<a href="<?php echo site_url('bookings'); ?>/' + d.id + '/edit" class="btn btn-outline-secondary">Sửa</a>';
-    actions += '<button type="button" class="btn btn-outline-danger" onclick="if(confirm(\'Hủy lịch đặt này?\')) submitBookingAction(\'cancelForm\',' + d.id + ')">Hủy lịch</button>';
     if (d.group){
-      actions += '<button type="button" class="btn btn-outline-danger" onclick="if(confirm(\'Hủy toàn bộ chuỗi lặp lại này?\')) submitGroupCancel(\'' + d.group + '\')">Hủy cả chuỗi</button>';
+      actions += '<div class="btn-group">' +
+        '<button type="button" class="btn btn-outline-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Hủy lịch</button>' +
+        '<ul class="dropdown-menu dropdown-menu-end">' +
+          '<li><a class="dropdown-item" href="#" onclick="event.preventDefault(); if(confirm(\'Hủy buổi này?\')) submitBookingAction(\'cancelForm\',' + d.id + ');">Chỉ buổi này</a></li>' +
+          '<li><a class="dropdown-item" href="#" onclick="event.preventDefault(); if(confirm(\'Hủy buổi này và mọi buổi sau nó trong chuỗi?\')) submitCancelScoped(\'onward\',' + d.id + ');">Buổi này trở về sau</a></li>' +
+          '<li><a class="dropdown-item" href="#" onclick="event.preventDefault(); if(confirm(\'Hủy buổi này và mọi buổi trước nó trong chuỗi?\')) submitCancelScoped(\'backward\',' + d.id + ');">Buổi này trở về trước</a></li>' +
+          '<li><hr class="dropdown-divider"></li>' +
+          '<li><a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); if(confirm(\'Hủy toàn bộ chuỗi lặp lại này?\')) submitGroupCancel(\'' + d.group + '\');">Toàn bộ chuỗi</a></li>' +
+        '</ul>' +
+      '</div>';
+    } else {
+      actions += '<button type="button" class="btn btn-outline-danger" onclick="if(confirm(\'Hủy lịch đặt này?\')) submitBookingAction(\'cancelForm\',' + d.id + ')">Hủy lịch</button>';
     }
   } else if (d.status === 'CHECKED_IN' && d.orderId && CAN_MANAGE_ORDER){
     actions += '<a href="<?php echo site_url('orders'); ?>/' + d.orderId + '" class="btn btn-outline-primary">Xem đơn</a>';
@@ -89,6 +99,12 @@ function submitBookingAction(formId, bookingId){
 function submitGroupCancel(groupId){
   var form = document.getElementById('cancelGroupForm');
   form.action = '<?php echo site_url('bookings/group'); ?>/' + groupId + '/cancel';
+  form.submit();
+}
+
+function submitCancelScoped(scope, bookingId){
+  var form = document.getElementById('cancelForm');
+  form.action = '<?php echo site_url('bookings'); ?>/' + bookingId + '/cancel-' + scope;
   form.submit();
 }
 </script>

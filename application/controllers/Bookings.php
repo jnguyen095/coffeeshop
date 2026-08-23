@@ -253,6 +253,30 @@ class Bookings extends MY_Controller
         redirect('bookings');
     }
 
+    /** Hủy buổi này và mọi buổi sau nó trong cùng chuỗi lặp lại (giữ nguyên các buổi trước đó). */
+    public function cancel_onward($id)
+    {
+        $booking = $this->Court_booking_model->get_by_id($id);
+        if ($booking && $booking['booking_group_id'])
+        {
+            $this->Court_booking_model->cancel_onward($booking['booking_group_id'], $booking['booking_date']);
+            $this->audit('court_booking', 'CANCEL_ONWARD', $booking, array('group_id' => $booking['booking_group_id'], 'from_date' => $booking['booking_date']));
+        }
+        redirect('bookings?date='.($booking['booking_date'] ?? date('Y-m-d')));
+    }
+
+    /** Hủy buổi này và mọi buổi trước nó trong cùng chuỗi lặp lại (giữ nguyên các buổi sau đó). */
+    public function cancel_backward($id)
+    {
+        $booking = $this->Court_booking_model->get_by_id($id);
+        if ($booking && $booking['booking_group_id'])
+        {
+            $this->Court_booking_model->cancel_backward($booking['booking_group_id'], $booking['booking_date']);
+            $this->audit('court_booking', 'CANCEL_BACKWARD', $booking, array('group_id' => $booking['booking_group_id'], 'from_date' => $booking['booking_date']));
+        }
+        redirect('bookings?date='.($booking['booking_date'] ?? date('Y-m-d')));
+    }
+
     /**
      * Sửa 1 buổi đặt — nếu buổi này thuộc 1 chuỗi lặp lại, người dùng chọn
      * áp dụng cho riêng buổi này hay cả chuỗi (giữ nguyên ngày riêng từng
