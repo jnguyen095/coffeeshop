@@ -8,7 +8,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class Trung_thu extends CI_Controller
 {
-    const EVENT_LABEL = '08:00 – 10:00 | Thứ Bảy, 26/09/2026';
+    const EVENT_LABEL = '18:00 – 21:00 | Thứ Sáu, 25/09/2026';
     /** Giới hạn số bé mỗi lượt đăng ký công khai — admin sửa trong /trung-thu/admin thì không bị giới hạn này. */
     const MAX_KIDS_PUBLIC = 3;
 
