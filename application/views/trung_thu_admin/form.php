@@ -12,7 +12,8 @@
     </div>
     <div class="mb-3">
       <label class="form-label">Số lượng bé</label>
-      <input type="number" name="kid_count" class="form-control" min="1" max="20" required value="<?php echo (int) $reg['kid_count']; ?>">
+      <input type="number" name="kid_count" class="form-control" min="1" required value="<?php echo (int) $reg['kid_count']; ?>">
+      <div class="form-text">Không giới hạn số bé khi quản trị viên chỉnh sửa (form đăng ký công khai giới hạn tối đa 3 bé).</div>
     </div>
     <div class="d-grid gap-2">
       <button class="btn btn-brand btn-lg">Lưu</button>

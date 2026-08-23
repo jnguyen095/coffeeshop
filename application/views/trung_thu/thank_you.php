@@ -4,7 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Đăng ký thành công - Pick Angel Park</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="🌕 <?php echo htmlspecialchars($parent_name); ?> vừa đăng ký nhận quà Trung Thu tại Pick Angel Park!">
+<meta property="og:description" content="Đêm Hội Trăng Rằm — nhận quà miễn phí cho bé lúc <?php echo $event_label; ?>. Đăng ký ngay cho bé nhà bạn!">
+<meta property="og:image" content="<?php echo $og_image_url; ?>">
+<meta property="og:url" content="<?php echo $share_url; ?>">
+<meta name="twitter:card" content="summary_large_image">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <style>
   body{
     margin:0; min-height:100vh;
@@ -35,6 +42,27 @@
     text-decoration:none;
   }
   .btn-tt-outline:active{ background:#fff3cd; }
+  .tt-share{ margin-top:1.5rem; padding-top:1.25rem; border-top:1px dashed #e8d9c3; }
+  .tt-share-label{ font-size:1.05rem; font-weight:700; color:#7a2e00; margin-bottom:.75rem; }
+  .tt-share-row{ display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; margin-bottom:.75rem; }
+  .btn-share{
+    font-size:1.02rem; font-weight:700; padding:.65rem 1rem; border-radius:12px;
+    border:none; color:#fff; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem;
+    flex:1 1 auto; justify-content:center;
+  }
+  .btn-share-native{ background:#c1272d; }
+  .btn-share-fb{ background:#1877f2; }
+  .btn-share-zalo{ background:#0068ff; }
+  .tt-share-link-row{ display:flex; gap:.4rem; }
+  .tt-share-link-input{
+    flex:1 1 auto; min-width:0; font-size:.85rem; padding:.6rem .7rem; border-radius:10px;
+    border:2px solid #e8d9c3; background:#fff; color:#7a2e00;
+  }
+  .btn-copy{
+    font-size:.9rem; font-weight:700; padding:.6rem .9rem; border-radius:10px;
+    border:2px solid #c1272d; color:#c1272d; background:#fff; flex-shrink:0;
+  }
+  .btn-copy:active{ background:#fff3cd; }
 </style>
 </head>
 <body>
@@ -49,7 +77,46 @@
       </div>
       <div class="tt-gift">🗓 Vui lòng đến nhận quà vào lúc:<br><?php echo $event_label; ?></div>
       <div class="tt-note">Hẹn gặp Ba/Mẹ và các bé trong Đêm hội Trăng Rằm nhé!</div>
+
+      <div class="tt-share">
+        <div class="tt-share-label">🔗 Chia sẻ niềm vui Trung Thu này:</div>
+        <div class="tt-share-row">
+          <button type="button" class="btn-share btn-share-native" id="nativeShareBtn"><i class="bi bi-share-fill"></i> Chia sẻ</button>
+          <a class="btn-share btn-share-fb" href="https://www.facebook.com/sharer/sharer.php?u=<?php echo rawurlencode($share_url); ?>" target="_blank" rel="noopener"><i class="bi bi-facebook"></i> Facebook</a>
+          <a class="btn-share btn-share-zalo" href="https://sp.zalo.me/plugin/share?u=<?php echo rawurlencode($share_url); ?>" target="_blank" rel="noopener"><i class="bi bi-chat-dots-fill"></i> Zalo</a>
+        </div>
+      </div>
     </div>
   </div>
+
+<script>
+var shareUrl = <?php echo json_encode($share_url); ?>;
+var nativeBtn = document.getElementById('nativeShareBtn');
+if (navigator.share){
+  nativeBtn.addEventListener('click', function(){
+    navigator.share({ title: document.title, text: 'Tôi vừa đăng ký nhận quà Trung Thu cho bé tại Pick Angel Park! 🌕', url: shareUrl }).catch(function(){});
+  });
+} else {
+  nativeBtn.style.display = 'none';
+}
+
+document.getElementById('copyLinkBtn').addEventListener('click', function(){
+  var btn = this;
+  var input = document.getElementById('shareUrlInput');
+  input.select();
+  input.setSelectionRange(0, 99999);
+  var done = function(){
+    var old = btn.textContent;
+    btn.textContent = 'Đã sao chép!';
+    setTimeout(function(){ btn.textContent = old; }, 1500);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(shareUrl).then(done).catch(function(){ document.execCommand('copy'); done(); });
+  } else {
+    document.execCommand('copy');
+    done();
+  }
+});
+</script>
 </body>
 </html>

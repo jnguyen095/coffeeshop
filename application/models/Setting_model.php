@@ -47,4 +47,16 @@ class Setting_model extends CI_Model
     {
         return $this->get('booking_end_time', '22:00');
     }
+
+    /** Thời điểm mở đăng ký quà Trung Thu, định dạng 'Y-m-d H:i:s'. Rỗng/NULL = không giới hạn (mở sẵn). */
+    public function get_trung_thu_open_at()
+    {
+        return $this->get('trung_thu_open_at') ?: NULL;
+    }
+
+    /** Thời điểm đóng đăng ký quà Trung Thu, định dạng 'Y-m-d H:i:s'. Rỗng/NULL = không giới hạn (không tự đóng). */
+    public function get_trung_thu_close_at()
+    {
+        return $this->get('trung_thu_close_at') ?: NULL;
+    }
 }

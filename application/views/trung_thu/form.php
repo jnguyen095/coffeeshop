@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Đăng ký nhận quà Trung Thu - Pick Angel Park</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="🌕 Đêm Hội Trăng Rằm — Đăng ký nhận quà Trung Thu miễn phí">
+<meta property="og:description" content="Cùng bé vui Trung Thu tại Pick Angel Park! Đăng ký nhận quà miễn phí — <?php echo $event_label; ?>.">
+<meta property="og:image" content="<?php echo $og_image_url; ?>">
+<meta property="og:url" content="<?php echo $canonical_url; ?>">
+<meta name="twitter:card" content="summary_large_image">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
   body{
@@ -44,7 +50,9 @@
     <div class="tt-card">
       <img src="<?php echo base_url('assets/img/trung-thu-icon-removebg.png'); ?>" alt="Trung thu" class="tt-icon">
       <div class="tt-title">🌕 ĐÊM HỘI TRĂNG RẰM 🎉</div>
-      <div class="tt-subtitle">Cùng bé vui Trung Thu tại Pick Angel Park</div>
+      <div class="tt-subtitle">Cùng bé vui Trung Thu tại<br>
+       <b>Pick Angel Park</b>
+      </div>
 
       <div class="tt-gift">🎁 ĐĂNG KÝ NHẬN QUÀ TRUNG THU<br>HOÀN TOÀN MIỄN PHÍ!</div>
       <div class="tt-time">🗓 <?php echo $event_label; ?></div>
@@ -64,7 +72,8 @@
         </div>
         <div class="mb-4">
           <label class="tt-label form-label">Số lượng bé đăng ký</label>
-          <input type="number" name="kid_count" class="form-control" min="1" max="20" placeholder="VD: 2" required value="<?php echo (int) $old['kid_count']; ?>">
+          <input type="number" name="kid_count" class="form-control" min="1" max="<?php echo $max_kids; ?>" placeholder="VD: 2" required value="<?php echo (int) $old['kid_count']; ?>">
+          <div class="form-text">Tối đa <?php echo $max_kids; ?> bé mỗi lượt đăng ký.</div>
         </div>
         <button type="submit" class="btn-tt">🎁 Đăng ký ngay</button>
       <?php echo form_close(); ?>

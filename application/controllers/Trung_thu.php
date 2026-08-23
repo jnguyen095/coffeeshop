@@ -9,15 +9,32 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Trung_thu extends CI_Controller
 {
     const EVENT_LABEL = '08:00 – 10:00 | Thứ Bảy, 26/09/2026';
+    /** Giới hạn số bé mỗi lượt đăng ký công khai — admin sửa trong /trung-thu/admin thì không bị giới hạn này. */
+    const MAX_KIDS_PUBLIC = 3;
 
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('Trung_thu_registration_model');
+        $this->load->model(array('Trung_thu_registration_model', 'Setting_model'));
     }
 
     public function index()
     {
+        $open_at = $this->Setting_model->get_trung_thu_open_at();
+        $close_at = $this->Setting_model->get_trung_thu_close_at();
+        $now = date('Y-m-d H:i:s');
+
+        if ($open_at && $now < $open_at)
+        {
+            $this->load->view('trung_thu/not_open', array('open_at_label' => date('H:i \n\g\à\y d/m/Y', strtotime($open_at))));
+            return;
+        }
+        if ($close_at && $now > $close_at)
+        {
+            $this->load->view('trung_thu/ended');
+            return;
+        }
+
         $error = NULL;
         $old = array('phone' => '', 'parent_name' => '', 'kid_count' => 1);
 
@@ -34,6 +51,10 @@ class Trung_thu extends CI_Controller
             {
                 $error = 'Vui lòng điền đầy đủ thông tin.';
             }
+            elseif ($kid_count > self::MAX_KIDS_PUBLIC)
+            {
+                $error = 'Mỗi lượt đăng ký tối đa '.self::MAX_KIDS_PUBLIC.' bé. Vui lòng đăng ký thêm lượt khác nếu có nhiều bé hơn.';
+            }
             elseif (strlen($phone_digits) < 9 || strlen($phone_digits) > 11)
             {
                 $error = 'Số điện thoại không hợp lệ.';
@@ -44,36 +65,49 @@ class Trung_thu extends CI_Controller
             }
             else
             {
+                $uuid = gen_token(32);
                 $this->Trung_thu_registration_model->create(array(
+                    'uuid'        => $uuid,
                     'phone'       => $phone_digits,
                     'parent_name' => $parent_name,
                     'kid_count'   => $kid_count,
                 ));
 
-                $this->session->set_flashdata('tt_parent_name', $parent_name);
-                $this->session->set_flashdata('tt_kid_count', $kid_count);
-                redirect('trung-thu/thank-you');
+                redirect('trung-thu/thank-you/'.$uuid);
                 return;
             }
         }
 
         $data = array(
-            'error'       => $error,
-            'old'         => $old,
-            'event_label' => self::EVENT_LABEL,
+            'error'         => $error,
+            'old'           => $old,
+            'event_label'   => self::EVENT_LABEL,
+            'max_kids'      => self::MAX_KIDS_PUBLIC,
+            'og_image_url'  => base_url('assets/img/trung-thu-icon.jpg'),
+            'canonical_url' => site_url('trung-thu'),
         );
         $this->load->view('trung_thu/form', $data);
     }
 
-    public function thank_you()
+    /**
+     * Trang cảm ơn — link riêng theo uuid (không phụ thuộc session) nên phụ
+     * huynh có thể chia sẻ lên mạng xã hội, ai bấm vào cũng xem được.
+     */
+    public function thank_you($uuid = NULL)
     {
-        $parent_name = $this->session->flashdata('tt_parent_name');
-        if ($parent_name === NULL) redirect('trung-thu');
+        $reg = $uuid ? $this->Trung_thu_registration_model->get_by_uuid($uuid) : NULL;
+        if ( ! $reg)
+        {
+            redirect('trung-thu');
+            return;
+        }
 
         $data = array(
-            'parent_name' => $parent_name,
-            'kid_count'   => $this->session->flashdata('tt_kid_count'),
-            'event_label' => self::EVENT_LABEL,
+            'parent_name'   => $reg['parent_name'],
+            'kid_count'     => $reg['kid_count'],
+            'event_label'   => self::EVENT_LABEL,
+            'share_url'     => site_url('trung-thu/thank-you/'.$reg['uuid']),
+            'og_image_url'  => base_url('assets/img/trung-thu-icon.jpg'),
         );
         $this->load->view('trung_thu/thank_you', $data);
     }

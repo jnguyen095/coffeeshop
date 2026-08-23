@@ -145,6 +145,7 @@ $route['menu/(:any)/(:any)'] = 'menu/visit/$1/$2';
 // Trung Thu gift registration (public, no auth)
 $route['trung-thu'] = 'trung_thu/index';
 $route['trung-thu/thank-you'] = 'trung_thu/thank_you';
+$route['trung-thu/thank-you/(:any)'] = 'trung_thu/thank_you/$1';
 $route['trung-thu/admin'] = 'trung_thu_admin/index';
 $route['trung-thu/admin/(:num)/edit'] = 'trung_thu_admin/edit/$1';
 $route['trung-thu/admin/(:num)/delete'] = 'trung_thu_admin/delete/$1';

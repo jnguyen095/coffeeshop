@@ -32,6 +32,11 @@ class Trung_thu_registration_model extends CI_Model
         return $this->db->where('id', $id)->get($this->table)->row_array();
     }
 
+    public function get_by_uuid($uuid)
+    {
+        return $this->db->where('uuid', $uuid)->get($this->table)->row_array();
+    }
+
     public function update($id, $data)
     {
         return $this->db->where('id', $id)->update($this->table, $data);
