@@ -65,7 +65,6 @@
       <?php if ($bank_info['bank_name'] || $bank_info['bank_account_number']): ?>
         <table class="table table-sm mb-0">
           <tr><td class="text-muted" style="width:40%;">Ngân hàng</td><td><?php echo htmlspecialchars((string) $bank_info['bank_name']); ?></td></tr>
-          <tr><td class="text-muted">Chi nhánh</td><td><?php echo htmlspecialchars((string) $bank_info['bank_branch']); ?></td></tr>
           <tr><td class="text-muted">Số tài khoản</td><td class="fw-semibold"><?php echo htmlspecialchars((string) $bank_info['bank_account_number']); ?></td></tr>
           <tr><td class="text-muted">Chủ tài khoản</td><td><?php echo htmlspecialchars((string) $bank_info['bank_account_name']); ?></td></tr>
         </table>

@@ -99,6 +99,51 @@ class Payroll extends MY_Controller
     }
 
     /**
+     * Tự cập nhật thông tin ngân hàng của chính mình (nhận lương qua chuyển
+     * khoản) — mọi role, chỉ tác động lên $this->current_user['id'], không
+     * bao giờ nhận user_id từ bên ngoài. Không đụng đến salary_type/mức
+     * lương (vẫn chỉ ADMIN qua settings()).
+     */
+    public function bank_info()
+    {
+        $user_id = $this->current_user['id'];
+        $error = NULL;
+        $success = FALSE;
+
+        if ($this->input->method() === 'post')
+        {
+            $data = array(
+                'bank_name'           => $this->input->post('bank_name', TRUE),
+                'bank_account_number' => $this->input->post('bank_account_number', TRUE),
+                'bank_account_name'   => $this->input->post('bank_account_name', TRUE),
+            );
+
+            if (($data['bank_name'] || $data['bank_account_number'] || $data['bank_account_name'])
+                && ( ! $data['bank_name'] || ! $data['bank_account_number'] || ! $data['bank_account_name']))
+            {
+                $error = 'Vui lòng điền đủ Ngân hàng, Số tài khoản và Chủ tài khoản (hoặc để trống cả 3 nếu chưa muốn cập nhật).';
+            }
+            else
+            {
+                $this->Payroll_setting_model->upsert($user_id, $data);
+                $this->audit('payroll_settings', 'UPDATE', NULL, array('user_id' => $user_id, 'self_service' => TRUE));
+                $success = TRUE;
+            }
+        }
+
+        $data = array(
+            'page_title'   => 'Thông tin ngân hàng',
+            'current_user' => $this->current_user,
+            'bank_info'    => $this->Payroll_setting_model->get_by_user_or_default($user_id),
+            'error'        => $error,
+            'success'      => $success,
+        );
+        $this->load->view('layout/header', $data);
+        $this->load->view('payroll/bank_form', $data);
+        $this->load->view('layout/footer');
+    }
+
+    /**
      * Chi tiết ngày làm/nghỉ của chính mình theo tháng — mọi role, chỉ xem
      * (sửa vẫn chỉ ADMIN qua hours()). HOURLY liệt kê từng ngày có giờ làm,
      * FIXED liệt kê từng ngày nghỉ (cả ngày/nửa ngày).
@@ -250,7 +295,6 @@ class Payroll extends MY_Controller
                 'fixed_salary'        => $fixed_salary,
                 'hourly_rate'         => $hourly_rate,
                 'bank_name'           => $this->input->post('bank_name', TRUE),
-                'bank_branch'         => $this->input->post('bank_branch', TRUE),
                 'bank_account_number' => $this->input->post('bank_account_number', TRUE),
                 'bank_account_name'   => $this->input->post('bank_account_name', TRUE),
             );

@@ -25,7 +25,6 @@ class Payroll_setting_model extends CI_Model
             'fixed_salary'        => 0,
             'hourly_rate'         => 0,
             'bank_name'           => NULL,
-            'bank_branch'         => NULL,
             'bank_account_number' => NULL,
             'bank_account_name'   => NULL,
         );

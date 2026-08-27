@@ -13,6 +13,7 @@ $route['change-password'] = 'profile/change_password';
 // Lương — mọi role xem lương của mình; các route /payroll/admin/* chỉ ADMIN
 $route['payroll'] = 'payroll/index';
 $route['payroll/detail'] = 'payroll/detail';
+$route['payroll/bank-info'] = 'payroll/bank_info';
 $route['payroll/admin'] = 'payroll/admin';
 $route['payroll/settings/(:num)'] = 'payroll/settings/$1';
 $route['payroll/record/(:num)'] = 'payroll/record/$1';

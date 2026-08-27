@@ -46,10 +46,6 @@
           <input type="text" name="bank_name" class="form-control" value="<?php echo htmlspecialchars((string) $settings['bank_name']); ?>">
         </div>
         <div class="col-sm-6">
-          <label class="form-label">Chi nhánh</label>
-          <input type="text" name="bank_branch" class="form-control" value="<?php echo htmlspecialchars((string) $settings['bank_branch']); ?>">
-        </div>
-        <div class="col-sm-6">
           <label class="form-label">Số tài khoản</label>
           <input type="text" name="bank_account_number" class="form-control" value="<?php echo htmlspecialchars((string) $settings['bank_account_number']); ?>">
         </div>

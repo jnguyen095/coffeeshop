@@ -140,6 +140,7 @@
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a class="dropdown-item" href="<?php echo site_url('payroll'); ?>"><i class="bi bi-cash-coin"></i> Chấm công</a></li>
+            <li><a class="dropdown-item" href="<?php echo site_url('payroll/bank-info'); ?>"><i class="bi bi-bank"></i> Thông tin ngân hàng</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('change-password'); ?>"><i class="bi bi-key"></i> Đổi mật khẩu</a></li>
             <li><a class="dropdown-item" href="<?php echo site_url('logout'); ?>"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a></li>
           </ul>
