@@ -11,7 +11,7 @@ class Payroll_hours_model extends CI_Model
     {
         $rows = $this->db->where('user_id', $user_id)
             ->where('work_date >=', $period.'-01')
-            ->where('work_date <=', $period.'-31')
+            ->where('work_date <=', date('Y-m-t', strtotime($period.'-01')))
             ->get($this->table)->result_array();
 
         $by_date = array();
@@ -27,7 +27,7 @@ class Payroll_hours_model extends CI_Model
         $row = $this->db->select_sum('hours')
             ->where('user_id', $user_id)
             ->where('work_date >=', $period.'-01')
-            ->where('work_date <=', $period.'-31')
+            ->where('work_date <=', date('Y-m-t', strtotime($period.'-01')))
             ->get($this->table)->row_array();
         return $row['hours'] ? (float) $row['hours'] : 0;
     }
@@ -37,7 +37,7 @@ class Payroll_hours_model extends CI_Model
     {
         $rows = $this->db->select('user_id, SUM(hours) as total_hours', FALSE)
             ->where('work_date >=', $period.'-01')
-            ->where('work_date <=', $period.'-31')
+            ->where('work_date <=', date('Y-m-t', strtotime($period.'-01')))
             ->group_by('user_id')
             ->get($this->table)->result_array();
 

@@ -1,9 +1,15 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-$route['default_controller'] = 'dashboard';
+$route['default_controller'] = 'public_site';
 $route['404_override'] = 'errors/page_missing';
 $route['translate_uri_dashes'] = FALSE;
+
+// Website public (khách hàng, không đăng nhập) — xem application/controllers/Public_site.php.
+// "/" giờ là trang chủ public thay vì dashboard nội bộ; nhân viên vào thẳng /login hoặc /dashboard.
+// Chỉ còn 1 trang duy nhất (one-page landing) — Khu vui chơi/Pickleball/Cà phê/
+// Photobooth/Khuyến mãi/Liên hệ đều là section trong trang chủ (anchor #kids,
+// #pickleball...), không còn route riêng.
 
 // Auth
 $route['login'] = 'auth/login';
@@ -93,6 +99,13 @@ $route['court-time-slots'] = 'court_time_slots/index';
 $route['court-time-slots/create'] = 'court_time_slots/create';
 $route['court-time-slots/(:num)/edit'] = 'court_time_slots/edit/$1';
 $route['court-time-slots/(:num)/delete'] = 'court_time_slots/delete/$1';
+
+$route['recipes'] = 'recipes/index';
+$route['recipes/create'] = 'recipes/create';
+$route['recipes/(:num)/edit'] = 'recipes/edit/$1';
+$route['recipes/(:num)/delete'] = 'recipes/delete/$1';
+$route['recipes/(:num)/ingredients/add'] = 'recipes/add_ingredient/$1';
+$route['recipes/(:num)/ingredients/(:num)/delete'] = 'recipes/delete_ingredient/$1/$2';
 
 $route['settings'] = 'settings/index';
 $route['audit-logs'] = 'audit_logs/index';

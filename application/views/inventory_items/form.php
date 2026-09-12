@@ -1,7 +1,16 @@
 <div class="container py-3 py-md-4" style="max-width:560px;">
   <h4 class="fw-bold mb-3"><?php echo $page_title; ?></h4>
   <?php if ( ! empty($error)): ?><div class="alert alert-danger py-2 small"><?php echo $error; ?></div><?php endif; ?>
-  <?php echo form_open(current_url()); ?>
+  <?php echo form_open(current_url(), array('enctype' => 'multipart/form-data')); ?>
+    <div class="mb-3">
+      <label class="form-label">Hình ảnh sản phẩm</label>
+      <div class="d-flex align-items-center gap-3">
+        <img id="imagePreview" src="<?php echo ($item && $item['image']) ? base_url('assets/'.$item['image']) : ''; ?>"
+             class="rounded border <?php echo ($item && $item['image']) ? '' : 'd-none'; ?>" style="width:88px;height:88px;object-fit:cover;">
+        <input type="file" name="image" accept="image/png,image/jpeg,image/webp" class="form-control" onchange="previewImage(this);">
+      </div>
+      <div class="form-text">Ảnh JPG/PNG/WEBP, tối đa 2MB. Để trống nếu không đổi ảnh.</div>
+    </div>
     <div class="row g-3 mb-3">
       <div class="col-sm-6">
         <label class="form-label">SKU</label>
@@ -45,6 +54,25 @@
         <input type="number" step="0.01" min="0" name="low_stock_threshold" class="form-control" value="<?php echo $item ? $item['low_stock_threshold'] : 0; ?>">
       </div>
     </div>
+    <div class="row g-3 mb-3">
+      <div class="col-sm-6">
+        <label class="form-label">Đơn vị cơ sở (để tính công thức)</label>
+        <select name="base_unit" id="baseUnitSelect" class="form-select" onchange="toggleBaseUnitCost();">
+          <option value="">-- Không dùng --</option>
+          <option value="ml" <?php echo ($item && $item['base_unit']==='ml') ? 'selected' : ''; ?>>ml</option>
+          <option value="g" <?php echo ($item && $item['base_unit']==='g') ? 'selected' : ''; ?>>gram</option>
+          <option value="cái" <?php echo ($item && $item['base_unit']==='cái') ? 'selected' : ''; ?>>cái</option>
+          <option value="lát" <?php echo ($item && $item['base_unit']==='lát') ? 'selected' : ''; ?>>lát</option>
+          <option value="lá" <?php echo ($item && $item['base_unit']==='lá') ? 'selected' : ''; ?>>lá</option>
+        </select>
+        <div class="form-text">Chỉ cần khi nguyên liệu này dùng trong công thức pha chế (VD: 1000ML/Chai → ml, ống hút → 1 cái, chanh → 1 lát).</div>
+      </div>
+      <div class="col-sm-6" id="baseUnitCostWrap">
+        <label class="form-label">Giá / đơn vị cơ sở (đ)</label>
+        <input type="number" step="0.01" min="0" name="base_unit_cost" class="form-control" value="<?php echo ($item && $item['base_unit_cost'] !== NULL) ? rtrim(rtrim(number_format($item['base_unit_cost'], 4, '.', ''), '0'), '.') : ''; ?>">
+        <div class="form-text">VD: chai 1000ml giá 200.000đ → nhập 200 (đ/ml).</div>
+      </div>
+    </div>
     <?php if ($item): ?>
     <div class="mb-3">
       <label class="form-label">Trạng thái</label>
@@ -64,6 +92,20 @@
     </div>
   <?php echo form_close(); ?>
 </div>
+
+<script>
+function previewImage(input){
+  if (!input.files || !input.files[0]) return;
+  var img = document.getElementById('imagePreview');
+  img.src = URL.createObjectURL(input.files[0]);
+  img.classList.remove('d-none');
+}
+function toggleBaseUnitCost(){
+  var has = document.getElementById('baseUnitSelect').value !== '';
+  document.getElementById('baseUnitCostWrap').classList.toggle('d-none', !has);
+}
+toggleBaseUnitCost();
+</script>
 
 <?php if ( ! $item): ?>
 <script>

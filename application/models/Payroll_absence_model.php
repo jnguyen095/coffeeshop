@@ -15,7 +15,7 @@ class Payroll_absence_model extends CI_Model
     {
         $rows = $this->db->where('user_id', $user_id)
             ->where('absence_date >=', $period.'-01')
-            ->where('absence_date <=', $period.'-31')
+            ->where('absence_date <=', date('Y-m-t', strtotime($period.'-01')))
             ->get($this->table)->result_array();
 
         $by_date = array();
@@ -32,7 +32,7 @@ class Payroll_absence_model extends CI_Model
         $row = $this->db->select_sum('fraction')
             ->where('user_id', $user_id)
             ->where('absence_date >=', $period.'-01')
-            ->where('absence_date <=', $period.'-31')
+            ->where('absence_date <=', date('Y-m-t', strtotime($period.'-01')))
             ->get($this->table)->row_array();
         return $row['fraction'] ? (float) $row['fraction'] : 0;
     }

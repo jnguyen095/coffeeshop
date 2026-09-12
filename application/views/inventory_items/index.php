@@ -54,15 +54,27 @@
   <div class="table-responsive">
     <table class="table bg-white shadow-sm rounded align-middle">
       <thead class="table-light">
-        <tr><th>STT</th><th>Tên</th><th>Danh mục</th><th>ĐVT</th><th>Bảo quản</th><th class="text-end">Tồn kho</th><th class="text-end">Ngưỡng</th><th>Trạng thái</th><?php if ($current_user['role'] === 'ADMIN'): ?><th></th><?php endif; ?></tr>
+        <tr><th>STT</th><th>Ảnh</th><th>Tên</th><th>Danh mục</th><th>ĐVT</th><th>Giá/ĐV cơ sở</th><th>Bảo quản</th><th class="text-end">Tồn kho</th><th class="text-end">Ngưỡng</th><th>Trạng thái</th><?php if ($current_user['role'] === 'ADMIN'): ?><th></th><?php endif; ?></tr>
       </thead>
       <tbody>
       <?php $stt = 1; foreach ($items as $it): $low = $it['qty_on_hand'] < $it['low_stock_threshold']; ?>
         <tr class="<?php echo $low ? 'table-danger' : ''; ?>">
           <td><?php echo $stt++; ?></td>
+          <td>
+            <?php if ($it['image']): ?>
+              <img src="<?php echo base_url('assets/'.$it['image']); ?>" style="width:48px;height:48px;object-fit:cover;" class="rounded border">
+            <?php else: ?>
+              <div class="d-flex align-items-center justify-content-center bg-light rounded border text-muted" style="width:48px;height:48px;"><i class="bi bi-box-seam"></i></div>
+            <?php endif; ?>
+          </td>
           <td><?php echo htmlspecialchars($it['name']); ?></td>
           <td><?php echo htmlspecialchars($it['category_name']); ?></td>
           <td><?php echo htmlspecialchars($it['unit_name']); ?></td>
+          <td class="small text-muted">
+            <?php if ($it['base_unit'] && $it['base_unit_cost'] !== NULL): ?>
+              <?php echo money_format_vnd($it['base_unit_cost']); ?>/<?php echo htmlspecialchars($it['base_unit']); ?>
+            <?php else: ?>—<?php endif; ?>
+          </td>
           <td><?php echo storage_type_label($it['storage_type']); ?></td>
           <td class="text-end fw-semibold"><?php echo rtrim(rtrim(number_format($it['qty_on_hand'], 2, '.', ''), '0'), '.'); ?></td>
           <td class="text-end text-muted"><?php echo rtrim(rtrim(number_format($it['low_stock_threshold'], 2, '.', ''), '0'), '.'); ?></td>
@@ -77,7 +89,7 @@
         </tr>
       <?php endforeach; ?>
       <?php if (empty($items)): ?>
-        <tr><td colspan="9" class="text-center text-muted py-4">Chưa có sản phẩm kho nào.</td></tr>
+        <tr><td colspan="11" class="text-center text-muted py-4">Chưa có sản phẩm kho nào.</td></tr>
       <?php endif; ?>
       </tbody>
     </table>

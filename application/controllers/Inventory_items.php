@@ -121,10 +121,15 @@ class Inventory_items extends MY_Controller
             }
             else
             {
-                $id = $this->Inventory_item_model->create($this->_form_data($sku));
-                $this->audit('inventory_item', 'CREATE', NULL, array('id' => $id));
-                redirect('inventory/items');
-                return;
+                $image = $this->_handle_image_upload($error);
+
+                if ( ! $error)
+                {
+                    $id = $this->Inventory_item_model->create($this->_form_data($sku, $image));
+                    $this->audit('inventory_item', 'CREATE', NULL, array('id' => $id));
+                    redirect('inventory/items');
+                    return;
+                }
             }
         }
 
@@ -162,10 +167,15 @@ class Inventory_items extends MY_Controller
             }
             else
             {
-                $this->Inventory_item_model->update($id, $this->_form_data($sku));
-                $this->audit('inventory_item', 'UPDATE', $item, array('id' => $id));
-                redirect('inventory/items');
-                return;
+                $image = $this->_handle_image_upload($error, $item['image']);
+
+                if ( ! $error)
+                {
+                    $this->Inventory_item_model->update($id, $this->_form_data($sku, $image));
+                    $this->audit('inventory_item', 'UPDATE', $item, array('id' => $id));
+                    redirect('inventory/items');
+                    return;
+                }
             }
         }
 
@@ -323,17 +333,64 @@ class Inventory_items extends MY_Controller
         fclose($out);
     }
 
-    private function _form_data($sku)
+    private function _form_data($sku, $image)
     {
+        $base_unit = $this->input->post('base_unit');
+        $base_unit = in_array($base_unit, array('ml', 'g', 'cái', 'lát', 'lá'), TRUE) ? $base_unit : NULL;
+        $base_unit_cost = $this->input->post('base_unit_cost');
+
         return array(
             'category_id'         => (int) $this->input->post('category_id'),
             'sku'                 => $sku,
             'name'                => $this->input->post('name', TRUE),
+            'image'               => $image,
             'unit_id'             => (int) $this->input->post('unit_id'),
+            'base_unit'           => $base_unit,
+            'base_unit_cost'      => ($base_unit && $base_unit_cost !== '') ? (float) $base_unit_cost : NULL,
             'storage_type'        => $this->input->post('storage_type') === 'COLD' ? 'COLD' : 'DRY',
             'low_stock_threshold' => (float) $this->input->post('low_stock_threshold'),
             'status'              => $this->input->post('status') ?: 'ACTIVE',
         );
+    }
+
+    /**
+     * Xử lý ảnh sản phẩm kho (tùy chọn) — trả về đường dẫn tương đối để lưu
+     * vào inventory_items.image, hoặc giữ nguyên $existing_image nếu không
+     * chọn file mới. Set $error (tham chiếu) và trả về NULL nếu upload lỗi.
+     * Cùng quy ước với Products::_handle_image_upload().
+     */
+    private function _handle_image_upload(&$error, $existing_image = NULL)
+    {
+        if (empty($_FILES['image']['name']))
+        {
+            return $existing_image;
+        }
+
+        $upload_dir = FCPATH.'assets/uploads/inventory_items/';
+        if ( ! is_dir($upload_dir))
+        {
+            mkdir($upload_dir, 0755, TRUE);
+        }
+
+        $this->load->library('upload', array(
+            'upload_path'   => $upload_dir,
+            'allowed_types' => 'jpg|jpeg|png|webp',
+            'max_size'      => 2048,
+            'encrypt_name'  => TRUE,
+        ));
+
+        if ( ! $this->upload->do_upload('image'))
+        {
+            $error = $this->upload->display_errors('', '');
+            return NULL;
+        }
+
+        if ($existing_image && is_file(FCPATH.'assets/'.$existing_image))
+        {
+            @unlink(FCPATH.'assets/'.$existing_image);
+        }
+
+        return 'uploads/inventory_items/'.$this->upload->data('file_name');
     }
 
     /**

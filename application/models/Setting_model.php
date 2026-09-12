@@ -59,4 +59,43 @@ class Setting_model extends CI_Model
     {
         return $this->get('trung_thu_close_at') ?: NULL;
     }
+
+    // ---- Thông tin website public (site/xem application/controllers/Public.php) ----
+
+    public function get_site_name()
+    {
+        return $this->get('site_name', 'Pick Angel Park');
+    }
+
+    public function get_site_phone()
+    {
+        return $this->get('site_phone', '0974749277');
+    }
+
+    public function get_site_address()
+    {
+        return $this->get('site_address', '82 Võ Văn Kiệt, Buôn Ma Thuột, Đắk Lắk');
+    }
+
+    /** Link Zalo (vd https://zalo.me/...) — rỗng nghĩa là chưa cấu hình, ẩn nút Zalo trên site public. */
+    public function get_site_zalo()
+    {
+        return $this->get('site_zalo', '') ?: NULL;
+    }
+
+    public function get_site_facebook()
+    {
+        return $this->get('site_facebook', '') ?: NULL;
+    }
+
+    public function get_site_tiktok()
+    {
+        return $this->get('site_tiktok', '') ?: NULL;
+    }
+
+    /** Link nhúng Google Maps tùy chỉnh — rỗng thì site public tự build link tìm theo địa chỉ. */
+    public function get_site_google_maps()
+    {
+        return $this->get('site_google_maps', '') ?: NULL;
+    }
 }
