@@ -15,7 +15,7 @@ class Payroll extends MY_Controller
     {
         parent::__construct();
         $this->load->helper('payroll');
-        $this->load->model(array('Payroll_setting_model', 'Payroll_record_model', 'Payroll_hours_model', 'Payroll_absence_model', 'Payroll_rate_history_model', 'User_model'));
+        $this->load->model(array('Payroll_setting_model', 'Payroll_record_model', 'Payroll_hours_model', 'Payroll_absence_model', 'Payroll_bonus_model', 'Payroll_rate_history_model', 'User_model'));
     }
 
     private function _require_admin()
@@ -69,7 +69,8 @@ class Payroll extends MY_Controller
     {
         $total_hours = $settings['salary_type'] === 'HOURLY' ? $this->Payroll_hours_model->sum_hours($user_id, $period) : 0;
         $absence_days = $settings['salary_type'] === 'FIXED' ? $this->Payroll_absence_model->sum_by_user_period($user_id, $period) : 0;
-        return payroll_compute($settings, $record, $total_hours, $absence_days, $period);
+        $bonus_total = $this->Payroll_bonus_model->sum_by_user_period($user_id, $period);
+        return payroll_compute($settings, $record, $total_hours, $absence_days, $period, $bonus_total);
     }
 
     /** Xem lương của chính mình theo tháng — mọi role. */
@@ -92,6 +93,7 @@ class Payroll extends MY_Controller
             // lương, không có các trường ngân hàng.
             'bank_info'    => $this->Payroll_setting_model->get_by_user_or_default($user_id),
             'salary'       => $this->_compute($settings, $record, $user_id, $period),
+            'bonuses'      => $this->Payroll_bonus_model->get_by_user_period($user_id, $period),
         );
         $this->load->view('layout/header', $data);
         $this->load->view('payroll/index', $data);
@@ -352,11 +354,82 @@ class Payroll extends MY_Controller
             'bank_info'    => $this->Payroll_setting_model->get_by_user_or_default($user_id),
             'record'       => $record,
             'salary'       => $this->_compute($settings, $record, $user_id, $period),
+            'bonuses'      => $this->Payroll_bonus_model->get_by_user_period($user_id, $period),
             'period'       => $period,
         );
         $this->load->view('layout/header', $data);
         $this->load->view('payroll/record_form', $data);
         $this->load->view('layout/footer');
+    }
+
+    /**
+     * Thêm 1 khoản thưởng — theo số tiền cố định (VD: "Thưởng 200.000 dịp lễ
+     * 2/7") hoặc theo giờ (số giờ × đơn giá/giờ hiện tại của nhân viên, lưu
+     * lại rate dùng để tính — không bị lệch nếu sau này đổi mức lương). ADMIN.
+     */
+    public function add_bonus($user_id)
+    {
+        $this->_require_admin();
+        $user = $this->User_model->get_by_id($user_id);
+        if ( ! $user) show_404();
+
+        $period = $this->input->post('period') ?: date('Y-m');
+        $bonus_type = $this->input->post('bonus_type') === 'HOURLY' ? 'HOURLY' : 'AMOUNT';
+        $note = $this->input->post('note', TRUE);
+
+        if ($bonus_type === 'HOURLY')
+        {
+            $hours = (float) $this->input->post('hours');
+            $settings = $this->_effective_settings($user_id, $period);
+            $rate = (float) $settings['hourly_rate'];
+            $data = array(
+                'bonus_type' => 'HOURLY',
+                'hours'      => $hours,
+                'rate'       => $rate,
+                'amount'     => $hours * $rate,
+                'note'       => $note,
+            );
+            $valid = $hours > 0;
+        }
+        else
+        {
+            $amount = (float) $this->input->post('amount');
+            $data = array(
+                'bonus_type' => 'AMOUNT',
+                'amount'     => $amount,
+                'note'       => $note,
+            );
+            $valid = $amount > 0;
+        }
+
+        if ($valid)
+        {
+            $this->Payroll_bonus_model->create($user_id, $period, $data, $this->current_user['id']);
+            $this->audit('payroll_bonus', 'CREATE', NULL, array('user_id' => $user_id, 'period' => $period, 'amount' => $data['amount']));
+            $this->session->set_flashdata('success', 'Đã thêm khoản thưởng cho '.$user['fullname'].'.');
+        }
+        else
+        {
+            $this->session->set_flashdata('error', 'Vui lòng nhập số tiền hoặc số giờ thưởng hợp lệ.');
+        }
+
+        redirect('payroll/record/'.$user_id.'?period='.$period);
+    }
+
+    /** Xoá 1 khoản thưởng — ADMIN. */
+    public function delete_bonus($user_id, $bonus_id)
+    {
+        $this->_require_admin();
+        $period = $this->input->get('period') ?: date('Y-m');
+
+        $bonus = $this->Payroll_bonus_model->get_by_id($bonus_id);
+        if ($bonus && (int) $bonus['user_id'] === (int) $user_id)
+        {
+            $this->Payroll_bonus_model->delete($bonus_id, $user_id);
+            $this->audit('payroll_bonus', 'DELETE', $bonus, array('user_id' => $user_id));
+        }
+
+        redirect('payroll/record/'.$user_id.'?period='.$period);
     }
 
     /**

@@ -47,11 +47,24 @@
 
       <hr>
       <table class="table table-sm mb-0">
+        <?php if ($salary['bonus_total'] > 0): ?>
+        <tr><td class="text-muted">Thưởng</td><td class="text-end text-success">+<?php echo money_format_vnd($salary['bonus_total']); ?></td></tr>
+        <?php endif; ?>
         <tr><td class="text-muted">Đã ứng lương</td><td class="text-end"><?php echo money_format_vnd($salary['advance_amount']); ?></td></tr>
         <tr><td class="fw-bold">Còn lại</td><td class="text-end fw-bold fs-5 text-brand"><?php echo money_format_vnd($salary['net_salary']); ?></td></tr>
       </table>
       <?php if ($salary['note']): ?>
         <div class="small text-muted mt-2"><i class="bi bi-chat-left-text"></i> <?php echo htmlspecialchars($salary['note']); ?></div>
+      <?php endif; ?>
+      <?php if ( ! empty($bonuses)): ?>
+        <hr>
+        <div class="small fw-semibold mb-1"><i class="bi bi-gift"></i> Chi tiết thưởng</div>
+        <?php foreach ($bonuses as $b): ?>
+          <div class="small text-muted d-flex justify-content-between">
+            <span><?php echo $b['note'] ? htmlspecialchars($b['note']) : 'Thưởng'; ?></span>
+            <span class="text-success">+<?php echo money_format_vnd($b['amount']); ?></span>
+          </div>
+        <?php endforeach; ?>
       <?php endif; ?>
     </div>
   </div>

@@ -1,11 +1,12 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-$route['default_controller'] = 'public_site';
+$route['default_controller'] = 'public/public_site';
 $route['404_override'] = 'errors/page_missing';
 $route['translate_uri_dashes'] = FALSE;
 
-// Website public (khách hàng, không đăng nhập) — xem application/controllers/Public_site.php.
+// Website public (khách hàng, không đăng nhập) — controller/view/asset đều tách
+// riêng thư mục, xem application/controllers/Public/Public_site.php.
 // "/" giờ là trang chủ public thay vì dashboard nội bộ; nhân viên vào thẳng /login hoặc /dashboard.
 // Chỉ còn 1 trang duy nhất (one-page landing) — Khu vui chơi/Pickleball/Cà phê/
 // Photobooth/Khuyến mãi/Liên hệ đều là section trong trang chủ (anchor #kids,
@@ -23,6 +24,8 @@ $route['payroll/bank-info'] = 'payroll/bank_info';
 $route['payroll/admin'] = 'payroll/admin';
 $route['payroll/settings/(:num)'] = 'payroll/settings/$1';
 $route['payroll/record/(:num)'] = 'payroll/record/$1';
+$route['payroll/record/(:num)/bonus/add'] = 'payroll/add_bonus/$1';
+$route['payroll/record/(:num)/bonus/(:num)/delete'] = 'payroll/delete_bonus/$1/$2';
 $route['payroll/hours/(:num)'] = 'payroll/hours/$1';
 
 // Staff / Cashier / Barista / Admin screens
@@ -151,15 +154,16 @@ $route['stock/adjust'] = 'stock/adjust';
 $route['stock/history'] = 'stock/history';
 
 // Customer QR Ordering (public, no auth)
-$route['menu/(:any)'] = 'menu/index/$1';
-$route['menu/(:any)/cart'] = 'menu/cart/$1';
-$route['menu/(:any)/history'] = 'menu/history/$1';
-$route['menu/(:any)/(:any)'] = 'menu/visit/$1/$2';
+$route['menu/(:any)'] = 'public/menu/index/$1';
+$route['menu/(:any)/cart'] = 'public/menu/cart/$1';
+$route['menu/(:any)/history'] = 'public/menu/history/$1';
+$route['menu/(:any)/(:any)'] = 'public/menu/visit/$1/$2';
 
-// Trung Thu gift registration (public, no auth)
-$route['trung-thu'] = 'trung_thu/index';
-$route['trung-thu/thank-you'] = 'trung_thu/thank_you';
-$route['trung-thu/thank-you/(:any)'] = 'trung_thu/thank_you/$1';
+// Trung Thu gift registration (public, no auth) — trang quản trị (trung-thu/admin/*)
+// vẫn là controller nội bộ Trung_thu_admin, chỉ trang đăng ký mới nằm trong Public/.
+$route['trung-thu'] = 'public/trung_thu/index';
+$route['trung-thu/thank-you'] = 'public/trung_thu/thank_you';
+$route['trung-thu/thank-you/(:any)'] = 'public/trung_thu/thank_you/$1';
 $route['trung-thu/admin'] = 'trung_thu_admin/index';
 $route['trung-thu/admin/(:num)/edit'] = 'trung_thu_admin/edit/$1';
 $route['trung-thu/admin/(:num)/delete'] = 'trung_thu_admin/delete/$1';

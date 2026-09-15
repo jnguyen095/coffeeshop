@@ -26,12 +26,12 @@ class Trung_thu extends CI_Controller
 
         if ($open_at && $now < $open_at)
         {
-            $this->load->view('trung_thu/not_open', array('open_at_label' => date('H:i \n\g\à\y d/m/Y', strtotime($open_at))));
+            $this->load->view('public/trung_thu/not_open', array('open_at_label' => date('H:i \n\g\à\y d/m/Y', strtotime($open_at))));
             return;
         }
         if ($close_at && $now > $close_at)
         {
-            $this->load->view('trung_thu/ended');
+            $this->load->view('public/trung_thu/ended');
             return;
         }
 
@@ -86,7 +86,7 @@ class Trung_thu extends CI_Controller
             'og_image_url'  => base_url('assets/img/trung-thu-icon.jpg'),
             'canonical_url' => site_url('trung-thu'),
         );
-        $this->load->view('trung_thu/form', $data);
+        $this->load->view('public/trung_thu/form', $data);
     }
 
     /**
@@ -109,6 +109,6 @@ class Trung_thu extends CI_Controller
             'share_url'     => site_url('trung-thu/thank-you/'.$reg['uuid']),
             'og_image_url'  => base_url('assets/img/trung-thu-icon.jpg'),
         );
-        $this->load->view('trung_thu/thank_you', $data);
+        $this->load->view('public/trung_thu/thank_you', $data);
     }
 }

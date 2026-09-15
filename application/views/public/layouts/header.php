@@ -60,6 +60,18 @@
           <li class="nav-item"><a class="nav-link" href="#cafe">Cà phê &amp; Photobooth</a></li>
           <li class="nav-item"><a class="nav-link" href="#today">Khuyến mãi</a></li>
           <li class="nav-item"><a class="nav-link" href="#location">Liên hệ</a></li>
+          <li class="nav-item">
+            <?php if ( ! empty($current_user)): ?>
+              <?php
+                $pap_home = 'dashboard';
+                if ($current_user['role'] === 'BOOKING') $pap_home = 'bookings';
+                elseif ($current_user['role'] === 'STOCKTAKER') $pap_home = 'stock/adjust';
+              ?>
+              <a class="nav-link" href="<?php echo site_url($pap_home); ?>" title="Vào hệ thống quản lý"><i class="bi bi-person-circle"></i> <?php echo htmlspecialchars($current_user['fullname']); ?></a>
+            <?php else: ?>
+              <a class="nav-link" href="<?php echo site_url('login'); ?>" title="Đăng nhập nhân viên"><i class="bi bi-box-arrow-in-right"></i> Đăng nhập</a>
+            <?php endif; ?>
+          </li>
           <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
             <a class="btn pap-btn-primary w-100" href="#location" onclick="papTrack('click_booking')">Đặt sân</a>
           </li>

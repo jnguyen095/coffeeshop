@@ -21,12 +21,25 @@ class Public_site extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+        $this->load->helper('kds');
         $this->load->model(array('Setting_model', 'Promotion_model', 'Gallery_model'));
     }
 
     public function index()
     {
+        // Nhân viên đã đăng nhập (session còn hạn, hoặc tự đăng nhập lại qua
+        // cookie "ghi nhớ") ghé trang public thì header hiện tên thay vì nút
+        // Đăng nhập — xem application/views/public/layouts/header.php.
+        $current_user = $this->session->userdata('user');
+        if ( ! $current_user)
+        {
+            $current_user = attempt_remember_login();
+        }
+
         $data = array_merge(
+            array(
+                'current_user' => $current_user,
+            ),
             array(
                 'site_name'        => $this->Setting_model->get_site_name(),
                 'site_phone'       => $this->Setting_model->get_site_phone(),

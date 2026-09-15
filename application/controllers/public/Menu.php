@@ -40,7 +40,7 @@ class Menu extends CI_Controller
 
         if (in_array($table['status'], array('WAIT_PAYMENT', 'PAID'), TRUE))
         {
-            $this->load->view('menu/closed', array('table' => $table));
+            $this->load->view('public/menu/closed', array('table' => $table));
             return;
         }
 
@@ -66,7 +66,7 @@ class Menu extends CI_Controller
 
         if (in_array($table['status'], array('WAIT_PAYMENT', 'PAID'), TRUE))
         {
-            $this->load->view('menu/closed', array('table' => $table));
+            $this->load->view('public/menu/closed', array('table' => $table));
             return;
         }
 
@@ -80,7 +80,7 @@ class Menu extends CI_Controller
                 'EXPIRED'    => 'Phiên đặt món đã hết hạn do quá lâu chưa thanh toán. Vui lòng gọi nhân viên hoặc quét lại mã QR trên bàn.',
                 'CLOSED'     => 'Bàn đã thanh toán, cảm ơn quý khách và sớm gặp lại'
             );
-            $this->load->view('menu/session_ended', array(
+            $this->load->view('public/menu/session_ended', array(
                 'table'   => $table,
                 'message' => $messages[$check['reason']],
             ));
@@ -93,7 +93,7 @@ class Menu extends CI_Controller
             'secret'               => $secret,
             'products_by_category' => $this->Product_model->get_active_grouped_by_category($table['table_type']),
         );
-        $this->load->view('menu/index', $data);
+        $this->load->view('public/menu/index', $data);
     }
 
     public function cart($token)

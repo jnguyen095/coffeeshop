@@ -11,10 +11,13 @@ if ( ! function_exists('payroll_compute'))
      * $absence_days: số ngày nghỉ trong tháng, tính từ payroll_absences —
      * admin đánh dấu từng ngày cụ thể (chỉ áp dụng khi salary_type = FIXED).
      * $period: 'YYYY-MM'.
+     * $bonus_total: tổng tiền thưởng trong tháng, từ payroll_bonuses (xem
+     * Payroll_bonus_model::sum_by_user_period()) — cộng thẳng vào net_salary,
+     * không qua gross_salary vì thưởng không phải lương cơ bản.
      *
      * Lương cố định: đơn giá/ngày = lương cố định / số ngày thực tế trong tháng đó.
      */
-    function payroll_compute($settings, $record, $total_hours, $absence_days, $period)
+    function payroll_compute($settings, $record, $total_hours, $absence_days, $period, $bonus_total = 0)
     {
         $advance = (float) $record['advance_amount'];
 
@@ -46,7 +49,8 @@ if ( ! function_exists('payroll_compute'))
         }
 
         $result['advance_amount'] = $advance;
-        $result['net_salary'] = $result['gross_salary'] - $advance;
+        $result['bonus_total'] = (float) $bonus_total;
+        $result['net_salary'] = $result['gross_salary'] - $advance + $result['bonus_total'];
         $result['paid_status'] = $record['paid_status'];
         $result['note'] = isset($record['note']) ? $record['note'] : NULL;
 
