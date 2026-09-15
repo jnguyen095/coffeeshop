@@ -64,6 +64,7 @@
           <option value="cái" <?php echo ($item && $item['base_unit']==='cái') ? 'selected' : ''; ?>>cái</option>
           <option value="lát" <?php echo ($item && $item['base_unit']==='lát') ? 'selected' : ''; ?>>lát</option>
           <option value="lá" <?php echo ($item && $item['base_unit']==='lá') ? 'selected' : ''; ?>>lá</option>
+          <option value="ly" <?php echo ($item && $item['base_unit']==='ly') ? 'selected' : ''; ?>>ly</option>
         </select>
         <div class="form-text">Chỉ cần khi nguyên liệu này dùng trong công thức pha chế (VD: 1000ML/Chai → ml, ống hút → 1 cái, chanh → 1 lát).</div>
       </div>

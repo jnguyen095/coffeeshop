@@ -64,7 +64,7 @@ class Recipes extends MY_Controller
         $this->load->view('layout/footer');
     }
 
-    private $valid_units = array('ml', 'g', 'cái', 'lát', 'lá');
+    private $valid_units = array('ml', 'g', 'cái', 'lát', 'lá', 'ly');
 
     public function edit($id)
     {
