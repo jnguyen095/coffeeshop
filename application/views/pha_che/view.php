@@ -1,5 +1,10 @@
 <div class="container py-3 py-md-4" style="max-width:600px;">
   <a href="<?php echo site_url('pha-che'); ?>" class="btn btn-sm btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> Pha chế</a>
+
+  <?php if ($recipe['image']): ?>
+    <img src="<?php echo base_url('assets/'.$recipe['image']); ?>" class="w-100 rounded-4 shadow-sm mb-3" style="max-height:260px;object-fit:cover;" alt="">
+  <?php endif; ?>
+
   <h4 class="fw-bold mb-3"><?php echo htmlspecialchars($recipe['name']); ?></h4>
 
   <div class="card border-0 shadow-sm rounded-4 mb-3">

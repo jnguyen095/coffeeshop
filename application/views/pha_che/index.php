@@ -15,9 +15,15 @@
     <?php foreach ($recipes as $r): ?>
       <div class="col">
         <a href="<?php echo site_url('pha-che/'.$r['id']); ?>" class="text-decoration-none">
-          <div class="card border-0 shadow-sm rounded-4 h-100">
-            <div class="card-body text-center d-flex flex-column justify-content-center align-items-center py-4">
-              <i class="bi bi-cup-hot-fill fs-1 text-brand mb-2"></i>
+          <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+            <?php if ($r['image']): ?>
+              <img src="<?php echo base_url('assets/'.$r['image']); ?>" class="card-img-top" style="height:120px;object-fit:cover;" alt="">
+            <?php else: ?>
+              <div class="d-flex align-items-center justify-content-center bg-light" style="height:120px;">
+                <i class="bi bi-cup-hot-fill fs-1 text-brand"></i>
+              </div>
+            <?php endif; ?>
+            <div class="card-body text-center py-3">
               <div class="fw-semibold text-dark"><?php echo htmlspecialchars($r['name']); ?></div>
             </div>
           </div>

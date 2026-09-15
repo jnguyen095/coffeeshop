@@ -14,7 +14,16 @@
 
   <div class="card border-0 shadow-sm rounded-4 mb-3">
     <div class="card-body">
-      <?php echo form_open(current_url()); ?>
+      <?php echo form_open(current_url(), array('enctype' => 'multipart/form-data')); ?>
+        <div class="mb-3">
+          <label class="form-label">Hình ảnh</label>
+          <div class="d-flex align-items-center gap-3">
+            <img id="recipeImagePreview" src="<?php echo $recipe['image'] ? base_url('assets/'.$recipe['image']) : ''; ?>"
+                 class="rounded border <?php echo $recipe['image'] ? '' : 'd-none'; ?>" style="width:88px;height:88px;object-fit:cover;">
+            <input type="file" name="image" accept="image/png,image/jpeg,image/webp" class="form-control" onchange="previewRecipeImage(this);">
+          </div>
+          <div class="form-text">Ảnh JPG/PNG/WEBP, tối đa 2MB. Hiện trên thẻ công thức ở /pha-che. Để trống nếu không đổi ảnh.</div>
+        </div>
         <div class="row g-2 align-items-end mb-2">
           <div class="col-sm-7">
             <label class="form-label">Tên món</label>
@@ -173,3 +182,12 @@
     </div>
   </div>
 </div>
+
+<script>
+function previewRecipeImage(input){
+  if (!input.files || !input.files[0]) return;
+  var img = document.getElementById('recipeImagePreview');
+  img.src = URL.createObjectURL(input.files[0]);
+  img.classList.remove('d-none');
+}
+</script>

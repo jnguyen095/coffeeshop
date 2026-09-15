@@ -17,10 +17,17 @@ class Inventory_item_model extends CI_Model
     /**
      * $stock_status: 'LOW' (sắp hết hàng — tồn < ngưỡng), 'OK' (đủ hàng —
      * tồn >= ngưỡng), hoặc NULL (không lọc theo tồn kho).
+     * $status: 'ACTIVE' (mặc định) | 'INACTIVE' | 'ALL' — dùng cho màn ADMIN
+     * xem lại/khôi phục sản phẩm đã xoá (xoá chỉ ẩn status=INACTIVE, không
+     * xoá hẳn dòng — xem delete()).
      */
-    public function get_all($category_id = NULL, $stock_status = NULL, $keyword = NULL)
+    public function get_all($category_id = NULL, $stock_status = NULL, $keyword = NULL, $status = 'ACTIVE')
     {
-        $this->_with_joins()->where('inventory_items.status', 'ACTIVE');
+        $this->_with_joins();
+        if ($status !== 'ALL')
+        {
+            $this->db->where('inventory_items.status', $status === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE');
+        }
 
         if ($category_id)
         {

@@ -34,15 +34,19 @@ class Inventory_items extends MY_Controller
         $category_id = $this->input->get('category_id');
         $stock_status = $this->input->get('stock_status'); // 'LOW' | 'OK' | rỗng = tất cả
         $keyword = trim((string) $this->input->get('q'));
+        // Lọc theo trạng thái (xem/khôi phục sản phẩm đã xoá) chỉ ADMIN mới
+        // thấy được trên UI — role khác luôn chỉ thấy sản phẩm ACTIVE.
+        $status = $this->current_user['role'] === 'ADMIN' ? ($this->input->get('status') ?: 'ACTIVE') : 'ACTIVE';
 
         $data = array(
             'page_title'    => 'Sản phẩm kho',
             'current_user'  => $this->current_user,
-            'items'         => $this->Inventory_item_model->get_all($category_id ?: NULL, $stock_status ?: NULL, $keyword ?: NULL),
+            'items'         => $this->Inventory_item_model->get_all($category_id ?: NULL, $stock_status ?: NULL, $keyword ?: NULL, $status),
             'categories'    => $this->Inventory_category_model->get_active(),
             'category_id'   => $category_id,
             'stock_status'  => $stock_status,
             'keyword'       => $keyword,
+            'status'        => $status,
         );
         $this->load->view('layout/header', $data);
         $this->load->view('inventory_items/index', $data);

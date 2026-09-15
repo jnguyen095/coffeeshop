@@ -86,8 +86,14 @@ class Recipes extends MY_Controller
             }
             else
             {
+                $image = $this->_handle_image_upload($error, $recipe['image']);
+            }
+
+            if ( ! $error)
+            {
                 $this->Recipe_model->update($id, array(
                     'name'           => $name,
+                    'image'          => $image,
                     'status'         => $this->input->post('status') === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE',
                     'yield_quantity' => ($yield_quantity !== NULL && $yield_quantity !== '') ? (float) $yield_quantity : NULL,
                     'yield_unit'     => $yield_unit,
@@ -150,6 +156,46 @@ class Recipes extends MY_Controller
         $this->load->view('layout/header', $data);
         $this->load->view('recipes/edit', $data);
         $this->load->view('layout/footer');
+    }
+
+    /**
+     * Ảnh công thức (tùy chọn) — trả về đường dẫn tương đối để lưu vào
+     * recipes.image, hoặc giữ nguyên $existing_image nếu không chọn file
+     * mới. Set $error (tham chiếu) và trả về NULL nếu upload lỗi. Cùng quy
+     * ước với Inventory_items::_handle_image_upload().
+     */
+    private function _handle_image_upload(&$error, $existing_image = NULL)
+    {
+        if (empty($_FILES['image']['name']))
+        {
+            return $existing_image;
+        }
+
+        $upload_dir = FCPATH.'assets/uploads/recipes/';
+        if ( ! is_dir($upload_dir))
+        {
+            mkdir($upload_dir, 0755, TRUE);
+        }
+
+        $this->load->library('upload', array(
+            'upload_path'   => $upload_dir,
+            'allowed_types' => 'jpg|jpeg|png|webp',
+            'max_size'      => 2048,
+            'encrypt_name'  => TRUE,
+        ));
+
+        if ( ! $this->upload->do_upload('image'))
+        {
+            $error = $this->upload->display_errors('', '');
+            return NULL;
+        }
+
+        if ($existing_image && is_file(FCPATH.'assets/'.$existing_image))
+        {
+            @unlink(FCPATH.'assets/'.$existing_image);
+        }
+
+        return 'uploads/recipes/'.$this->upload->data('file_name');
     }
 
     public function delete($id)
