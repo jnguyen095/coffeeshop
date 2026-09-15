@@ -8,9 +8,10 @@
         <div class="d-flex align-items-center gap-3">
           <img id="imagePreview" src="<?php echo ($product && $product['image']) ? base_url('assets/'.$product['image']) : ''; ?>"
                class="rounded border <?php echo ($product && $product['image']) ? '' : 'd-none'; ?>" style="width:88px;height:88px;object-fit:cover;">
-          <input type="file" name="image" accept="image/png,image/jpeg,image/webp" class="form-control" onchange="previewImage(this);">
+          <input type="file" name="image" accept="image/png,image/jpeg,image/webp" class="form-control" onchange="papHandleImageInput(this, 'imagePreview', 'imageStatus');">
         </div>
-        <div class="form-text">Ảnh JPG/PNG/WEBP, tối đa 2MB. Để trống nếu không đổi ảnh.</div>
+        <div class="form-text">Ảnh JPG/PNG/WEBP. Ảnh lớn (chụp từ điện thoại) sẽ tự động được nén nhỏ lại. Để trống nếu không đổi ảnh.</div>
+        <div id="imageStatus" class="form-text text-primary"></div>
       </div>
       <div class="col-6">
         <label class="form-label">Mã SKU</label>
@@ -70,11 +71,4 @@
     </div>
   <?php echo form_close(); ?>
 </div>
-<script>
-function previewImage(input){
-  if (!input.files || !input.files[0]) return;
-  var img = document.getElementById('imagePreview');
-  img.src = URL.createObjectURL(input.files[0]);
-  img.classList.remove('d-none');
-}
-</script>
+<script src="<?php echo base_url('assets/js/image-compress.js'); ?>"></script>

@@ -7,9 +7,10 @@
       <div class="d-flex align-items-center gap-3">
         <img id="imagePreview" src="<?php echo ($item && $item['image']) ? base_url('assets/'.$item['image']) : ''; ?>"
              class="rounded border <?php echo ($item && $item['image']) ? '' : 'd-none'; ?>" style="width:88px;height:88px;object-fit:cover;">
-        <input type="file" name="image" accept="image/png,image/jpeg,image/webp" class="form-control" onchange="previewImage(this);">
+        <input type="file" name="image" accept="image/png,image/jpeg,image/webp" class="form-control" onchange="papHandleImageInput(this, 'imagePreview', 'imageStatus');">
       </div>
-      <div class="form-text">Ảnh JPG/PNG/WEBP, tối đa 2MB. Để trống nếu không đổi ảnh.</div>
+      <div class="form-text">Ảnh JPG/PNG/WEBP. Ảnh lớn (chụp từ điện thoại) sẽ tự động được nén nhỏ lại. Để trống nếu không đổi ảnh.</div>
+      <div id="imageStatus" class="form-text text-primary"></div>
     </div>
     <div class="row g-3 mb-3">
       <div class="col-sm-6">
@@ -95,13 +96,8 @@
   <?php echo form_close(); ?>
 </div>
 
+<script src="<?php echo base_url('assets/js/image-compress.js'); ?>"></script>
 <script>
-function previewImage(input){
-  if (!input.files || !input.files[0]) return;
-  var img = document.getElementById('imagePreview');
-  img.src = URL.createObjectURL(input.files[0]);
-  img.classList.remove('d-none');
-}
 function toggleBaseUnitCost(){
   var has = document.getElementById('baseUnitSelect').value !== '';
   document.getElementById('baseUnitCostWrap').classList.toggle('d-none', !has);
