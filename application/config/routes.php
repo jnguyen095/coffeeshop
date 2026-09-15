@@ -103,6 +103,10 @@ $route['court-time-slots/create'] = 'court_time_slots/create';
 $route['court-time-slots/(:num)/edit'] = 'court_time_slots/edit/$1';
 $route['court-time-slots/(:num)/delete'] = 'court_time_slots/delete/$1';
 
+// Pha chế — xem công thức không kèm cost, cho nhân viên bar/bếp (khác /recipes của ADMIN)
+$route['pha-che'] = 'pha_che/index';
+$route['pha-che/(:num)'] = 'pha_che/view/$1';
+
 $route['recipes'] = 'recipes/index';
 $route['recipes/create'] = 'recipes/create';
 $route['recipes/(:num)/edit'] = 'recipes/edit/$1';

@@ -71,6 +71,9 @@
         <?php if ($can('bookings')): ?>
         <li class="nav-item"><a class="nav-link" href="<?php echo site_url('bookings'); ?>"><i class="bi bi-calendar-check"></i> Lịch sân</a></li>
         <?php endif; ?>
+        <?php if ($can('pha_che')): ?>
+        <li class="nav-item"><a class="nav-link" href="<?php echo site_url('pha-che'); ?>"><i class="bi bi-cup-straw"></i> Pha chế</a></li>
+        <?php endif; ?>
         <?php if ($can('kitchen')): ?>
         <!-- <li class="nav-item"><a class="nav-link" href="<?php echo site_url('kitchen'); ?>"><i class="bi bi-fire"></i> Bếp (KDS)</a></li> -->
         <?php endif; ?>
