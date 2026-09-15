@@ -340,7 +340,7 @@ class Inventory_items extends MY_Controller
     private function _form_data($sku, $image)
     {
         $base_unit = $this->input->post('base_unit');
-        $base_unit = in_array($base_unit, array('ml', 'g', 'cái', 'lát', 'lá', 'ly'), TRUE) ? $base_unit : NULL;
+        $base_unit = in_array($base_unit, array('ml', 'g', 'cái', 'lát', 'lá', 'ly', 'gói'), TRUE) ? $base_unit : NULL;
         $base_unit_cost = $this->input->post('base_unit_cost');
 
         return array(
