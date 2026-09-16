@@ -42,6 +42,7 @@
 
 <script>
 (function(){
+  var BASE_URL = '<?php echo base_url(); ?>';
   var categorySelect = document.getElementById('categorySelect');
   var searchInput = document.getElementById('searchInput');
   var itemsList = document.getElementById('itemsList');
@@ -92,6 +93,12 @@
 
   function fmt(n){ n = parseFloat(n); return (Math.round(n*100)/100).toString(); }
 
+  function imageHtml(it){
+    return it.image
+      ? '<img src="'+BASE_URL+'assets/'+it.image+'" class="rounded border flex-shrink-0" style="width:48px;height:48px;object-fit:cover;cursor:zoom-in;" onclick="papOpenImageLightbox(this);">'
+      : '<div class="d-flex align-items-center justify-content-center bg-light rounded border text-muted flex-shrink-0" style="width:48px;height:48px;"><i class="bi bi-box-seam"></i></div>';
+  }
+
   function renderItems(items){
     if (items.length === 0){
       itemsList.innerHTML = '<p class="text-muted small">Không tìm thấy sản phẩm.</p>';
@@ -104,6 +111,7 @@
       var val = enteredQty.hasOwnProperty(it.id) ? enteredQty[it.id] : systemQty;
       var lowStock = parseFloat(it.qty_on_hand) < parseFloat(it.low_stock_threshold);
       return '<div class="d-flex align-items-center gap-2 py-2 border-bottom">'+
+        imageHtml(it)+
         '<div class="flex-grow-1">'+
           '<div class="fw-semibold">'+it.name+'</div>'+
           '<div class="small text-muted">Hệ thống: <span class="fw-semibold '+(lowStock ? 'text-danger' : 'text-success')+'">'+systemQty+'</span> '+it.unit_name+'</div>'+
@@ -167,3 +175,4 @@
   loadItems(); // tải sẵn "Tất cả danh mục" khi vào trang
 })();
 </script>
+<script src="<?php echo base_url('assets/js/image-lightbox.js'); ?>"></script>
