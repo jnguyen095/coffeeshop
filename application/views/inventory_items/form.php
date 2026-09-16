@@ -6,7 +6,7 @@
       <label class="form-label">Hình ảnh sản phẩm</label>
       <div class="d-flex align-items-center gap-3">
         <img id="imagePreview" src="<?php echo ($item && $item['image']) ? base_url('assets/'.$item['image']) : ''; ?>"
-             class="rounded border <?php echo ($item && $item['image']) ? '' : 'd-none'; ?>" style="width:88px;height:88px;object-fit:cover;">
+             class="rounded border <?php echo ($item && $item['image']) ? '' : 'd-none'; ?>" style="width:88px;height:88px;object-fit:cover;cursor:zoom-in;" onclick="papOpenImageLightbox(this);">
         <input type="file" name="image" accept="image/png,image/jpeg,image/webp" class="form-control" onchange="papHandleImageInput(this, 'imagePreview', 'imageStatus');">
       </div>
       <div class="form-text">Ảnh JPG/PNG/WEBP. Ảnh lớn (chụp từ điện thoại) sẽ tự động được nén nhỏ lại. Để trống nếu không đổi ảnh.</div>
@@ -97,6 +97,7 @@
 </div>
 
 <script src="<?php echo base_url('assets/js/image-compress.js'); ?>"></script>
+<script src="<?php echo base_url('assets/js/image-lightbox.js'); ?>"></script>
 <script>
 function toggleBaseUnitCost(){
   var has = document.getElementById('baseUnitSelect').value !== '';

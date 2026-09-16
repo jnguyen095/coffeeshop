@@ -71,7 +71,7 @@
           <td><?php echo $stt++; ?></td>
           <td>
             <?php if ($it['image']): ?>
-              <img src="<?php echo base_url('assets/'.$it['image']); ?>" style="width:48px;height:48px;object-fit:cover;" class="rounded border">
+              <img src="<?php echo base_url('assets/'.$it['image']); ?>" style="width:48px;height:48px;object-fit:cover;cursor:zoom-in;" class="rounded border" onclick="papOpenImageLightbox(this);">
             <?php else: ?>
               <div class="d-flex align-items-center justify-content-center bg-light rounded border text-muted" style="width:48px;height:48px;"><i class="bi bi-box-seam"></i></div>
             <?php endif; ?>
@@ -112,3 +112,5 @@
     </table>
   </div>
 </div>
+
+<script src="<?php echo base_url('assets/js/image-lightbox.js'); ?>"></script>
