@@ -6,7 +6,7 @@ class Monthly_revenue_model extends CI_Model
 {
     protected $table = 'monthly_revenue';
 
-    const CATEGORIES = array('KHU_VUI_CHOI', 'NUOC_DO_AN', 'PICKLEBALL', 'PHOTOBOOTH');
+    const CATEGORIES = array('KHU_VUI_CHOI', 'NUOC_DO_AN', 'PICKLEBALL', 'PHOTOBOOTH', 'GRABFOOD');
 
     /** Mảng [category => row] cho 1 tháng — category chưa có dữ liệu sẽ không xuất hiện trong mảng trả về. */
     public function get_by_period($period)
