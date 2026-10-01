@@ -1,7 +1,10 @@
 <div class="container-fluid py-3 py-md-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="fw-bold mb-0">🌕 Đăng ký quà Trung Thu</h4>
-    <a href="<?php echo site_url('trung-thu'); ?>" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="bi bi-box-arrow-up-right"></i> Xem form đăng ký</a>
+    <div class="d-flex gap-2">
+      <a href="<?php echo site_url('trung-thu/admin/export'); ?>" class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-arrow-down"></i> Export Excel</a>
+      <a href="<?php echo site_url('trung-thu'); ?>" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="bi bi-box-arrow-up-right"></i> Xem form đăng ký</a>
+    </div>
   </div>
 
   <?php if ( ! empty($error)): ?>

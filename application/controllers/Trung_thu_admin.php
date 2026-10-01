@@ -129,4 +129,31 @@ class Trung_thu_admin extends MY_Controller
         $this->audit('trung_thu_registration', 'DELETE', $reg, NULL);
         redirect('trung-thu/admin');
     }
+
+    /** Xuất Excel (CSV) toàn bộ đăng ký — cột "Đã nhận quà" để trống, dùng in ra kiểm ở sự kiện. */
+    public function export()
+    {
+        $registrations = $this->Trung_thu_registration_model->get_all();
+
+        $this->output->set_content_type('text/csv');
+        header('Content-Disposition: attachment; filename="dang_ky_trung_thu_'.date('Ymd_His').'.csv"');
+        echo "\xEF\xBB\xBF";
+        $out = fopen('php://output', 'w');
+        fputcsv($out, array('STT', 'Thời gian đăng ký', 'Tên Ba/Mẹ', 'Số điện thoại', 'Số bé đăng ký', 'Đã nhận quà'));
+
+        $stt = 1;
+        foreach ($registrations as $r)
+        {
+            fputcsv($out, array(
+                $stt++,
+                date('d/m/Y H:i', strtotime($r['created_at'])),
+                $r['parent_name'],
+                // ="..." ép Excel hiểu là text, tránh mất số 0 đầu số điện thoại.
+                '="'.$r['phone'].'"',
+                (int) $r['kid_count'],
+                '', // Đã nhận quà - để trống, dùng khi in ra kiểm ở sự kiện
+            ));
+        }
+        fclose($out);
+    }
 }

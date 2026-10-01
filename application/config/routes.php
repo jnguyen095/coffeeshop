@@ -169,6 +169,7 @@ $route['trung-thu'] = 'public/trung_thu/index';
 $route['trung-thu/thank-you'] = 'public/trung_thu/thank_you';
 $route['trung-thu/thank-you/(:any)'] = 'public/trung_thu/thank_you/$1';
 $route['trung-thu/admin'] = 'trung_thu_admin/index';
+$route['trung-thu/admin/export'] = 'trung_thu_admin/export';
 $route['trung-thu/admin/(:num)/edit'] = 'trung_thu_admin/edit/$1';
 $route['trung-thu/admin/(:num)/delete'] = 'trung_thu_admin/delete/$1';
 
