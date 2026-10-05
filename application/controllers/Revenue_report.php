@@ -31,24 +31,31 @@ class Revenue_report extends MY_Controller
         $by_category = $this->Monthly_revenue_model->get_revenue_by_category($period);
         $total = array_sum($by_category);
 
+        // So với tháng trước — tháng trước luôn nằm trong $trend (12 tháng vừa lấy ở trên), không cần query thêm.
+        $prev_period = date('Y-m', strtotime($period.'-01 -1 month'));
+        $prev_by_category = isset($trend[$prev_period]) ? $trend[$prev_period]['by_category'] : array_fill_keys(Monthly_revenue_model::CATEGORIES, 0);
+
         $breakdown = array();
         foreach ($by_category as $category => $revenue)
         {
+            $prev_revenue = isset($prev_by_category[$category]) ? (float) $prev_by_category[$category] : 0;
             $breakdown[] = array(
-                'category' => $category,
-                'revenue'  => $revenue,
-                'percent'  => $total > 0 ? ($revenue / $total) * 100 : 0,
+                'category'      => $category,
+                'revenue'       => $revenue,
+                'percent'       => $total > 0 ? ($revenue / $total) * 100 : 0,
+                'change_label'  => revenue_change_label($revenue, $prev_revenue),
             );
         }
 
         $data = array(
-            'page_title'   => 'Báo cáo doanh thu',
-            'current_user' => $this->current_user,
-            'period'       => $period,
-            'periods'      => $periods,
-            'trend'        => $trend,
-            'breakdown'    => $breakdown,
-            'total'        => $total,
+            'page_title'          => 'Báo cáo doanh thu',
+            'current_user'        => $this->current_user,
+            'period'              => $period,
+            'periods'             => $periods,
+            'trend'               => $trend,
+            'breakdown'           => $breakdown,
+            'total'               => $total,
+            'total_change_label'  => revenue_change_label($total, array_sum($prev_by_category)),
         );
         $this->load->view('layout/header', $data);
         $this->load->view('revenue_report/index', $data);

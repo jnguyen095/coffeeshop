@@ -134,6 +134,40 @@ if ( ! function_exists('revenue_category_color'))
     }
 }
 
+if ( ! function_exists('revenue_change_label'))
+{
+    /**
+     * So với tháng trước — mảng ['text' => "Tăng 5%"/"Giảm 20%"/..., 'class' => CSS class màu chữ].
+     * $previous = 0 mà $current > 0 thì chưa có gì để tính % (chia cho 0) -> "Mới".
+     * Cả 2 = 0 -> không có dữ liệu để so sánh -> "—". Lệch dưới 0.05% coi như "Không đổi".
+     */
+    function revenue_change_label($current, $previous)
+    {
+        $current = (float) $current;
+        $previous = (float) $previous;
+
+        if ($previous <= 0)
+        {
+            return $current > 0
+                ? array('text' => 'Mới', 'class' => 'text-primary')
+                : array('text' => '—', 'class' => 'text-muted');
+        }
+
+        $change = (($current - $previous) / $previous) * 100;
+        $formatted = rtrim(rtrim(number_format(abs($change), 1, '.', ''), '0'), '.');
+
+        if ($change > 0.05)
+        {
+            return array('text' => 'Tăng '.$formatted.'%', 'class' => 'text-success');
+        }
+        if ($change < -0.05)
+        {
+            return array('text' => 'Giảm '.$formatted.'%', 'class' => 'text-danger');
+        }
+        return array('text' => 'Không đổi', 'class' => 'text-muted');
+    }
+}
+
 if ( ! function_exists('audit_module_label'))
 {
     /** Tên tiếng Việt cho module trong audit_logs — dùng cho màn nhật ký hệ thống. */

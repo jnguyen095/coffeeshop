@@ -69,7 +69,7 @@
     <div class="card-body">
       <h6 class="fw-bold mb-3">Chi tiết <?php echo mb_strtolower(payroll_period_label($period), 'UTF-8'); ?></h6>
       <table class="table table-sm mb-0">
-        <thead class="text-muted small"><tr><th>Danh mục</th><th class="text-end">Doanh thu</th><th class="text-end">Tỷ lệ</th></tr></thead>
+        <thead class="text-muted small"><tr><th>Danh mục</th><th class="text-end">Doanh thu</th><th class="text-end">Tỷ lệ</th><th class="text-end">So với tháng trước</th></tr></thead>
         <tbody>
         <?php foreach ($breakdown as $b): ?>
           <tr>
@@ -79,12 +79,14 @@
             </td>
             <td class="text-end"><?php echo money_format_vnd($b['revenue']); ?></td>
             <td class="text-end"><?php echo rtrim(rtrim(number_format($b['percent'], 1, '.', ''), '0'), '.'); ?>%</td>
+            <td class="text-end fw-semibold <?php echo $b['change_label']['class']; ?>"><?php echo $b['change_label']['text']; ?></td>
           </tr>
         <?php endforeach; ?>
         <tr class="fw-bold border-top">
           <td>Tổng</td>
           <td class="text-end"><?php echo money_format_vnd($total); ?></td>
           <td class="text-end">100%</td>
+          <td class="text-end <?php echo $total_change_label['class']; ?>"><?php echo $total_change_label['text']; ?></td>
         </tr>
         </tbody>
       </table>
